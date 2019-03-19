@@ -1,0 +1,8 @@
+{
+  "name": "nodejs-reactive-moviebase",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:sckv/nodejs-reactive-moviebase.git",
+  "author": "Konstantin Knyazev <konstantinknyazev@outlook.com>",
+  "license": "MIT"
+}

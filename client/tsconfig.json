@@ -1,0 +1,25 @@
+{
+  "extends": "../tsconfig.common.json",
+  "compilerOptions": {
+    "jsx": "react",
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "strictBindCallApply": true,
+    "outDir": "build",
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["src/app/*"],
+      "@src/*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["../node_modules", "build", "src/**/*.test.tsx"]
+}
