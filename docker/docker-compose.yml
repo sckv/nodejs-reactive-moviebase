@@ -1,0 +1,31 @@
+version: '3.6'
+services:
+  mongo:
+    image: mongo:4.0.6-xenial
+    restart: on-failure
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: exampl
+    networks:
+      - backend
+
+  node:
+    context: ./node
+    networks:
+      - backend
+
+  envoy:
+    image: envoyproxy/envoy:latest
+    expose:
+      - 80:80
+      - 443:443
+    networks:
+      - backend
+
+volumes:
+  data:
+    driver: local
+
+networks:
+  backend:
+    network_mode: bridge
