@@ -17,7 +17,7 @@
     "preserveConstEnums": true,
     "removeComments": true,
     "pretty": true,
-    "resolveJsonModule": false,
+    "resolveJsonModule": true,
     "importHelpers": false
   },
   "plugins": [

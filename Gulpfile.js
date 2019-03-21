@@ -14,12 +14,7 @@ gulp.task('build:client', () => {
   return gulp
     .src(path.join(frontPath, 'build'), {read: false, allowEmpty: true})
     .pipe(clean())
-    .pipe(
-      webpackStream(
-        require(path.join(frontPath, 'config/webpack.gulp.js')),
-        webpack,
-      ),
-    )
+    .pipe(webpackStream(require(path.join(frontPath, 'config/webpack.gulp.js')), webpack))
     .pipe(gulp.dest(path.join(frontPath, 'build')))
     .pipe(tsProject.src().pipe(tsProject()))
     .js.pipe(
@@ -28,4 +23,20 @@ gulp.task('build:client', () => {
       }),
     )
     .pipe(gulp.dest(path.join(frontPath, 'build')));
+});
+
+gulp.task('start:server', () => {
+  const backPath = path.join(__dirname, 'server');
+  const tsProject = ts.createProject(path.join(backPath, 'tsconfig.json'));
+  // console.log(backPath, tsProject.src());
+  return gulp
+    .src(path.join(backPath, 'build'), {base: './server', read: true, allowEmpty: true})
+    .pipe(clean())
+    .pipe(tsProject.src().pipe(tsProject()))
+    .js.pipe(
+      babel({
+        configFile: path.join(__dirname, 'babel.config.back.js'),
+      }),
+    )
+    .pipe(gulp.dest(path.join(backPath, 'build')));
 });
