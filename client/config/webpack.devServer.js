@@ -28,6 +28,4 @@ const devServerConfig = {
 webpackDevServer.addDevServerEntrypoints(webpackConfig, devServerConfig);
 const compiler = webpack(webpackConfig);
 const server = new webpackDevServer(compiler, devServerConfig);
-server.listen(port, '127.0.0.1', () =>
-  green(`Webpack dev server listening at: http://localhost:${port}`),
-);
+server.listen(port, '127.0.0.1', () => green(`Webpack dev server listening at: http://localhost:${port}`));

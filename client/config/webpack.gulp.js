@@ -79,7 +79,6 @@ module.exports = require('./webpack.config.gulp')({
   ],
 
   performance: {
-    assetFilter: assetFilename =>
-      !/(\.map$)|(^(main\.|favicon\.))/.test(assetFilename),
+    assetFilter: assetFilename => !/(\.map$)|(^(main\.|favicon\.))/.test(assetFilename),
   },
 });

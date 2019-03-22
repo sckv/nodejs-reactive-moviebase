@@ -13,7 +13,8 @@
     "prettify": "prettier --write \"**/{src,__tests__}/**/*.{ts,tsx,js}\"",
     "lint:ts:client": "cd client && tslint --fix -p tsconfig.json -c tslint.json '{src,__tests__}/**/*.{tsx,ts}'",
     "start": "node index",
-    "transpile": "cd client && tsc",
+    "transpile:client": "cd client && tsc",
+    "transpile:server": "cd server && tsc",
     "resolve": "cd client && babel build --out-dir build"
   },
   "engines": {
@@ -40,7 +41,8 @@
     "react-dom": "^16.8.4",
     "react-hot-loader": "^4.8.0",
     "react-router-dom": "^5.0.0",
-    "react-select": "^2.4.2"
+    "react-select": "^2.4.2",
+    "spdy": "^4.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.3",
