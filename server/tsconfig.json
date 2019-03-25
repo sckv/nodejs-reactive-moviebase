@@ -2,13 +2,15 @@
   "extends": "../tsconfig.common.json",
   "compilerOptions": {
     "module": "commonjs",
-    "outDir": "build/src",
+    "target": "es6",
+    "outDir": "build",
     "checkJs": false,
     "strict": false,
     "noImplicitAny": false,
     "strictNullChecks": false,
     "strictFunctionTypes": false,
     "strictPropertyInitialization": false,
+    "rootDir": "src",
     "baseUrl": ".",
     "paths": {
       "@config/*": ["src/config/*"],
@@ -16,5 +18,5 @@
     }
   },
   "include": ["src/**/*"],
-  "exclude": ["../node_modules", "build", "__tests__/**/*"]
+  "exclude": ["build", "__tests__/**/*"]
 }

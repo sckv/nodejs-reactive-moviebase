@@ -6,7 +6,7 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const tsconfigPath = path.join(process.cwd(), 'client/tsconfig.json');
 
-module.exports = require('./webpack.config.gulp')({
+module.exports = require('./webpack.config.gulp.js')({
   mode: 'production',
   bail: true,
   entry: [path.resolve('client', 'src/index.tsx')],
