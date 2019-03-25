@@ -7,25 +7,33 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: exampl
     networks:
-      - backend
+      - backendmesh
 
   node:
     context: ./node
     networks:
-      - backend
+      - backendmesh
 
   envoy:
-    image: envoyproxy/envoy:latest
+    context: ./envoy
     expose:
       - 80:80
       - 443:443
     networks:
-      - backend
+      - backendmesh
+    command: /usr/local/bin/envoy -c /etc/envoy.yaml
+    volumes:
+      - ./envoy/envoy.yaml:/etc/envoy.yaml
+
+
+  front:
+    context: ./nginx
+    networks:
+      - backendmesh
 
 volumes:
   data:
     driver: local
 
 networks:
-  backend:
-    network_mode: bridge
+  backendmesh: {}
