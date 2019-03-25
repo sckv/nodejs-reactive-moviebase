@@ -43,7 +43,6 @@
     "react-dom": "^16.8.5",
     "react-hot-loader": "^4.8.0",
     "react-router-dom": "^5.0.0",
-    "react-select": "^2.4.2",
     "spdy": "^4.0.0"
   },
   "devDependencies": {
@@ -81,9 +80,11 @@
     "gulp-typescript": "^5.0.1",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
+    "husky": "^1.3.1",
     "image-webpack-loader": "^4.6.0",
     "imports-loader": "^0.8.0",
     "jest": "^24.5.0",
+    "lint-staged": "^8.1.5",
     "node-sass": "^4.11.0",
     "nodemon": "^1.18.10",
     "null-loader": "^0.1.1",
