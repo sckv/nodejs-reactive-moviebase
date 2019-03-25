@@ -6,37 +6,57 @@ const ts = require('gulp-typescript');
 const clean = require('gulp-clean');
 const webpackStream = require('webpack-stream');
 const webpack = require('webpack');
+const nodemon = require('gulp-nodemon');
+
+const frontPath = path.join(process.cwd(), 'client');
+const tsFrontProject = ts.createProject(path.join(frontPath, 'tsconfig.json'));
+const buildFrontPath = path.join(frontPath, 'build');
+
+const backPath = path.join(process.cwd(), 'server');
+const buildBackPath = path.join(backPath, 'build');
+const tsBackProject = ts.createProject(path.join(backPath, 'tsconfig.json'));
 
 gulp.task('build:client', () => {
-  const frontPath = path.join(process.cwd(), 'client');
-  const tsProject = ts.createProject(path.join(frontPath, 'tsconfig.json'));
-
   return gulp
-    .src(path.join(frontPath, 'build'), {read: false, allowEmpty: true})
+    .src(buildFrontPath, {read: false, allowEmpty: true})
     .pipe(clean())
     .pipe(webpackStream(require(path.join(frontPath, 'config/webpack.gulp.js')), webpack))
-    .pipe(gulp.dest(path.join(frontPath, 'build')))
-    .pipe(tsProject.src().pipe(tsProject()))
+    .pipe(gulp.dest(buildFrontPath))
+    .pipe(tsFrontProject.src())
+    .pipe(tsFrontProject())
     .js.pipe(
       babel({
-        configFile: path.join(__dirname, 'babel.config.front.js'),
+        configFile: path.join(process.cwd(), 'babel.config.front.js'),
       }),
     )
-    .pipe(gulp.dest(path.join(frontPath, 'build')));
+    .pipe(gulp.dest(buildFrontPath));
 });
 
-gulp.task('start:server', () => {
-  const backPath = path.join(__dirname, 'server');
-  const tsProject = ts.createProject(path.join(backPath, 'tsconfig.json'));
-  // console.log(backPath, tsProject.src());
+gulp.task('compile:server', () => {
   return gulp
-    .src(path.join(backPath, 'build'), {base: './server', read: true, allowEmpty: true})
+    .src(buildBackPath, {read: true, allowEmpty: true})
     .pipe(clean())
-    .pipe(tsProject.src().pipe(tsProject()))
+    .pipe(tsBackProject.src())
+    .pipe(tsBackProject())
     .js.pipe(
       babel({
-        configFile: path.join(__dirname, 'babel.config.back.js'),
+        configFile: path.join(process.cwd(), 'babel.config.back.js'),
       }),
     )
-    .pipe(gulp.dest(path.join(backPath, 'build')));
+    .pipe(gulp.dest(buildBackPath));
 });
+
+gulp.task('nodemon:server', () => {
+  return nodemon({
+    script: 'server/build/start.js',
+    watch: 'server/src',
+    ext: 'ts',
+    tasks: ['compile:server'], // compile synchronously onChange
+    done: false,
+  });
+});
+
+// gulp.task('watch:server', () => {
+// eslint-disable-next-line security/detect-non-literal-fs-filename
+// gulp.watch(path.join(backPath, 'src'), gulp.series('compile:server', 'nodemon:server'));
+// });
