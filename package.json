@@ -113,12 +113,5 @@
     "webpack-cli": "^3.3.0",
     "webpack-dev-server": "^3.2.1",
     "webpack-stream": "^5.2.1"
-  },
-  "nodemonConfig": {
-    "ignore": [
-      "test/*",
-      "docs/*"
-    ],
-    "delay": "2500"
   }
 }
