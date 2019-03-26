@@ -11,11 +11,17 @@ const options = {
   cert: fs.readFileSync(path.join(backPath, 'cert/server.crt')),
 };
 
-spdy.createServer(options, app).listen(port, error => {
-  if (error) {
-    console.error(error);
-    return process.exit(1);
-  } else {
-    console.log('Listening on port: ' + port + '.');
-  }
-});
+try {
+  fs.readdirSync(path.join(__dirname, 'routes')).map(file => {
+    require('./routes/' + file)(app);
+  });
+} catch (error) {
+  console.error('Error loading routes!', error);
+  process.exit(1);
+}
+
+export const ignite = () => {
+  return spdy.createServer(options, app).listen(port, () => {
+    if (process.env.NODE_ENV !== 'test') console.log(`Example app listening on ${port} port and host!`);
+  });
+};
