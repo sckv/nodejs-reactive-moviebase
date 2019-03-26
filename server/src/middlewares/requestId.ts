@@ -7,5 +7,6 @@ export const uniqueRequestId: CustomRequestHandler = (request, response, next) =
   if (!request.headers['user-agent']) response.status(403).end();
   const id = uuidv1();
   request.id = id;
+  response.header('X-Request-ID', id);
   next();
 };
