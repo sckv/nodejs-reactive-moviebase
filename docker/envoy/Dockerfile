@@ -1,4 +1,4 @@
-FROM envoyproxy/envoy-dev:latest
+FROM envoyproxy/envoy-alpine:latest
 
 RUN apt-get update && apt-get upgrade -y
 
