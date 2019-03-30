@@ -54,16 +54,16 @@ class RedisServiceClass {
     }
 
     return {
-      ee: this.emitter,
+      consume: this.emitter.on,
       force: () => this.pushToListeners(hash),
     };
   }
 
-  public unsubscribeFrom(hash: string, cb: () => void) {
+  public unsubscribeFrom(hash: string, listener: (...args: any[]) => void) {
     const indexOfHash = this.subscriptionsList.indexOf(hash);
     if (indexOfHash > -1) {
       this.subscriptionsList.splice(indexOfHash, 1);
-      this.emitter.removeListener(hash, cb);
+      this.emitter.removeListener(hash, listener);
       return true;
     }
     return false;
@@ -80,8 +80,8 @@ export interface RedisService {
   subscribeTo(
     hash: string,
   ): {
-    ee: EventEmitter;
-    force: () => Promise<void>;
+    consume(event: string | symbol, listener: (...args: any[]) => void): void;
+    force(): Promise<void>;
   };
-  unsubscribeFrom(hash: string, cb: () => void): boolean;
+  unsubscribeFrom(hash: string, listener: (...args: any[]) => void): boolean;
 }
