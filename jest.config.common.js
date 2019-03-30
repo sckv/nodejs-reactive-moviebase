@@ -10,7 +10,7 @@ module.exports = dir => ({
   rootDir: abs(`.`),
   // testRegex: '(client/src/.*(\\.| /)(test|spec))\\.(tsx?)$',
   //(${dir}/__tests__/.*|\\.(test|spec))\\.(ts|tsx)$
-  testMatch: [`${dir}/__tests__/**/*.test.(ts|tsx)`], // uncomment if you want keep tests in __tests__ folder
+  testMatch: [__dirname + `/${dir}/__tests__/**/*.test.(ts|tsx)`], // uncomment if you want keep tests in __tests__ folder
   resetMocks: true,
   moduleNameMapper: {
     '@src(.*)': `<rootDir>/${dir}/src/$1`,
