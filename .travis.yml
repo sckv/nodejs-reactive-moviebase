@@ -13,5 +13,5 @@ before_install:
 cache: yarn
 
 script:
-  - yarn test:back
-  - yarn test:front
+  - yarn test:server
+  - yarn test:client
