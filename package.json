@@ -42,6 +42,7 @@
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "express-pino-logger": "^4.0.0",
+    "fast-deep-equal": "^2.0.1",
     "helmet": "^3.16.0",
     "ioredis": "^4.9.0",
     "lodash": "^4.17.11",
