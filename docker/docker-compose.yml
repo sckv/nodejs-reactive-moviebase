@@ -8,14 +8,18 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: exampl
     networks:
       - backendmesh
+    tty: true
 
   node:
     context: ./node
+    restart: on-failure
     networks:
       - backendmesh
+    tty: true
 
   envoy:
     context: ./envoy
+    restart: on-failure
     expose:
       - 80:80
       - 443:443
@@ -24,12 +28,20 @@ services:
     command: /usr/local/bin/envoy -c /etc/envoy.yaml
     volumes:
       - ./envoy/envoy.yaml:/etc/envoy.yaml
-
+    tty: true
 
   front:
     context: ./nginx
+    restart: on-failure
     networks:
       - backendmesh
+    volumes:
+      - ~/nginx_certs:/etc/nginx/certs
+      - ~/letsencrypt_www:/var/www/letsencrypt
+      - ~/app:/var/www
+      - ~/app-logs/nginx:/var/log/nginx
+      - ./nginx/sites:/etc/nginx/sites-available
+    tty: true
 
 volumes:
   data:
