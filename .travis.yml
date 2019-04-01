@@ -7,10 +7,7 @@ git:
   depth: 3
 
 env:
-  - NODE_ENV=test
-  - REDIS_PORT=6379
-  - REDIS_HOST=localhost
-  - REDIS_DB=0
+  - NODE_ENV=test REDIS_PORT=6379 REDIS_HOST=localhost  REDIS_DB=0
 
 services:
   - redis-server
