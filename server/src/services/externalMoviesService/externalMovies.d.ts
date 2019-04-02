@@ -9,6 +9,17 @@ export interface MovieSearchResult {
   };
 }
 
+export interface TranslatedText {
+  data: {
+    translations: [
+      {
+        translatedText: string;
+        model: 'nmt';
+      }
+    ];
+  };
+}
+
 export interface IMDBMoviesResponse {
   l: string;
   id: string;
