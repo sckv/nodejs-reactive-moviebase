@@ -19,7 +19,9 @@
     "start": "node index",
     "transpile:client": "cd client && tsc",
     "transpile:server": "cd server && tsc",
-    "resolve": "cd client && babel build --out-dir build"
+    "resolve": "cd client && babel build --out-dir build",
+    "run:test": "cross-env REDIS_PORT=6379 REDIS_HOST=localhost REDIS_DB=0 node server/build/services/cachingService.js"
+
   },
   "engines": {
     "node": ">=10.0.0"
@@ -77,6 +79,7 @@
     "chalk": "^2.4.2",
     "cross-env": "^5.2.0",
     "css-loader": "^2.1.1",
+    "dotenv": "^7.0.0",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.1.0",
     "eslint-plugin-import": "^2.16.0",

@@ -3,10 +3,10 @@ import EventEmitter from 'events';
 
 const {REDIS_PORT, REDIS_HOST, REDIS_DB} = process.env;
 
-const RedisPoller = ioredis({
-  port: +REDIS_PORT,
-  host: REDIS_HOST,
-  db: +REDIS_DB,
+const RedisPoller = new ioredis({
+  port: +REDIS_PORT || 6379,
+  host: REDIS_HOST || 'localhost',
+  db: +REDIS_DB || 0,
 });
 
 export const REDIS_CACHE_KEY_PREFIX = 'cache:';
