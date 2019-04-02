@@ -11,7 +11,7 @@
     "test:client": "cross-env NODE_ENV=test jest --config=jest.config.client.js",
     "test:client:coverage": "cross-env NODE_ENV=test jest --config=jest.config.client.js --coverage",
     "test:client:watch": "cross-env NODE_ENV=test jest --config=jest.config.client.js --watchAll",
-    "test:server": "cross-env NODE_ENV=test jest --config=jest.config.server.js",
+    "test:server": "cross-env NODE_ENV=test jest --config=jest.config.server.js --forceExit",
     "test:server:coverage": "cross-env NODE_ENV=test jest --config=jest.config.server.js --coverage",
     "test:server:watch": "cross-env NODE_ENV=test jest --config=jest.config.server.js --watchAll",
     "prettify": "prettier --write \"**/{src,__tests__}/**/*.{ts,tsx,js}\"",
@@ -19,7 +19,9 @@
     "start": "node index",
     "transpile:client": "cd client && tsc",
     "transpile:server": "cd server && tsc",
-    "resolve": "cd client && babel build --out-dir build"
+    "resolve": "cd client && babel build --out-dir build",
+    "run:test": "cross-env REDIS_PORT=6379 REDIS_HOST=localhost REDIS_DB=0 node server/build/services/cachingService.js"
+
   },
   "engines": {
     "node": ">=10.0.0"
@@ -42,6 +44,7 @@
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "express-pino-logger": "^4.0.0",
+    "fast-deep-equal": "^2.0.1",
     "helmet": "^3.16.0",
     "ioredis": "^4.9.0",
     "lodash": "^4.17.11",
@@ -76,6 +79,7 @@
     "chalk": "^2.4.2",
     "cross-env": "^5.2.0",
     "css-loader": "^2.1.1",
+    "dotenv": "^7.0.0",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.1.0",
     "eslint-plugin-import": "^2.16.0",

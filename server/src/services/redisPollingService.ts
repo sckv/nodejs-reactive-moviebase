@@ -3,14 +3,13 @@ import EventEmitter from 'events';
 
 const {REDIS_PORT, REDIS_HOST, REDIS_DB} = process.env;
 
-const RedisListener = ioredis({
-  port: +REDIS_PORT,
-  host: REDIS_HOST,
-  db: +REDIS_DB,
+const RedisPoller = new ioredis({
+  port: +REDIS_PORT || 6379,
+  host: REDIS_HOST || 'localhost',
+  db: +REDIS_DB || 0,
 });
-const RedisPoller = RedisListener.duplicate();
 
-const REDIS_CACHE_KEY_PREFIX = 'cache:';
+export const REDIS_CACHE_KEY_PREFIX = 'cache:';
 
 class RedisServiceClass {
   private static _instance: RedisServiceClass;
@@ -21,11 +20,6 @@ class RedisServiceClass {
 
   constructor() {
     this.rPoller = RedisPoller;
-    // DOES THIS COME HERE?
-    this.rListener = RedisListener;
-    this.rListener.on('ready', () => {
-      this.rListener.config('SET', 'notify-keyspace-events', 'Ex');
-    });
     this.eventsHandler();
   }
 

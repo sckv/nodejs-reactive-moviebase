@@ -2,10 +2,15 @@ dist: xenial
 language: node_js
 node_js:
   - "11"
+
 git:
   depth: 3
+
 env:
-  - NODE_ENV=test
+  - NODE_ENV=test REDIS_PORT=6379 REDIS_HOST=localhost  REDIS_DB=0
+
+services:
+  - redis-server
 
 before_install:
   - curl -o- -L https://yarnpkg.com/install.sh | bash
