@@ -10,7 +10,7 @@ module.exports = dir => ({
   rootDir: abs(`.`),
   // testRegex: '(client/src/.*(\\.| /)(test|spec))\\.(tsx?)$',
   //(${dir}/__tests__/.*|\\.(test|spec))\\.(ts|tsx)$
-  testMatch: [__dirname + `/${dir}/__tests__/**/*.test.(ts|tsx)`], // uncomment if you want keep tests in __tests__ folder
+  testMatch: [abs(`.`) + `/${dir}/__tests__/**/*.test.(ts|tsx)`], // uncomment if you want keep tests in __tests__ folder
   setupFiles: ['dotenv/config'],
   resetMocks: true,
   moduleNameMapper: {
