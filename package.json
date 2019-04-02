@@ -21,7 +21,6 @@
     "transpile:server": "cd server && tsc",
     "resolve": "cd client && babel build --out-dir build",
     "run:test": "cross-env REDIS_PORT=6379 REDIS_HOST=localhost REDIS_DB=0 node server/build/services/cachingService.js"
-
   },
   "engines": {
     "node": ">=10.0.0"
@@ -48,6 +47,7 @@
     "helmet": "^3.16.0",
     "ioredis": "^4.9.0",
     "lodash": "^4.17.11",
+    "qs": "^6.7.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-hot-loader": "^4.8.1",
@@ -65,11 +65,14 @@
     "@types/jest": "^24.0.11",
     "@types/lodash": "^4.14.123",
     "@types/node": "^11.12.2",
+    "@types/qs": "^6.5.2",
     "@types/react": "^16.8.10",
     "@types/react-dom": "^16.8.3",
     "@types/react-router": "^4.4.5",
     "@types/react-router-dom": "^4.3.1",
     "@types/react-select": "^2.0.15",
+    "@types/request": "^2.48.1",
+    "@types/request-promise-native": "^1.0.15",
     "@types/spdy": "^3.4.4",
     "@types/uuid": "^3.4.4",
     "@types/webpack": "^4.4.26",
