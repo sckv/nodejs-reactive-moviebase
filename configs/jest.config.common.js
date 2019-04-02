@@ -5,7 +5,7 @@ module.exports = dir => ({
   verbose: true,
   moduleFileExtensions: ['ts', 'tsx', 'js', 'json', 'jsx'],
   transform: {
-    '^.+\\.(ts|tsx)$': abs('preprocessor.js'),
+    '^.+\\.(ts|tsx)$': abs('configs/preprocessor.js'),
   },
   rootDir: abs(`.`),
   // testRegex: '(client/src/.*(\\.| /)(test|spec))\\.(tsx?)$',
