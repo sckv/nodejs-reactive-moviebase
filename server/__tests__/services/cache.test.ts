@@ -1,5 +1,6 @@
 import ioredis from 'ioredis';
-import {hashUrl} from '../../src/utils/hashUrl';
+import {hashUrl, jsonSafeParse} from '../../src/utils';
+
 import {cachingService} from '../../src/services/cachingService';
 
 const {REDIS_PORT, REDIS_HOST, REDIS_DB} = process.env;
@@ -22,7 +23,7 @@ describe('<-- Cache service -->', () => {
     redis.disconnect();
   });
 
-  it('receive and decode payload', async () => {
+  it('receive and decode payload', async done => {
     const fixture = {url: '/test', data: {test: 'object', nice: ['array']}};
 
     await new Promise(resolve =>
@@ -38,9 +39,10 @@ describe('<-- Cache service -->', () => {
       setTimeout(async () => {
         const [data, url] = await redis.hmget(hashedUrl, 'data', 'url');
         if (!data || !url) fail();
-        expect(JSON.parse(data)).toEqual(fixture.data);
+        expect(jsonSafeParse(data)).toEqual(fixture.data);
         expect(url).toEqual(fixture.url);
         resolve();
+        done();
       }, 3000),
     );
   }, 6000);

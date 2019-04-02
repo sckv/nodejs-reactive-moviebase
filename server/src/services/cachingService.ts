@@ -1,7 +1,9 @@
-import ioredis from 'ioredis';
 import isEqual from 'fast-deep-equal';
+import ioredis from 'ioredis';
+
 import {hashUrl} from '../utils/hashUrl';
 import {REDIS_CACHE_KEY_PREFIX} from './redisPollingService';
+import {jsonSafeParse} from '@src/utils/jsonSafeParse';
 
 const {REDIS_PORT, REDIS_HOST, REDIS_DB} = process.env;
 
@@ -20,29 +22,25 @@ RedisConnection.on('ready', () => {
 export const cachingService = () => {
   RedisSubscription.on('message', async (channel, message) => {
     if (channel !== 'digest:cache') return;
-    try {
-      const {data, url} = JSON.parse(message);
-      const prefixedUrl = REDIS_CACHE_KEY_PREFIX + hashUrl(url);
-      const oldEntry = await RedisConnection.hmget(prefixedUrl, 'data');
 
-      if ((oldEntry.length && !oldEntry[0]) || !isEqual(JSON.parse(oldEntry), data)) {
-        try {
-          //@ts-ignore
-          await RedisConnection.hset(prefixedUrl, 'url', url, 'data', JSON.stringify(data));
-          // DO WE NEED IT HERE?
-          // await RedisConnection.expire(prefixedUrl, 60);
-        } catch (e) {
-          console.log('Error at cache refill', e);
-        }
-      }
-    } catch (e) {
-      console.log('Error parsing message', e);
+    const {data, url} = jsonSafeParse<CacheDigestableMessage>(message);
+    const prefixedUrl = REDIS_CACHE_KEY_PREFIX + hashUrl(url);
+    const oldEntry = await RedisConnection.hget(prefixedUrl, 'data');
+    if (oldEntry && isEqual(jsonSafeParse(oldEntry), data)) {
+      //TODO: CHANGE FOR PINO
+      console.log('cache:digest contents are the same', data, oldEntry);
+      return;
     }
-  });
 
-  RedisSubscription.subscribe('digest:cache', () => {
-    console.log('SUBSCRIBED TO digest:cache');
+    //@ts-ignore
+    await RedisConnection.hset(prefixedUrl, 'url', url, 'data', JSON.stringify(data));
+    // DO WE NEED IT HERE?
+    // await RedisConnection.expire(prefixedUrl, 60);
   });
+  RedisSubscription.subscribe('digest:cache');
 };
 
-// cachingService();
+interface CacheDigestableMessage {
+  data: {[k: string]: any};
+  url: string;
+}
