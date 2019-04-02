@@ -18,7 +18,7 @@ export const searchMovies = async (criteria: string): Promise<MovieSearchResult[
   return transformToSearchResult(result);
 };
 
-const createEncodedCriteria = (searchString: string) => {
+export const createEncodedCriteria = (searchString: string) => {
   let result = '';
   if (!searchString.length) return result;
   result += searchString.substr(1, 1);

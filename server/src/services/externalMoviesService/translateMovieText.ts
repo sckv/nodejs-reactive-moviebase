@@ -12,7 +12,7 @@ const modelObject = {
   q: [''],
 };
 
-export const translateSequence = async (text: string): Promise<string | null> => {
+export const translateMovieText = async (text: string): Promise<string | null> => {
   if (!text) return null;
 
   const translation: TranslatedText = await rq({
