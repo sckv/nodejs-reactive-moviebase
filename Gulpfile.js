@@ -26,7 +26,7 @@ gulp.task('build:client', () => {
     .pipe(tsFrontProject())
     .js.pipe(
       babel({
-        configFile: path.join(process.cwd(), 'babel.config.front.js'),
+        configFile: path.join(process.cwd(), 'configs/babel.config.front.js'),
       }),
     )
     .pipe(gulp.dest(buildFrontPath));
@@ -40,7 +40,7 @@ gulp.task('compile:server', () => {
     .pipe(tsBackProject())
     .js.pipe(
       babel({
-        configFile: path.join(process.cwd(), 'babel.config.back.js'),
+        configFile: path.join(process.cwd(), 'configs/babel.config.back.js'),
       }),
     )
     .pipe(gulp.dest(buildBackPath));
