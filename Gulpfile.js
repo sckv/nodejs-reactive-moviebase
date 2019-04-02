@@ -51,12 +51,7 @@ gulp.task('nodemon:server', () => {
     script: 'server/build/start.js',
     watch: 'server/src',
     ext: 'ts',
-    tasks: ['compile:server'], // compile synchronously onChange
+    tasks: ['compile:server'],
     done: false,
   });
 });
-
-// gulp.task('watch:server', () => {
-// eslint-disable-next-line security/detect-non-literal-fs-filename
-// gulp.watch(path.join(backPath, 'src'), gulp.series('compile:server', 'nodemon:server'));
-// });

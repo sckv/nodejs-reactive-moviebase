@@ -7,7 +7,7 @@ module.exports = options => ({
   output: Object.assign(
     {
       path: path.resolve('build'),
-      publicPath: '/static',
+      publicPath: '/',
     },
     options.output,
   ),
