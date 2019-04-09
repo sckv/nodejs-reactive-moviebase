@@ -1,1 +1,3 @@
-declare module 'types/userControlling.services' {}
+declare module 'types/userControlling.services' {
+
+}

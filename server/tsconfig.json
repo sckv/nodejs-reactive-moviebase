@@ -17,6 +17,6 @@
       "@src/*": ["src/*"]
     }
   },
-  "include": ["@types", "src/**/*", "cert"],
+  "include": ["../@types", "src/**/*", "cert"],
   "exclude": ["build", "__tests__/**/*"]
 }

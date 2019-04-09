@@ -13,6 +13,7 @@ declare module 'types/users.repository' {
 
   type GetUserObject = {
     userId: ObjectID;
+    selfId: ObjectID;
     personalData?: boolean;
     moviesData?: boolean;
     listsData?: boolean;

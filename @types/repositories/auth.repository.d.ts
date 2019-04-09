@@ -24,5 +24,6 @@ declare module 'types/auth.repository' {
   type SessionObject = {
     username: string;
     userId: ObjectID;
+    language: 'es' | 'en';
   };
 }

@@ -1,6 +1,6 @@
 import rq from 'request-promise-native';
 import qs from 'qs';
-import {MovieSearchResult, IMDBMoviesResponse} from '@src/services/externalMoviesService/externalMovies';
+import {MovieSearchResult, IMDBMoviesResponse} from 'types/externalMovies';
 import {jsonSafeParse} from '@src/utils';
 const IMDB_URL_PREFIX = 'https://v2.sg.media-imdb.com/suggests/';
 
