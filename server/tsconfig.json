@@ -17,6 +17,6 @@
       "@src/*": ["src/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["@types", "src/**/*", "@types/users.repository.ts", "@types/movies.repository.d.ts"],
   "exclude": ["build", "__tests__/**/*"]
 }

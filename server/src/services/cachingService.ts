@@ -1,5 +1,5 @@
 import isEqual from 'fast-deep-equal';
-import ioredis from 'ioredis';
+import Ioredis from 'ioredis';
 
 import {hashUrl} from '../utils/hashUrl';
 import {REDIS_CACHE_KEY_PREFIX} from './redisPollingService';
@@ -7,7 +7,7 @@ import {jsonSafeParse} from '@src/utils/jsonSafeParse';
 
 const {REDIS_PORT, REDIS_HOST, REDIS_DB} = process.env;
 
-const RedisConnection = new ioredis({
+const RedisConnection = new Ioredis({
   port: +REDIS_PORT || 6379,
   host: REDIS_HOST || 'localhost',
   db: +REDIS_DB || 0,

@@ -20,7 +20,7 @@ export const translateMovieText = async (text: string): Promise<string | null> =
     method: 'POST',
     body: {
       ...modelObject,
-      q: [].concat(text),
+      q: [text],
     },
     json: true,
   });
