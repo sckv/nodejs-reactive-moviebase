@@ -1,5 +1,5 @@
 import uuidv1 from 'uuid/v1';
-import {CustomRequestHandler} from '@src/types';
+import {CustomRequestHandler} from 'types/utils';
 
 export const uniqueRequestId: CustomRequestHandler = (request, response, next) => {
   const contentType = request.is('json') || request.is('urlencoded') || request.is('html');

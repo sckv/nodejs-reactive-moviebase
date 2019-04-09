@@ -1,9 +1,10 @@
-import ioredis from 'ioredis';
+import IOredis, {Redis} from 'ioredis';
 import EventEmitter from 'events';
+import {jsonSafeParse} from '@src/utils';
 
 const {REDIS_PORT, REDIS_HOST, REDIS_DB} = process.env;
 
-const RedisPoller = new ioredis({
+const RedisPoller = new IOredis({
   port: +REDIS_PORT || 6379,
   host: REDIS_HOST || 'localhost',
   db: +REDIS_DB || 0,
@@ -15,8 +16,8 @@ class RedisServiceClass {
   private static _instance: RedisServiceClass;
   private emitter: EventEmitter = new EventEmitter();
   private subscriptionsList: string[] = [];
-  private rPoller: ioredis.Redis;
-  private rListener: ioredis.Redis;
+  private rPoller: Redis;
+  private rListener: Redis;
 
   constructor() {
     this.rPoller = RedisPoller;
@@ -34,7 +35,7 @@ class RedisServiceClass {
 
   private async pushToListeners(key: string) {
     const rawData = await this.rListener.hget(key, 'data');
-    const data = JSON.parse(rawData);
+    const data = jsonSafeParse(rawData);
 
     if (this.emitter.listeners(key).length) {
       this.emitter.emit(key, data);

@@ -1,4 +1,4 @@
-export const jsonSafeParse = <T>(data: string): T | null => {
+export const jsonSafeParse = <T = {[k: string]: any}>(data: string): T | null => {
   try {
     return JSON.parse(data) as T;
   } catch (e) {
