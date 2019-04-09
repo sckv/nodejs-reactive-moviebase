@@ -1,5 +1,5 @@
 import rq from 'request-promise-native';
-import {OMDBMovieResponse} from '@src/services/externalMoviesService/externalMovies';
+import {OMDBMovieResponse} from 'types/externalMovies';
 const OMDB_URL = `http://www.omdbapi.com/?apikey=${process.env.OMBD_API_KEY}&i=`;
 
 export const plotMovie = async (ttId: string): Promise<OMDBMovieResponse | null> => {

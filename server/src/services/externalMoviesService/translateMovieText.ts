@@ -1,5 +1,5 @@
 import rq from 'request-promise-native';
-import {TranslatedText} from '@src/services/externalMoviesService/externalMovies';
+import {TranslatedText} from 'types/externalMovies';
 
 const {GOOGLE_TRANSLATE_API} = process.env;
 const TRANSLATE_API_PREFIX = `https://translation.googleapis.com/language/translate/v2?key=${GOOGLE_TRANSLATE_API}`;
@@ -20,7 +20,7 @@ export const translateMovieText = async (text: string): Promise<string | null> =
     method: 'POST',
     body: {
       ...modelObject,
-      q: [].concat(text),
+      q: [text],
     },
     json: true,
   });

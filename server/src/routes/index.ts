@@ -1,4 +1,4 @@
-import {RouteController} from '@src/types';
+import {RouteController} from 'types/utils';
 
 export const index: RouteController = app => {
   app.route('/index').get((_, res) => {
