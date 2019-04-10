@@ -1,29 +1,30 @@
 declare module 'types/auth.repository' {
   import {ObjectID} from 'bson';
+  import {LanguageType} from 'types/movies.repository';
 
-  type LoginObject = {
+  interface LoginObject {
     username: string;
     password: string;
-  };
+  }
 
-  type LoginResponseObject = {
+  interface LoginResponseObject {
     userId: ObjectID;
     token: string;
-  };
+  }
 
-  type NewPasswordObject = {
+  interface NewPasswordObject {
     userId: ObjectID;
     password: string;
-  };
+  }
 
-  type RecoveryResponseObject = {
+  interface RecoveryResponseObject {
     userId: ObjectID;
     resetToken: string;
-  };
+  }
 
-  type SessionObject = {
+  interface SessionObject {
     username: string;
     userId: ObjectID;
-    language: 'es' | 'en';
-  };
+    language: LanguageType;
+  }
 }
