@@ -4,11 +4,23 @@ import {RegisterUserObject, SearchUsersObject, GetUserObject, ModifyUserObject} 
 
 export const UsersRepository = (connection: MongoClient) => {
   return {
-    register: async (registerData: RegisterUserObject): Promise<boolean> => {},
-    search: async <T>({username = null}: SearchUsersObject): Promise<T[]> => {},
-    get: async <T>(userId: GetUserObject): Promise<T> => {},
-    modify: async (userId: ModifyUserObject): Promise<boolean> => {},
-    follow: async ({userId, followId}: {userId: ObjectID; followId: ObjectID}) => {},
-    unfollow: async ({userId, followId}: {userId: ObjectID; followId: ObjectID}) => {},
+    register: async (registerData: RegisterUserObject): Promise<boolean> => {
+      return;
+    },
+    search: async <T>({username = null}: SearchUsersObject): Promise<T[]> => {
+      return;
+    },
+    get: async <T>(userId: GetUserObject): Promise<T> => {
+      return;
+    },
+    modify: async (userId: ModifyUserObject): Promise<boolean> => {
+      return;
+    },
+    follow: async ({userId, followId}: {userId: ObjectID; followId: ObjectID}) => {
+      return;
+    },
+    unfollow: async ({userId, followId}: {userId: ObjectID; followId: ObjectID}) => {
+      return;
+    },
   };
 };

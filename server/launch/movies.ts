@@ -1,4 +1,4 @@
-import {launchFabric} from 'launch/launchFabric';
+import {launchFabric} from './launchFabric';
 
 const port = process.env.MOVIES_REQUESTING_SERVICE_PORT;
 

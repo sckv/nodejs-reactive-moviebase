@@ -3,7 +3,11 @@ import {SessionObject} from 'types/auth.repository';
 
 export const AuthCacheRepository = (redis: Redis) => {
   return {
-    setSession: async (data: SessionObject): Promise<boolean> => {},
-    clearSession: async (token: string): Promise<boolean> => {},
+    setSession: async (data: SessionObject): Promise<boolean> => {
+      return;
+    },
+    clearSession: async (token: string): Promise<boolean> => {
+      return;
+    },
   };
 };

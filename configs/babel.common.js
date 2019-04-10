@@ -13,8 +13,8 @@ module.exports = dir => {
           root: '.',
           extensions: ['.js'],
           alias: {
-            '@src': '.',
-            '@config': 'config',
+            '@src': './src',
+            '@config': './config',
           },
         },
       ],
