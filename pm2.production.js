@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'movies',
-      script: './movies.js',
+      script: './server/build/launch/movies.js',
       instances: 2,
       autorestart: true,
       watch: false,
@@ -16,7 +16,7 @@ module.exports = {
     },
     {
       name: 'cache',
-      script: './cache.js',
+      script: './server/build/launch/cache.js',
       instances: 1,
       autorestart: true,
       watch: false,
@@ -30,7 +30,7 @@ module.exports = {
     },
     {
       name: 'users',
-      script: './users.js',
+      script: './server/build/launch/users.js',
       instances: 1,
       autorestart: true,
       watch: false,
@@ -44,7 +44,7 @@ module.exports = {
     },
     {
       name: 'auth',
-      script: './auth.js',
+      script: './server/build/launch/auth.js',
       instances: 1,
       autorestart: true,
       watch: false,
@@ -58,7 +58,7 @@ module.exports = {
     },
     {
       name: 'emails',
-      script: './emails.js',
+      script: './server/build/launch/emails.js',
       instances: 1,
       autorestart: true,
       watch: false,

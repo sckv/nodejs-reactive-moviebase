@@ -8,4 +8,5 @@ const index: RouteController = app => {
     res.sendStatus(200);
   });
 };
+
 export = index;
