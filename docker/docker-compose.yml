@@ -36,8 +36,8 @@ services:
     networks:
       - backendmesh
     volumes:
-      - ~/nginx_certs:/etc/nginx/certs
-      - ~/letsencrypt_www:/var/www/letsencrypt
+      # - ~/nginx_certs:/etc/nginx/certs
+      # - ~/letsencrypt_www:/var/www/letsencrypt
       - ~/app:/var/www
       - ~/app-logs/nginx:/var/log/nginx
       - ./nginx/sites:/etc/nginx/sites-available

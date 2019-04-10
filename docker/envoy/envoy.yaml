@@ -15,7 +15,7 @@ static_resources:
           route_config:
             name: local_route
             virtual_hosts:
-            - name: service
+            - name: services
               domains:
               - "*"
               routes:
@@ -24,28 +24,89 @@ static_resources:
                 route:
                   cluster: front_service
               - match:
-                  prefix: "/api/*"
+                  prefix: "/api/auth/*"
                 route:
-                  cluster: node_service
+                  cluster: auth_service
+                  timeout: 60s
+              - match:
+                  prefix: "/api/movies/*"
+                route:
+                  cluster: movies_service
+                  timeout: 60s
+              - match:
+                  prefix: "/api/lists/*"
+                route:
+                  cluster: lists_service
+                  timeout: 60s
+              - match:
+                  prefix: "/api/users/*"
+                route:
+                  cluster: users_service
+                  timeout: 60s
           http_filters:
           - name: envoy.router
             typed_config: {}
   clusters:
-  - name: node_service
+  - name: auth_service
     connect_timeout: 0.25s
     tcp_keepalive:
       keepalive_time: 32
     type: strict_dns
     lb_policy: round_robin
     load_assignment:
-      cluster_name: node_service
+      cluster_name: auth_service
       endpoints:
       - lb_endpoints:
         - endpoint:
             address:
               socket_address:
                 address: node
-                port_value: 8080
+                port_value: 8000
+  - name: movies_service
+    connect_timeout: 0.25s
+    tcp_keepalive:
+      keepalive_time: 32
+    type: strict_dns
+    lb_policy: round_robin
+    load_assignment:
+      cluster_name: movies_service
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: node
+                port_value: 8100
+  - name: lists_service
+    connect_timeout: 0.25s
+    tcp_keepalive:
+      keepalive_time: 32
+    type: strict_dns
+    lb_policy: round_robin
+    load_assignment:
+      cluster_name: lists_service
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: node
+                port_value: 8200
+  - name: users_service
+    connect_timeout: 0.25s
+    tcp_keepalive:
+      keepalive_time: 32
+    type: strict_dns
+    lb_policy: round_robin
+    load_assignment:
+      cluster_name: users_service
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: node
+                port_value: 8300
   - name: front_service
     connect_timeout: 0.25s
     type: strict_dns
