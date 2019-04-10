@@ -8,5 +8,7 @@ export const UsersRepository = (connection: MongoClient) => {
     search: async <T>({username = null}: SearchUsersObject): Promise<T[]> => {},
     get: async <T>(userId: GetUserObject): Promise<T> => {},
     modify: async (userId: ModifyUserObject): Promise<boolean> => {},
+    follow: async ({userId, followId}: {userId: ObjectID; followId: ObjectID}) => {},
+    unfollow: async ({userId, followId}: {userId: ObjectID; followId: ObjectID}) => {},
   };
 };

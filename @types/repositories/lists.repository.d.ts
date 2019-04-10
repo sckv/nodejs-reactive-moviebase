@@ -1,22 +1,22 @@
 declare module 'types/lists.repository' {
   import {ObjectID} from 'bson';
 
-  type CreateListData = {
+  interface CreateListObject {
     title: string;
     description: string;
     private: boolean;
     userId: ObjectID;
-  };
+  }
 
-  type RemoveMovieData = {
+  interface RemoveMovieObject {
     listId: ObjectID;
     movieId: ObjectID;
-  };
+  }
 
-  type AddMovieToList = {
+  interface AddMovieToListObject {
     listId: ObjectID;
     movieId: ObjectID;
     rate: 1 | 2 | 3 | 4 | 5;
     commentary: string;
-  };
+  }
 }

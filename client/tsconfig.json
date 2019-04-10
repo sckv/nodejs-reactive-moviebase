@@ -21,6 +21,6 @@
       "@src/*": ["src/*"]
     }
   },
-  "include": ["../@types", "src/**/*"],
+  "include": ["../@types/**/*", "src/**/*"],
   "exclude": ["../node_modules", "build", "src/**/*.test.tsx"]
 }

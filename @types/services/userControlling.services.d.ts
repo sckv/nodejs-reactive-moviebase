@@ -1,15 +1,14 @@
-import {ListThinObject} from 'types/listing.services';
-
 declare module 'types/userControlling.services' {
   import {ObjectID} from 'bson';
-  import {MovieSlimObject} from 'types/moviesRequesting.services';
+  import {MovieSlim} from 'types/moviesRequesting.services';
+  import {ListEntryThin} from 'types/listing.services';
 
-  interface UserObject {
+  interface User {
     _id: ObjectID;
     username: string;
   }
 
-  interface UserPrivateObject extends UserObject {
+  interface UserPrivate extends User {
     email: string;
     language: 'en' | 'es';
   }
@@ -22,17 +21,17 @@ declare module 'types/userControlling.services' {
 
   interface UserMovies {
     movies: Array<{
-      movie: MovieSlimObject;
+      movie: MovieSlim;
       rating: 1 | 2 | 3 | 4 | 5;
       comment: string;
     }>;
   }
 
   interface UserLists {
-    lists: ListThinObject[];
+    lists: ListEntryThin[];
   }
 
-  interface UserFullObject extends UserObject, UserMovies, UserLists {
+  interface UserFull extends User, UserMovies, UserLists {
     followers: UserFollower[];
     follows: UserFollower[];
   }

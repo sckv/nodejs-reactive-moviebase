@@ -1,11 +1,11 @@
 declare module 'types/utils' {
-  import express, {Request, RequestHandler, Response, NextFunction} from 'express';
+  import {Request, RequestHandler, Response, NextFunction, Express} from 'express';
 
-  type CustomRequest = Request & {
+  interface CustomRequest extends Request {
     id: string;
-  };
+  }
 
   type CustomRequestHandler = (req: CustomRequest, res: Response, next: NextFunction) => any;
 
-  type RouteController = (app: ReturnType<typeof express>) => void;
+  type RouteController = (app: Express) => void;
 }

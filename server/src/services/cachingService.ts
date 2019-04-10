@@ -5,7 +5,7 @@ import {CacheDigestableMessage} from 'types/cache';
 import {hashUrl} from '@src/utils/hashUrl';
 import {REDIS_CACHE_KEY_PREFIX} from './redisPollingService';
 import {jsonSafeParse} from '@src/utils/jsonSafeParse';
-import {loggers} from '@src/utils/logger';
+import {logger} from '@src/utils/logger';
 
 const {REDIS_PORT, REDIS_HOST, REDIS_DB} = process.env;
 
@@ -30,8 +30,7 @@ export const cachingService = () => {
     const oldEntry = await RedisConnection.hget(prefixedUrl, 'data');
     if (oldEntry && isEqual(jsonSafeParse(oldEntry), data)) {
       //TODO: CHANGE FOR PINO
-      loggers.logger.info('cache: cache:digest contents are the same', data, oldEntry);
-      loggers.loggerDev.info('cache: cache:digest contents are the same', data, oldEntry);
+      logger.info('cache: cache:digest contents are the same', data, oldEntry);
       return;
     }
 

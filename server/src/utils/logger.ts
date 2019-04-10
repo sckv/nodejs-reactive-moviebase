@@ -3,14 +3,14 @@ import path from 'path';
 
 const DESTINATION = path.resolve(path.join(process.cwd(), 'logs'));
 
-const createLoggers = () => {
-  const logger = pino(pino.extreme(DESTINATION));
+const createLogger = () => {
+  const loggerInstance = pino(pino.extreme(DESTINATION));
 
   setInterval(() => {
-    logger.flush();
+    loggerInstance.flush();
   }, 10000).unref();
 
-  const handler = pino.final(logger, (err, finalLogger, evt) => {
+  const handler = pino.final(loggerInstance, (err, finalLogger, evt) => {
     finalLogger.info(`${evt} caught`);
     if (err) finalLogger.error(err, 'error caused exit');
     process.exit(err ? 1 : 0);
@@ -23,18 +23,7 @@ const createLoggers = () => {
   process.on('SIGQUIT', () => handler(null, 'SIGQUIT'));
   process.on('SIGTERM', () => handler(null, 'SIGTERM'));
 
-  return {
-    logger,
-    loggerDev: process.env.NODE_ENV !== 'production' ? pino(pino.extreme()) : fakeLogger,
-  };
+  return process.env.NODE_ENV === 'production' ? loggerInstance : pino(pino.extreme());
 };
 
-const fakeLogger: Logger = {
-  warn: () => null,
-  info: () => null,
-  debug: () => null,
-  error: () => null,
-  fatal: () => null,
-} as any;
-
-export const loggers = createLoggers();
+export const logger = createLogger();
