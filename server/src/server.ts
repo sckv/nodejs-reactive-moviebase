@@ -6,16 +6,16 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import {uniqueRequestId} from '@src/middlewares/requestId';
 
-const app = express();
+const api = express();
 
-app.use(uniqueRequestId);
-app.use(helmet());
-app.use(pinoLogger());
-app.use(cors({maxAge: 1728000}));
-app.use(express.urlencoded({extended: true}));
-app.use(express.json({limit: '1mb'}));
-app.use(cookieParser());
+api.use(uniqueRequestId);
+api.use(helmet());
+api.use(pinoLogger());
+api.use(cors({maxAge: 1728000}));
+api.use(express.urlencoded({extended: true}));
+api.use(express.json({limit: '1mb'}));
+api.use(cookieParser());
 
-app.set('json spaces', 4);
+api.set('json spaces', 4);
 
-export {app};
+export {api};

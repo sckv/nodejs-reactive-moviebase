@@ -10,13 +10,13 @@
     "strictNullChecks": false,
     "strictFunctionTypes": false,
     "strictPropertyInitialization": false,
-    "rootDir": "src",
+    "rootDir": ".",
     "baseUrl": ".",
     "paths": {
       "@config/*": ["src/config/*"],
       "@src/*": ["src/*"]
     }
   },
-  "include": ["../@types", "src/**/*", "cert"],
+  "include": ["../@types/**/*", "launch", "src/**/*", "cert"],
   "exclude": ["build", "__tests__/**/*"]
 }

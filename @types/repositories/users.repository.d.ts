@@ -1,17 +1,17 @@
 declare module 'types/users.repository' {
   import {ObjectID} from 'bson';
 
-  type RegisterUserObject = {
+  interface RegisterUserObject {
     username: string;
     password: string;
     email: string;
-  };
+  }
 
-  type SearchUsersObject = {
+  interface SearchUsersObject {
     username?: string;
-  };
+  }
 
-  type GetUserObject = {
+  interface GetUserObject {
     userId: ObjectID;
     selfId: ObjectID;
     personalData?: boolean;
@@ -19,10 +19,10 @@ declare module 'types/users.repository' {
     listsData?: boolean;
     followers?: boolean;
     follows?: boolean;
-  };
+  }
 
-  type ModifyUserObject = {
+  interface ModifyUserObject {
     userId: ObjectID;
     password?: string;
-  };
+  }
 }

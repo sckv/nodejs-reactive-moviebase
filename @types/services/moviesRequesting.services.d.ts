@@ -1,8 +1,9 @@
 declare module 'types/moviesRequesting.services' {
   import {ObjectID} from 'bson';
 
-  interface MovieObject {
+  interface Movie {
     _id: ObjectID;
+    ttid: string;
     title: string;
     year: number;
     data: {
@@ -12,8 +13,9 @@ declare module 'types/moviesRequesting.services' {
     };
   }
 
-  interface MovieThinObject {
+  interface MovieThin {
     _id: ObjectID;
+    ttid: string;
     title: string;
     year: number;
     data: {
@@ -21,8 +23,9 @@ declare module 'types/moviesRequesting.services' {
     };
   }
 
-  interface MovieSlimObject {
+  interface MovieSlim {
     _id: ObjectID;
+    ttid: string;
     title: string;
     data: {
       poster: string;
