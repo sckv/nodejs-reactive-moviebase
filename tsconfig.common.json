@@ -20,6 +20,7 @@
     "resolveJsonModule": true,
     "importHelpers": false
   },
+  "include": ["./@types/**/*"],
   "plugins": [
     {
       "name": "typescript-tslint-plugin",

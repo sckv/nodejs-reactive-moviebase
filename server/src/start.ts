@@ -1,7 +1,7 @@
 import fs from 'fs';
 import spdy from 'spdy';
 import path from 'path';
-import {app} from '@src/server';
+import {api} from '@src/server';
 
 const port = 3000;
 const backPath = path.join(process.cwd(), 'server');
@@ -13,7 +13,7 @@ const options = {
 
 try {
   fs.readdirSync(path.join(__dirname, 'routes')).map(file => {
-    require('./routes/' + file)(app);
+    require('./routes/' + file)(api);
   });
 } catch (error) {
   console.error('Error loading routes!', error);
@@ -21,7 +21,7 @@ try {
 }
 
 export const ignite = () => {
-  return spdy.createServer(options, app).listen(port, () => {
+  return spdy.createServer(options, api).listen(port, () => {
     if (process.env.NODE_ENV !== 'test') console.log(`Example app listening on ${port} port and host!`);
   });
 };
