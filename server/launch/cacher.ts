@@ -1,3 +1,3 @@
-import {cachingService} from '@src/services/cachingService';
+import {cachingService} from '@src/services/caching-service';
 
 cachingService();

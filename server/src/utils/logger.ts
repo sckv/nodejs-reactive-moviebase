@@ -1,4 +1,4 @@
-import pino, {Logger} from 'pino';
+import pino from 'pino';
 import path from 'path';
 
 const DESTINATION = path.resolve(path.join(process.cwd(), 'logs'));

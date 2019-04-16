@@ -1,5 +1,6 @@
 declare module 'types/lists.repository' {
   import {ObjectID} from 'bson';
+  import {MovieRating} from 'types/Movie.model';
 
   interface CreateListObject {
     title: string;
@@ -16,7 +17,7 @@ declare module 'types/lists.repository' {
   interface AddMovieToListObject {
     listId: ObjectID;
     movieId: ObjectID;
-    rate: 1 | 2 | 3 | 4 | 5;
+    rate: MovieRating;
     commentary: string;
   }
 }

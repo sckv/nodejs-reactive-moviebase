@@ -1,4 +1,4 @@
-import {launchFabric} from './launchFabric';
+import {launchFabric} from './launch-fabric';
 
 const port = process.env.USER_CONTROLLING_SERVICE_PORT;
 
