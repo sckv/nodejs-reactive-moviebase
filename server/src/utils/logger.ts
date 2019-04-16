@@ -8,7 +8,7 @@ const createLogger = () => {
 
   setInterval(() => {
     loggerInstance.flush();
-  }, 10000).unref();
+  }, 10000);
 
   const handler = pino.final(loggerInstance, (err, finalLogger, evt) => {
     finalLogger.info(`${evt} caught`);
