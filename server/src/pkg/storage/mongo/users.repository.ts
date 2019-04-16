@@ -13,6 +13,9 @@ export const UsersRepository = (connection: MongoClient) => {
     get: async <T>(userId: GetUserObject): Promise<T> => {
       return;
     },
+    getByEmail: async <T>(email: string): Promise<T> => {
+      return;
+    },
     modify: async (userId: ModifyUserObject): Promise<boolean> => {
       return;
     },

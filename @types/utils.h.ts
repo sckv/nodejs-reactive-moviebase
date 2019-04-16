@@ -8,4 +8,9 @@ declare module 'types/utils' {
   type CustomRequestHandler = (req: CustomRequest, res: Response, next: NextFunction) => any;
 
   type RouteController = (app: Express) => void;
+
+  type ErrorProps = {
+    code?: number;
+    message: string;
+  };
 }

@@ -2,9 +2,9 @@ import isEqual from 'fast-deep-equal';
 import IOredis from 'ioredis';
 import {CacheDigestableMessage} from 'types/cache';
 
-import {hashUrl} from '@src/utils/hashUrl';
-import {REDIS_CACHE_KEY_PREFIX} from './redisPollingService';
-import {jsonSafeParse} from '@src/utils/jsonSafeParse';
+import {hashUrl} from '@src/utils/hash-url';
+import {REDIS_CACHE_KEY_PREFIX} from './redis-polling-service';
+import {jsonSafeParse} from '@src/utils/json-safe-parse';
 import {logger} from '@src/utils/logger';
 
 const {REDIS_PORT, REDIS_HOST, REDIS_DB} = process.env;

@@ -1,4 +1,6 @@
 declare module 'types/movies.repository' {
+  import {LanguageType} from 'types/User.model';
+
   interface SearchMoviesObject {
     language: LanguageType;
     page?: number;
@@ -25,6 +27,4 @@ declare module 'types/movies.repository' {
       };
     };
   }
-
-  type LanguageType = 'es' | 'en';
 }
