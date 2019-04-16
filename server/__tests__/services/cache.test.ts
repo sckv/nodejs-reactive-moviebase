@@ -1,7 +1,7 @@
 import ioredis from 'ioredis';
 import {hashUrl, jsonSafeParse} from '../../src/utils';
 
-import {cachingService} from '../../src/services/cachingService';
+import {cachingService} from '../../src/services/caching-service';
 
 const {REDIS_PORT, REDIS_HOST, REDIS_DB} = process.env;
 
