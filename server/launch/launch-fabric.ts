@@ -5,7 +5,7 @@ import {api} from '@src/server';
 import {logger} from '@src/utils/logger';
 
 const backPath = path.join(process.cwd(), 'server');
-const routesPath = path.join(backPath, 'build', 'routes');
+const routesPath = path.join(backPath, 'build', 'src', 'routes');
 
 type LaunchSettings = {port: string | number; routesDir: string; serviceName: string};
 
@@ -16,18 +16,21 @@ const options = {
 
 export const launchFabric = ({port, routesDir, serviceName}: LaunchSettings) => {
   try {
-    fs.readdirSync(routesPath).map(file => {
-      require(path.join(routesPath, routesDir) + file)(api);
+    fs.readdirSync(path.join(routesPath, routesDir)).map(file => {
+      const filePath = path.join(routesPath, routesDir, file);
+      require(filePath)(api);
     });
   } catch (error) {
-    logger.error(`Error loading routes for ${serviceName}`, error);
+    console.error(`Error loading routes for ${serviceName}`, error);
+    // logger.error(`Error loading routes for ${serviceName}`, error);
     process.exit(1);
   }
 
   return () => {
     return spdy.createServer(options, api).listen(port, () => {
       if (process.env.NODE_ENV !== 'test') {
-        logger.error(`${serviceName} listening on ${port} port!`);
+        console.error(`${serviceName} listening on ${port} port!`);
+        // logger.error(`${serviceName} listening on ${port} port!`);
       }
     });
     // return api.listen(+port, host, err => {

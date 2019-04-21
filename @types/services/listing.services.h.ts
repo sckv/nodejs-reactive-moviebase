@@ -1,6 +1,6 @@
 declare module 'types/listing.services' {
   import {ObjectID} from 'bson';
-  import {MovieThin} from 'types/moviesRequesting.services';
+  import {MovieThin} from 'types/movies-requesting.services';
 
   interface ListEntry {
     _id: ObjectID;

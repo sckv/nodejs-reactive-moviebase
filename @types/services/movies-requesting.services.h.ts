@@ -1,4 +1,4 @@
-declare module 'types/moviesRequesting.services' {
+declare module 'types/movies-requesting.services' {
   import {ObjectID} from 'bson';
 
   interface Movie {

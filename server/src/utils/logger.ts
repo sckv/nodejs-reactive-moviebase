@@ -1,4 +1,4 @@
-import pino, {Logger} from 'pino';
+import pino from 'pino';
 import path from 'path';
 
 const DESTINATION = path.resolve(path.join(process.cwd(), 'logs'));
@@ -8,7 +8,7 @@ const createLogger = () => {
 
   setInterval(() => {
     loggerInstance.flush();
-  }, 10000).unref();
+  }, 10000);
 
   const handler = pino.final(loggerInstance, (err, finalLogger, evt) => {
     finalLogger.info(`${evt} caught`);

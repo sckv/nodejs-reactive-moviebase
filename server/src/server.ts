@@ -4,7 +4,7 @@ import path from 'path';
 import pinoLogger from 'express-pino-logger';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
-import {uniqueRequestId} from '@src/middlewares/requestId';
+import {uniqueRequestId} from '@src/middlewares/request-id';
 
 const api = express();
 

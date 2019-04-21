@@ -1,6 +1,6 @@
-declare module 'types/userControlling.services' {
+declare module 'types/user-controlling.services' {
   import {ObjectID} from 'bson';
-  import {MovieSlim} from 'types/moviesRequesting.services';
+  import {MovieSlim} from 'types/movies-requesting.services';
   import {ListEntryThin} from 'types/listing.services';
 
   interface User {

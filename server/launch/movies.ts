@@ -1,5 +1,5 @@
-import {launchFabric} from 'launch/launchFabric';
+import {launchFabric} from './launch-fabric';
 
 const port = process.env.MOVIES_REQUESTING_SERVICE_PORT;
 
-launchFabric({port, routesDir: 'moviesRequesting', serviceName: 'MoviesRequestingWebService'});
+launchFabric({port: 2555, routesDir: 'moviesRequesting', serviceName: 'MoviesRequestingWebService'})();

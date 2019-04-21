@@ -1,4 +1,4 @@
-declare module 'types/externalMovies' {
+declare module 'types/external-movies' {
   interface MovieSearchResult {
     ttid: string;
     title: string;
