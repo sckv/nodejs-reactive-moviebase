@@ -1,23 +1,23 @@
-import {ObjectID} from 'bson';
 import {Omit} from 'utility-types';
-import {MongoClient} from 'mongodb';
+import {Db} from 'mongodb';
 import {CreateListObject, AddMovieToListObject, RemoveMovieObject} from 'types/lists.repository';
+import {MongoObjectID} from 'types/utils';
 
-export const ListsRepository = (connection: MongoClient) => {
+export const ListsRepository = (connection: Db) => {
   return {
-    getByUser: async <T>(criteria: ObjectID | string): Promise<T[]> => {
+    getByUser: async <T>(criteria: MongoObjectID | string): Promise<T[]> => {
       return;
     },
-    get: async <T>(list: ObjectID): Promise<T> => {
+    get: async <T>(list: MongoObjectID): Promise<T> => {
       return;
     },
     create: async (listData: CreateListObject): Promise<boolean> => {
       return;
     },
-    modify: async (listData: {listId: ObjectID} & Partial<Omit<CreateListObject, 'userId'>>): Promise<boolean> => {
+    modify: async (listData: {listId: MongoObjectID} & Partial<Omit<CreateListObject, 'userId'>>): Promise<boolean> => {
       return;
     },
-    delete: async (list: ObjectID): Promise<boolean> => {
+    delete: async (list: MongoObjectID): Promise<boolean> => {
       return;
     },
     addMovie: async (addData: AddMovieToListObject): Promise<boolean> => {

@@ -1,10 +1,9 @@
 declare module 'types/user-controlling.services' {
-  import {ObjectID} from 'bson';
   import {MovieSlim} from 'types/movies-requesting.services';
   import {ListEntryThin} from 'types/listing.services';
 
   interface User {
-    _id: ObjectID;
+    _id: string;
     username: string;
   }
 
@@ -14,7 +13,7 @@ declare module 'types/user-controlling.services' {
   }
 
   type UserFollower = {
-    _id: ObjectID;
+    _id: string;
     avatar: string;
     username: string;
   };

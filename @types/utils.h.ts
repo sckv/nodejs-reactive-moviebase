@@ -1,5 +1,6 @@
 declare module 'types/utils' {
   import {Request, RequestHandler, Response, NextFunction, Express} from 'express';
+  import {Db} from 'mongodb';
 
   interface CustomRequest extends Request {
     id: string;
@@ -11,6 +12,16 @@ declare module 'types/utils' {
 
   type ErrorProps = {
     code?: number;
-    message: string;
+    message?: string;
+    data: {[k: string]: any};
   };
+
+  interface ExtendedError {
+    code?: number;
+    data: {[k: string]: any};
+  }
+
+  type MongoObjectID = string;
+
+  // type RepositoryMapper<T> = (connection: Db) => {[k in keyof T]: <A, R>(args: A) => Promise<R>};
 }

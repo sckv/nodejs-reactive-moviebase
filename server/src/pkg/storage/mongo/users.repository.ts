@@ -1,8 +1,8 @@
 import {ObjectID} from 'bson';
-import {MongoClient} from 'mongodb';
+import {Db} from 'mongodb';
 import {RegisterUserObject, SearchUsersObject, GetUserObject, ModifyUserObject} from 'types/users.repository';
 
-export const UsersRepository = (connection: MongoClient) => {
+export const UsersRepository = (connection: Db) => {
   return {
     register: async (registerData: RegisterUserObject): Promise<boolean> => {
       return;

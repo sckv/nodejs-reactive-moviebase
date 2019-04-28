@@ -22,24 +22,13 @@ export const launchFabric = ({port, routesDir, serviceName}: LaunchSettings) => 
     });
   } catch (error) {
     console.error(`Error loading routes for ${serviceName}`, error);
-    // logger.error(`Error loading routes for ${serviceName}`, error);
     process.exit(1);
   }
 
-  return () => {
-    return spdy.createServer(options, api).listen(port, () => {
-      if (process.env.NODE_ENV !== 'test') {
-        console.error(`${serviceName} listening on ${port} port!`);
-        // logger.error(`${serviceName} listening on ${port} port!`);
-      }
-    });
-    // return api.listen(+port, host, err => {
-    //   if (err) {
-    //     console.error(err);
-    //     logger.error('Error starting ' + serviceName);
-    //     process.exit(1);
-    //   }
-    //   if (process.env.NODE_ENV !== 'test') console.log(`${serviceName} listening on ${port} port and ${host} host!`);
-    // });
-  };
+  return spdy.createServer(options, api).listen(port, () => {
+    if (process.env.NODE_ENV !== 'test') {
+      console.error(`${serviceName} listening on ${port} port!`);
+      // logger.error(`${serviceName} listening on ${port} port!`);
+    }
+  });
 };
