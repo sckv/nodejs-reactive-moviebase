@@ -1,10 +1,9 @@
 declare module 'types/Session.model' {
-  import {ObjectID} from 'bson';
-  import {_UserId} from 'types/User.model';
+  import {MongoObjectID} from 'types/utils';
 
   interface Session {
-    _id: ObjectID;
-    userId: _UserId;
+    _id: MongoObjectID;
+    userId: MongoObjectID;
     token: string;
     closed: boolean;
   }

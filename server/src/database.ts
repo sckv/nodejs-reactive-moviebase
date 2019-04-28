@@ -1,9 +1,9 @@
-import {MongoClient} from 'mongodb';
+import {MongoClient, Db} from 'mongodb';
 import {logger} from '@src/utils/logger';
 
 const mongoUrl = `mongodb://${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_DATABASE}`;
 
-const connectToDatabase = async (): Promise<MongoClient> => {
+const connectToDatabase = async (): Promise<Db> => {
   let connection: MongoClient = null;
 
   const tryConnect = async () => {
@@ -20,10 +20,10 @@ const connectToDatabase = async (): Promise<MongoClient> => {
       setTimeout(async () => await tryConnect(), 5000);
     });
 
-  return connection;
+  return connection.db('moviebase');
 };
 
-let resolvedConnection: MongoClient;
+let resolvedConnection: Db;
 connectToDatabase().then(res => (resolvedConnection = res));
 
 export const mongoConnection = resolvedConnection;

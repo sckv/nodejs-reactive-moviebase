@@ -1,34 +1,34 @@
 declare module 'types/auth.repository' {
-  import {ObjectID} from 'bson';
+  import {MongoObjectID} from 'types/utils';
   import {LanguageType} from 'types/User.model';
 
-  interface NewSessionObject {
+  type NewSessionObject = {
     username: string;
     sessionToken: string;
-  }
-  interface NewPasswordObject {
-    userId: ObjectID;
+  };
+  type NewPasswordObject = {
+    userId: MongoObjectID;
     password: string;
-  }
+  };
 
-  interface RecoveryResponseObject {
-    userId: ObjectID;
+  type RecoveryResponseObject = {
+    userId: MongoObjectID;
     resetToken: string;
-  }
+  };
 
-  interface SessionObject {
+  type SessionObject = {
     username: string;
-    userId: ObjectID;
+    userId: MongoObjectID;
     language: LanguageType;
-  }
+  };
 
-  interface SetActivationTokenObject {
-    userId: ObjectID;
+  type SetActivationTokenObject = {
+    userId: MongoObjectID;
     activationToken: string;
-  }
+  };
 
-  interface SetRecoveryTokenObject {
+  type SetRecoveryTokenObject = {
     email: string;
     recoveryToken: string;
-  }
+  };
 }
