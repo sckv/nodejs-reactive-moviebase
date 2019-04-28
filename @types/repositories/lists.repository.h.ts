@@ -1,22 +1,22 @@
 declare module 'types/lists.repository' {
-  import {ObjectID} from 'bson';
   import {MovieRating} from 'types/Movie.model';
+  import {MongoObjectID} from 'types/utils';
 
   interface CreateListObject {
     title: string;
     description: string;
     private: boolean;
-    userId: ObjectID;
+    userId: MongoObjectID;
   }
 
   interface RemoveMovieObject {
-    listId: ObjectID;
-    movieId: ObjectID;
+    listId: MongoObjectID;
+    movieId: MongoObjectID;
   }
 
   interface AddMovieToListObject {
-    listId: ObjectID;
-    movieId: ObjectID;
+    listId: MongoObjectID;
+    movieId: MongoObjectID;
     rate: MovieRating;
     commentary: string;
   }

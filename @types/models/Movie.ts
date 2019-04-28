@@ -1,12 +1,11 @@
 declare module 'types/Movie.model' {
-  import {ObjectID} from 'bson';
-  import {_UserId, LanguageType} from 'types/User.model';
+  import {LanguageType} from 'types/User.model';
+  import {MongoObjectID} from 'types/utils';
 
-  type _MovieId = ObjectID;
   type MovieRating = 1 | 2 | 3 | 4 | 5;
 
   interface Movie {
-    _id: ObjectID;
+    _id: MongoObjectID;
     ttid: string;
     title: string;
     year: number;
@@ -20,7 +19,7 @@ declare module 'types/Movie.model' {
       }
     >;
     ratedBy: Array<{
-      userId: _UserId;
+      userId: MongoObjectID;
       comment: string;
       rate: MovieRating;
     }>;

@@ -1,24 +1,22 @@
 declare module 'types/User.model' {
-  import {ObjectID} from 'bson';
-  import {_MovieId} from 'types/Movie.model';
+  import {MongoObjectID} from 'types/utils';
 
-  type _UserId = ObjectID;
   type LanguageType = 'es' | 'en';
 
   interface User {
-    _id: ObjectID;
+    _id: string;
     username: string;
     password: string;
     email: string;
     language: LanguageType;
-    follows: _UserId[];
-    ratedMovies: _MovieId[];
+    follows: MongoObjectID[];
+    ratedMovies: MongoObjectID[];
     lists: Array<{
-      _id: ObjectID;
+      _id: string;
       title: string;
       description: string;
       private: boolean;
-      movies: _MovieId[];
+      movies: MongoObjectID[];
     }>;
     activationToken?: string;
     recoveryToken?: string;

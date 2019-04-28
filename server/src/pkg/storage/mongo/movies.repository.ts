@@ -1,8 +1,9 @@
 import {ObjectID} from 'bson';
-import {MongoClient} from 'mongodb';
-import {SearchMoviesObject, LanguageType, MovieCreateObject} from 'types/movies.repository';
+import {Db} from 'mongodb';
+import {SearchMoviesObject, MovieCreateObject} from 'types/movies.repository';
+import {LanguageType} from 'types/User.model';
 
-export const MoviesRepository = (connection: MongoClient) => {
+export const MoviesRepository = (connection: Db) => {
   return {
     add: async (movieCreateObject: MovieCreateObject): Promise<boolean> => {
       return;

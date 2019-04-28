@@ -18,7 +18,8 @@
     "removeComments": true,
     "pretty": true,
     "resolveJsonModule": true,
-    "importHelpers": false
+    "importHelpers": false,
+    "noUnusedLocals": true
   },
   "include": ["./@types/**/*"],
   "plugins": [

@@ -2,13 +2,12 @@ import {mongoConnection} from '@src/database';
 import {AuthRepository} from '@src/pkg/storage/mongo/auth.repository';
 import bcrypt from 'bcrypt';
 import {LoginResponseObject, LoginObject} from 'types/authorizing.services';
-import {promisify} from 'util';
-import crypto from 'crypto';
-import {InvalidPasswordError} from '@src/domain-errors/invalid-password';
-import {ObjectID} from 'bson';
+
+import {InvalidPasswordError} from '@src/errors/application-errors/invalid-password';
 import {UsersRepository} from '@src/pkg/storage/mongo/users.repository';
 import {GetUserObject} from 'types/users.repository';
 import {UserPrivate} from 'types/user-controlling.services';
+import {generateToken} from '@src/utils/generate-token';
 
 const SALT_ROUNDS = 10;
 const SESSION_TOKEN_LENGTH = 76;
@@ -28,16 +27,21 @@ export const AuthServices = async () => {
         const {userId} = await AuthRepo.setSession({username, sessionToken});
         return {userId, token: sessionToken};
       } else {
-        throw new InvalidPasswordError({message: "Passwords don't match"});
+        throw new InvalidPasswordError({
+          data: {
+            username,
+            password,
+          },
+        });
       }
     },
-    logout: ({sessionId}: {sessionId: ObjectID}): Promise<boolean> => {
+    logout: ({sessionId}: {sessionId: string}): Promise<boolean> => {
       return AuthRepo.closeSession(sessionId);
     },
     getSession: ({sessionToken}: {sessionToken: string}) => {
       return AuthRepo.getSession(sessionToken);
     },
-    generateActivationToken: async ({userId}: {userId: ObjectID}) => {
+    generateActivationToken: async ({userId}: {userId: string}) => {
       return AuthRepo.setActivationPublicToken({
         userId,
         activationToken: await generateToken(ACTIVATION_RESET_TOKEN_LENGTH),
@@ -50,9 +54,4 @@ export const AuthServices = async () => {
       });
     },
   };
-};
-
-const generateToken = async (length: number = 76) => {
-  const randomBuffer = await promisify(crypto.randomBytes)(length);
-  return randomBuffer.toString('hex');
 };
