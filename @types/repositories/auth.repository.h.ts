@@ -7,7 +7,8 @@ declare module 'types/auth.repository' {
     sessionToken: string;
   };
   type NewPasswordObject = {
-    userId: MongoObjectID;
+    resetToken?: string;
+    userId?: MongoObjectID;
     password: string;
   };
 

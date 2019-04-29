@@ -2,19 +2,18 @@ declare module 'types/user-controlling.services' {
   import {MovieSlim} from 'types/movies-requesting.services';
   import {ListEntryThin} from 'types/listing.services';
 
-  interface User {
+  interface UserThin {
     _id: string;
     username: string;
   }
 
-  interface UserPrivate extends User {
+  interface UserPrivate extends UserThin {
     email: string;
     language: 'en' | 'es';
   }
 
   type UserFollower = {
     _id: string;
-    avatar: string;
     username: string;
   };
 
@@ -30,8 +29,14 @@ declare module 'types/user-controlling.services' {
     lists: ListEntryThin[];
   }
 
-  interface UserFull extends User, UserMovies, UserLists {
+  interface UserFull extends UserThin, UserMovies, UserLists {
     followers: UserFollower[];
     follows: UserFollower[];
   }
+
+  type RegistrationObject = {
+    email: string;
+    password: string;
+    username: string;
+  };
 }

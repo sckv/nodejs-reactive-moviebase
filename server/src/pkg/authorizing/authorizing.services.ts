@@ -1,25 +1,19 @@
 import {mongoConnection} from '@src/database';
-import {AuthRepository} from '@src/pkg/storage/mongo/auth.repository';
-import bcrypt from 'bcrypt';
-import {LoginResponseObject, LoginObject} from 'types/authorizing.services';
-
 import {InvalidPasswordError} from '@src/errors/application-errors/invalid-password';
-import {UsersRepository} from '@src/pkg/storage/mongo/users.repository';
-import {GetUserObject} from 'types/users.repository';
-import {UserPrivate} from 'types/user-controlling.services';
+import {AuthRepository} from '@src/pkg/storage/mongo/auth.repository';
 import {generateToken} from '@src/utils/generate-token';
+import bcrypt from 'bcrypt';
+import {NewPasswordObject} from 'types/auth.repository';
+import {LoginObject, LoginResponseObject} from 'types/authorizing.services';
 
-const SALT_ROUNDS = 10;
 const SESSION_TOKEN_LENGTH = 76;
 const ACTIVATION_RESET_TOKEN_LENGTH = 96;
 
 export const AuthServices = async () => {
-  const connection = await mongoConnection;
-  const AuthRepo = AuthRepository(connection);
-  const UsersRepo = UsersRepository(connection);
+  const AuthRepo = AuthRepository(mongoConnection);
+  // const UsersRepo = UsersRepository(connection);
   return {
     login: async ({username, password}: LoginObject): Promise<LoginResponseObject> => {
-      // const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
       const userPassword = await AuthRepo.getPasswordByUsername(username);
 
       if (await bcrypt.compare(password, userPassword.password)) {
@@ -52,6 +46,15 @@ export const AuthServices = async () => {
         email,
         recoveryToken: await generateToken(ACTIVATION_RESET_TOKEN_LENGTH),
       });
+    },
+    checkRecoveryAndSetResetToken: async ({recoveryToken}: {recoveryToken: string}) => {
+      return AuthRepo.matchRecoveryAndSetResetToken({
+        recoveryToken,
+        resetToken: await generateToken(ACTIVATION_RESET_TOKEN_LENGTH),
+      });
+    },
+    reSetNewPassword: async ({userId, password, resetToken}: NewPasswordObject) => {
+      return AuthRepo.setPassword({userId, password, resetToken});
     },
   };
 };
