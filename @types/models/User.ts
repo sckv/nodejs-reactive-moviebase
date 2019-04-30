@@ -18,6 +18,7 @@ declare module 'types/User.model' {
       private: boolean;
       movies: MongoObjectID[];
     }>;
+    active: boolean;
     activationToken?: string;
     recoveryToken?: string;
     resetToken?: string;
