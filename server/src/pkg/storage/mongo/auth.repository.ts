@@ -13,6 +13,7 @@ import {SessionNotSetError} from '@src/errors/domain-errors/session-not-set';
 import {SessionDoNotExistError} from '@src/errors/domain-errors/session-do-not-exist';
 import {User} from 'types/User.model';
 import {Session} from 'types/Session.model';
+import {MongoObjectID} from 'types/utils';
 
 export const AuthRepository = (connection: Db) => {
   return {
@@ -20,7 +21,14 @@ export const AuthRepository = (connection: Db) => {
      * @throws UserNotFoundError
      */
     getPasswordByUsername: async (username: string): Promise<{password: string}> => {
-      const password = await connection.collection('users').findOne<string>({username, active: true});
+      const {password} = await connection.collection('users').findOne<{password: string}>(
+        {username, active: true},
+        {
+          projection: {
+            password: 1,
+          },
+        },
+      );
       if (!password) throw new UserNotFoundError({data: {username}, message: ErrorsList.USER_NOT_FOUND});
       return {password};
     },
@@ -41,11 +49,9 @@ export const AuthRepository = (connection: Db) => {
           token: sessionToken,
         },
         {
-          $set: {
-            $currentDate: {
-              lastModified: true,
-              createdAt: {$type: 'timestamp'},
-            },
+          $currentDate: {
+            lastModified: true,
+            createdAt: {$type: 'timestamp'},
           },
         },
         {upsert: true},
@@ -59,10 +65,10 @@ export const AuthRepository = (connection: Db) => {
     /**
      * @throws SessionDoNotExistError
      */
-    closeSession: async (sessionId: string): Promise<boolean> => {
+    closeSession: async (sessionToken: MongoObjectID): Promise<boolean> => {
       const success = await connection.collection<Session>('sessions').updateOne(
         {
-          $and: [{_id: {$eq: sessionId}}, {sessionClosed: {$exists: false}}],
+          $and: [{sessionToken: {$eq: sessionToken}}, {sessionClosed: {$exists: false}}],
         },
         {
           $currentDate: {
@@ -72,7 +78,7 @@ export const AuthRepository = (connection: Db) => {
           },
         },
       );
-      if (!success.matchedCount) throw new SessionDoNotExistError({data: {sessionId}});
+      if (!success.matchedCount) throw new SessionDoNotExistError({data: {sessionToken}});
       return true;
     },
 
@@ -103,7 +109,7 @@ export const AuthRepository = (connection: Db) => {
         ])
         .limit(1)
         .next();
-
+      console.log('sessionObject>>', sessionObject);
       if (!sessionObject) throw new SessionDoNotExistError({data: {sessionToken}});
 
       return sessionObject;
@@ -117,9 +123,7 @@ export const AuthRepository = (connection: Db) => {
       activationToken,
     }: SetActivationTokenObject): Promise<{activationToken: string}> => {
       const success = await connection.collection<User>('users').updateOne(
-        {
-          _id: userId,
-        },
+        {$and: [{_id: {$eq: userId}}, {active: {$eq: false}}]},
         {
           $set: {activationToken},
           $currentDate: {
@@ -146,7 +150,7 @@ export const AuthRepository = (connection: Db) => {
         },
       );
 
-      if (!success.matchedCount) throw new UserNotFoundError({data: {activationToken}});
+      if (!success.matchedCount && !success.modifiedCount) throw new UserNotFoundError({data: {activationToken}});
       return true;
     },
 
@@ -199,7 +203,7 @@ export const AuthRepository = (connection: Db) => {
      */
     setPassword: async ({userId, password, resetToken}: NewPasswordObject): Promise<boolean> => {
       const updatedUser = await connection.collection('users').updateOne(
-        {_id: userId, resetToken},
+        {$and: [{_id: {$eq: userId}}, {resetToken: {$eq: resetToken}}]},
         {
           $set: {password},
           $currentDate: {

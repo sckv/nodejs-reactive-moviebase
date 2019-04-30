@@ -1,29 +1,33 @@
 import {MongoClient, Db} from 'mongodb';
 import {logger} from '@src/utils/logger';
+import {InitializeDatabase} from '@src/initialize-database';
 
 const mongoUrl = `mongodb://${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_DATABASE}`;
 
-const connectToDatabase = async (): Promise<Db> => {
+export const connectToDatabase = async (): Promise<{db: Db; connection: MongoClient}> => {
   let connection: MongoClient = null;
 
   const tryConnect = async () => {
     try {
-      connection = await MongoClient.connect(mongoUrl, {loggerLevel: 'debug'});
+      connection = await MongoClient.connect(mongoUrl);
+      await InitializeDatabase(connection.db('moviebase'));
       return connection;
     } catch (error) {
       logger.error('Error with database connection');
     }
   };
-
+  await tryConnect();
   connection &&
     connection.on('error', () => {
       setTimeout(async () => await tryConnect(), 5000);
     });
-
-  return connection.db('moviebase');
+  return {
+    db: connection.db('moviebase'),
+    connection,
+  };
 };
 
 let resolvedConnection: Db;
-connectToDatabase().then(res => (resolvedConnection = res));
+connectToDatabase().then(res => (resolvedConnection = res.db));
 
 export const mongoConnection = resolvedConnection;

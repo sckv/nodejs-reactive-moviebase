@@ -5,12 +5,14 @@ import {generateToken} from '@src/utils/generate-token';
 import bcrypt from 'bcrypt';
 import {NewPasswordObject} from 'types/auth.repository';
 import {LoginObject, LoginResponseObject} from 'types/authorizing.services';
+import {Db} from 'mongodb';
 
 const SESSION_TOKEN_LENGTH = 76;
 const ACTIVATION_RESET_TOKEN_LENGTH = 96;
 
-export const AuthServices = async () => {
-  const AuthRepo = AuthRepository(mongoConnection);
+// We let injectable mongoclientDB ONLY for testing purposes
+export const AuthServices = async (mc?: Db) => {
+  const AuthRepo = AuthRepository(mc || mongoConnection);
   // const UsersRepo = UsersRepository(connection);
   return {
     login: async ({username, password}: LoginObject): Promise<LoginResponseObject> => {
