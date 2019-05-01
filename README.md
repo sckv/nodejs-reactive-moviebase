@@ -38,8 +38,7 @@ Whole application is dockerized and managed through `docker-compose`, node proce
 
 #### Server
 
-Contains server launching fabric for different microservices what are going to be executed.
-
+- `launch` contains server launching fabric for different microservices what are going to be executed.
 - `services` contain external / independent services
 - `handlers` contain all controllers to which the routes will claim for
 - `routes` archives with routing for express
