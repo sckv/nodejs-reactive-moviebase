@@ -10,6 +10,7 @@ declare module 'types/User.model' {
     email: string;
     language: LanguageType;
     follows: MongoObjectID[];
+    followers: MongoObjectID[];
     ratedMovies: MongoObjectID[];
     lists: Array<{
       _id: string;

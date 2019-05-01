@@ -3,6 +3,8 @@ import {RegisterUserObject, SearchUsersObject, GetUserObject, ModifyUserObject} 
 import {UserRegisterError} from '@src/errors/domain-errors/user-register-error';
 import {User} from 'types/User.model';
 import {UserFull} from 'types/user-controlling.services';
+import {UserNotFoundError} from '@src/errors/domain-errors/user-not-found';
+import {FollowingOperationError} from '@src/errors/domain-errors/following';
 
 const USERS_PER_PAGE = 30;
 
@@ -16,20 +18,10 @@ export const UsersRepository = (connection: Db) => {
     search: async <T>({username, page = 0}: SearchUsersObject): Promise<T[]> => {
       const users = await connection
         .collection<User>('users')
-        .find<T[]>(
+        .find<T>(
           {
-            $and: [
-              {
-                $text: {
-                  $search: username,
-                },
-              },
-              {
-                cast: {
-                  $elemMatch: {$regex: new RegExp(`/${username}/`, 'gi')},
-                },
-              },
-            ],
+            username: new RegExp(username, 'gi'),
+            active: true,
           },
           {
             projection: {
@@ -40,7 +32,7 @@ export const UsersRepository = (connection: Db) => {
         )
         .skip(page > 0 ? (page - 1) * USERS_PER_PAGE : 0)
         .limit(USERS_PER_PAGE)
-        .next();
+        .toArray();
 
       return users;
     },
@@ -99,14 +91,81 @@ export const UsersRepository = (connection: Db) => {
     // getByEmail: async <T>(email: string): Promise<T> => {
     //   return;
     // },
-    modify: async (userData: ModifyUserObject): Promise<boolean> => {
+    modify: async ({userId, ...userData}: ModifyUserObject): Promise<boolean> => {
+      const updatedUser = await connection.collection<User>('users').updateOne(
+        {_id: userId},
+        {
+          $set: {
+            ...userData,
+          },
+          $currentDate: {
+            lastModified: true,
+          },
+        },
+      );
+      if (!updatedUser.matchedCount || !updatedUser.modifiedCount)
+        throw new UserNotFoundError({data: {userId, ...userData}});
       return;
     },
     follow: async ({userId, followId}: {userId: string; followId: string}) => {
-      return;
+      const followed = await connection.collection<User>('users').bulkWrite([
+        {
+          updateOne: {
+            filter: {
+              _id: userId,
+            },
+            update: {
+              $addToSet: {
+                follows: followId,
+              },
+            },
+          },
+        },
+        {
+          updateOne: {
+            filter: {
+              _id: followId,
+            },
+            update: {
+              $addToSet: {
+                followers: userId,
+              },
+            },
+          },
+        },
+      ]);
+      if (followed.matchedCount !== 2) throw new FollowingOperationError({data: {userId, followId}});
+      return true;
     },
     unfollow: async ({userId, followId}: {userId: string; followId: string}) => {
-      return;
+      const followed = await connection.collection<User>('users').bulkWrite([
+        {
+          updateOne: {
+            filter: {
+              _id: userId,
+            },
+            update: {
+              $pull: {
+                follows: followId,
+              },
+            },
+          },
+        },
+        {
+          updateOne: {
+            filter: {
+              _id: followId,
+            },
+            update: {
+              $pull: {
+                followers: userId,
+              },
+            },
+          },
+        },
+      ]);
+      if (followed.matchedCount !== 2) throw new FollowingOperationError({data: {userId, followId}});
+      return true;
     },
   };
 };

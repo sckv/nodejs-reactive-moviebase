@@ -7,7 +7,6 @@ import {moviesFixture} from '../fixtures/movies.fixture';
 // Service & Repo
 import {AuthServices} from '../../src/pkg/authorizing/authorizing.services';
 import {AuthRepository} from '../../src/pkg/storage/mongo/auth.repository';
-import {UserIDS} from '../fixtures/IDs';
 
 type ThenArg<T> = T extends Promise<infer U> ? U : T;
 
@@ -49,14 +48,14 @@ describe('<-- Authorizing service / repository -->', () => {
 
   it('sets session / repo', async () => {
     const user1 = usersFixture[1];
-    const user = await repository.setSession({username: user1.username, sessionToken: SESSION_TEST_TOKEN});
-    expect('' + user.userId).toEqual('' + user1._id.toHexString());
+    const {userId} = await repository.setSession({username: user1.username, sessionToken: SESSION_TEST_TOKEN});
+    expect(String(userId)).toEqual(String(user1._id.toHexString()));
   });
 
   it('gets session / repo', async () => {
     const user1 = usersFixture[1];
     const session = await repository.getSession(SESSION_TEST_TOKEN);
-    expect('' + session.userId).toEqual('' + user1._id.toHexString());
+    expect(String(session.userId)).toEqual(String(user1._id.toHexString()));
     expect(session.username).toEqual(user1.username);
     expect(session.language).toEqual(user1.language);
   });
