@@ -6,20 +6,19 @@ export const moviesFixture = [
     ttid: 'tt0',
     title: 'Movie 0 TEST',
     year: 1007,
-    data: [
-      {
-        en: {
-          plot: 'Movie 0 EN PLOT',
-          description: 'Movie 0 EN DESCRIPTION',
-          poster: 'Movie 1 EN POSTER',
-        },
-        es: {
-          plot: 'Movie 0 ESP PLOT',
-          description: 'Movie 0 ESP DESCRIPCION',
-          poster: 'Movie 0 ESP POSTER',
-        },
+    data: {
+      en: {
+        plot: 'Movie 0 EN PLOT',
+        description: 'Movie 0 EN DESCRIPTION',
+        poster: 'Movie 1 EN POSTER',
       },
-    ],
+      es: {
+        plot: 'Movie 0 ESP PLOT',
+        description: 'Movie 0 ESP DESCRIPCION',
+        poster: 'Movie 0 ESP POSTER',
+      },
+    },
+
     ratedBy: [
       {
         userId: UserIDS.user0,
@@ -35,20 +34,19 @@ export const moviesFixture = [
     ttid: 'tt1',
     title: 'Movie 1 TEST',
     year: 1007,
-    data: [
-      {
-        en: {
-          plot: 'Movie 1 EN PLOT',
-          description: 'Movie 1 EN DESCRIPTION',
-          poster: 'Movie 1 EN POSTER',
-        },
-        es: {
-          plot: 'Movie 1 ESP PLOT',
-          description: 'Movie 1 ESP DESCRIPCION',
-          poster: 'Movie 1 ESP POSTER',
-        },
+    data: {
+      en: {
+        plot: 'Movie 1 EN PLOT',
+        description: 'Movie 1 EN DESCRIPTION',
+        poster: 'Movie 1 EN POSTER',
       },
-    ],
+      es: {
+        plot: 'Movie 1 ESP PLOT',
+        description: 'Movie 1 ESP DESCRIPCION',
+        poster: 'Movie 1 ESP POSTER',
+      },
+    },
+
     ratedBy: [
       {
         userId: UserIDS.user0,
@@ -69,20 +67,19 @@ export const moviesFixture = [
     ttid: 'tt2',
     title: 'Movie 2 TEST',
     year: 1007,
-    data: [
-      {
-        en: {
-          plot: 'Movie 2 EN PLOT',
-          description: 'Movie 2 EN DESCRIPTION',
-          poster: 'Movie 2 EN POSTER',
-        },
-        es: {
-          plot: 'Movie 2 ESP PLOT',
-          description: 'Movie 2 ESP DESCRIPCION',
-          poster: 'Movie 2 ESP POSTER',
-        },
+    data: {
+      en: {
+        plot: 'Movie 2 EN PLOT',
+        description: 'Movie 2 EN DESCRIPTION',
+        poster: 'Movie 2 EN POSTER',
       },
-    ],
+      es: {
+        plot: 'Movie 2 ESP PLOT',
+        description: 'Movie 2 ESP DESCRIPCION',
+        poster: 'Movie 2 ESP POSTER',
+      },
+    },
+
     ratedBy: [
       {
         userId: UserIDS.user0,
@@ -98,20 +95,19 @@ export const moviesFixture = [
     ttid: 'tt3',
     title: 'Movie 3 TEST',
     year: 1007,
-    data: [
-      {
-        en: {
-          plot: 'Movie 3 EN PLOT',
-          description: 'Movie 3 EN DESCRIPTION',
-          poster: 'Movie 3 EN POSTER',
-        },
-        es: {
-          plot: 'Movie 3 ESP PLOT',
-          description: 'Movie 3 ESP DESCRIPCION',
-          poster: 'Movie 3 ESP POSTER',
-        },
+    data: {
+      en: {
+        plot: 'Movie 3 EN PLOT',
+        description: 'Movie 3 EN DESCRIPTION',
+        poster: 'Movie 3 EN POSTER',
       },
-    ],
+      es: {
+        plot: 'Movie 3 ESP PLOT',
+        description: 'Movie 3 ESP DESCRIPCION',
+        poster: 'Movie 3 ESP POSTER',
+      },
+    },
+
     ratedBy: [
       {
         userId: UserIDS.user1,
@@ -132,20 +128,19 @@ export const moviesFixture = [
     ttid: 'tt4',
     title: 'Movie 4 TEST',
     year: 1007,
-    data: [
-      {
-        en: {
-          plot: 'Movie 4 EN PLOT',
-          description: 'Movie 4 EN DESCRIPTION',
-          poster: 'Movie 4 EN POSTER',
-        },
-        es: {
-          plot: 'Movie 4 ESP PLOT',
-          description: 'Movie 4 ESP DESCRIPCION',
-          poster: 'Movie 4 ESP POSTER',
-        },
+    data: {
+      en: {
+        plot: 'Movie 4 EN PLOT',
+        description: 'Movie 4 EN DESCRIPTION',
+        poster: 'Movie 4 EN POSTER',
       },
-    ],
+      es: {
+        plot: 'Movie 4 ESP PLOT',
+        description: 'Movie 4 ESP DESCRIPCION',
+        poster: 'Movie 4 ESP POSTER',
+      },
+    },
+
     ratedBy: [
       {
         userId: UserIDS.user1,
@@ -161,20 +156,18 @@ export const moviesFixture = [
     ttid: 'tt5',
     title: 'Movie 5 TEST',
     year: 1007,
-    data: [
-      {
-        en: {
-          plot: 'Movie 5 EN PLOT',
-          description: 'Movie 5 EN DESCRIPTION',
-          poster: 'Movie 5 EN POSTER',
-        },
-        es: {
-          plot: 'Movie 5 ESP PLOT',
-          description: 'Movie 5 ESP DESCRIPCION',
-          poster: 'Movie 5 ESP POSTER',
-        },
+    data: {
+      en: {
+        plot: 'Movie 5 EN PLOT',
+        description: 'Movie 5 EN DESCRIPTION',
+        poster: 'Movie 5 EN POSTER',
       },
-    ],
+      es: {
+        plot: 'Movie 5 ESP PLOT',
+        description: 'Movie 5 ESP DESCRIPCION',
+        poster: 'Movie 5 ESP POSTER',
+      },
+    },
     ratedBy: [
       {
         userId: UserIDS.user0,

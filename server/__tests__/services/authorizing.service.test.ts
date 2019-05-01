@@ -7,7 +7,6 @@ import {moviesFixture} from '../fixtures/movies.fixture';
 // Service & Repo
 import {AuthServices} from '../../src/pkg/authorizing/authorizing.services';
 import {AuthRepository} from '../../src/pkg/storage/mongo/auth.repository';
-import {UserIDS} from '../fixtures/IDs';
 
 type ThenArg<T> = T extends Promise<infer U> ? U : T;
 

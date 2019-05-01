@@ -68,7 +68,7 @@ export const AuthRepository = (connection: Db) => {
     closeSession: async (sessionToken: MongoObjectID): Promise<boolean> => {
       const success = await connection.collection<Session>('sessions').updateOne(
         {
-          $and: [{sessionToken: {$eq: sessionToken}}, {sessionClosed: {$exists: false}}],
+          $and: [{token: {$eq: sessionToken}}, {sessionClosed: {$exists: false}}],
         },
         {
           $currentDate: {
@@ -89,6 +89,7 @@ export const AuthRepository = (connection: Db) => {
       const sessionObject = await connection
         .collection<User>('users')
         .aggregate<SessionObject>([
+          {$match: {active: true}},
           {
             $lookup: {
               from: 'sessions',
@@ -97,19 +98,33 @@ export const AuthRepository = (connection: Db) => {
               as: 'sessions',
             },
           },
-          {$unwind: '$sessions'},
-          {$match: {'sessions.sessionToken': sessionToken, active: true}},
           {
             $project: {
-              userId: '_id',
+              userId: '$_id',
+              username: '$username',
+              language: '$language',
+              sessions: {
+                $filter: {
+                  input: '$sessions',
+                  as: 'session',
+                  cond: {
+                    $eq: ['$$session.token', sessionToken],
+                  },
+                },
+              },
+            },
+          },
+          {$unwind: '$sessions'},
+          {
+            $project: {
+              _id: 0,
+              userId: 1,
               username: 1,
-              languageType: 1,
+              language: 1,
             },
           },
         ])
-        .limit(1)
         .next();
-      console.log('sessionObject>>', sessionObject);
       if (!sessionObject) throw new SessionDoNotExistError({data: {sessionToken}});
 
       return sessionObject;
@@ -202,8 +217,12 @@ export const AuthRepository = (connection: Db) => {
      * @throws UserNotFoundError
      */
     setPassword: async ({userId, password, resetToken}: NewPasswordObject): Promise<boolean> => {
+      let option;
+      if (userId) option = {_id: userId};
+      if (resetToken) option = {resetToken};
       const updatedUser = await connection.collection('users').updateOne(
-        {$and: [{_id: {$eq: userId}}, {resetToken: {$eq: resetToken}}]},
+        // {$or: [{_id: {$eq: userId}}, {resetToken: {$eq: resetToken}}]},
+        option,
         {
           $set: {password},
           $currentDate: {
