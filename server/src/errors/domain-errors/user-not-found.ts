@@ -5,6 +5,7 @@ export class UserNotFoundError extends Error {
   data: {[k: string]: any};
   constructor({data}: ErrorProps) {
     super(ErrorsList.USER_NOT_FOUND);
+    this.message = ErrorsList.USER_NOT_FOUND;
     this.data = data;
   }
 }

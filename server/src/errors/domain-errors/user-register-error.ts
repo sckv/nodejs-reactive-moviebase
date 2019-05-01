@@ -5,6 +5,7 @@ export class UserRegisterError extends Error {
   data: {[k: string]: any};
   constructor({data}: ErrorProps) {
     super(ErrorsList.USER_REGISTER_ERROR);
+    this.message = ErrorsList.USER_REGISTER_ERROR;
     this.data = data;
   }
 }

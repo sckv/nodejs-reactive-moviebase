@@ -5,15 +5,18 @@ import bcrypt from 'bcrypt';
 import isEmail from 'validator/lib/isEmail';
 import {InvalidEmailError} from '@src/errors/application-errors/invalid-email';
 import {GetUserObject, ModifyUserObject} from 'types/users.repository';
+import {Db} from 'mongodb';
 
-export const UserControllingServices = async () => {
-  const UsersRepo = UsersRepository(mongoConnection);
+export const PASSWORD_HASHING_ROUNDS = 10;
+
+export const UserControllingServices = async (db?: Db) => {
+  const UsersRepo = UsersRepository(db || mongoConnection);
   return {
     register: async ({username, password, email}: RegistrationObject): Promise<boolean> => {
       if (!isEmail(String(email))) throw new InvalidEmailError({data: {email, username}});
       return UsersRepo.register({
         username,
-        password: await bcrypt.hash(String(password).trim(), 10),
+        password: await bcrypt.hash(String(password).trim(), PASSWORD_HASHING_ROUNDS),
         email,
       });
     },
@@ -23,16 +26,20 @@ export const UserControllingServices = async () => {
     get: (criterias: GetUserObject) => {
       return UsersRepo.get(criterias);
     },
-    modify: async (userData: ModifyUserObject) => {
+    modify: async ({userId, password, language}: ModifyUserObject) => {
+      let encrypted: string;
+      if (password) encrypted = await bcrypt.hash(password, PASSWORD_HASHING_ROUNDS);
       return UsersRepo.modify({
-        ...userData,
+        userId,
+        language,
+        password: password ? encrypted : undefined,
       });
     },
-    follow: async (followsData: {userId: string; followId: string}) => {
-      return UsersRepo.follow(followsData);
+    follow: async (followData: {userId: string; followId: string}) => {
+      return UsersRepo.follow(followData);
     },
-    unfollow: async (followsData: {userId: string; followId: string}) => {
-      return UsersRepo.follow(followsData);
+    unfollow: async (unfollowData: {userId: string; followId: string}) => {
+      return UsersRepo.unfollow(unfollowData);
     },
   };
 };
