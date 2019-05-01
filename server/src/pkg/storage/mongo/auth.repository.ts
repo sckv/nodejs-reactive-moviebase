@@ -43,7 +43,7 @@ export const AuthRepository = (connection: Db) => {
 
       if (!_id) throw new UserNotFoundError({data: {username}});
 
-      const session = await connection.collection<Session>('sessions').update(
+      const session = await connection.collection<Session>('sessions').updateOne(
         {
           userId: _id,
           token: sessionToken,
