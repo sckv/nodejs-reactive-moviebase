@@ -41,7 +41,7 @@ Whole application is dockerized and managed through `docker-compose`, node proce
 - `launch` contains server launching fabric for different microservices what are going to be executed.
 - `services` contain external / independent services
 - `handlers` contain all controllers to which the routes will claim for
-- `routes` archives with routing for express
+- `routes` files with routing for express
 - `pkg` it is the main directory for the application services/repositories
 - `pkg/storage` different repositories for each different DB motor we implement
 - `pkg/{verbose}` self-explainable services
