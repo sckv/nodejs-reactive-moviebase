@@ -15,7 +15,7 @@ const redis = new ioredis({
 
 jest.setTimeout(25000);
 
-describe('<-- Cache service -->', () => {
+export default describe('<-- Cache service -->', () => {
   beforeAll(() => {
     cachingService();
   }, 5000);

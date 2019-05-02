@@ -1,28 +1,51 @@
-import {Db} from 'mongodb';
+import {Db, ObjectId} from 'mongodb';
 import {RegisterUserObject, SearchUsersObject, GetUserObject, ModifyUserObject} from 'types/users.repository';
 import {UserRegisterError} from '@src/errors/domain-errors/user-register-error';
 import {User} from 'types/User.model';
 import {UserFull} from 'types/user-controlling.services';
 import {UserNotFoundError} from '@src/errors/domain-errors/user-not-found';
 import {FollowingOperationError} from '@src/errors/domain-errors/following';
+import {UserModifyingError} from '@src/errors/domain-errors/user-modifying-error';
+import {logger} from '@src/utils/logger';
 
 const USERS_PER_PAGE = 30;
 
 export const UsersRepository = (connection: Db) => {
   return {
     register: async (registerData: RegisterUserObject): Promise<boolean> => {
-      const registration = await connection.collection<Partial<User>>('users').insert({...registerData});
-      if (!registration.insertedCount) throw new UserRegisterError({data: {registerData}});
-      return true;
+      try {
+        const registration = await connection
+          .collection<Partial<User>>('users')
+          .insertOne({...registerData, language: 'en'});
+
+        if (!registration.insertedCount) throw new UserRegisterError({data: {registerData}});
+
+        const updating = await connection.collection<User>('users').updateOne(
+          {_id: registration.insertedId},
+          {
+            $set: {
+              language: 'en',
+              active: false,
+            },
+            $currentDate: {
+              createdAt: {$type: 'timestamp'},
+              lastModified: true,
+            },
+          },
+        );
+
+        if (!updating.modifiedCount) throw new UserModifyingError({data: {registerData}});
+        return true;
+      } catch (e) {
+        logger.error(e);
+        throw new UserRegisterError({data: {registerData}});
+      }
     },
     search: async <T>({username, page = 0}: SearchUsersObject): Promise<T[]> => {
       const users = await connection
         .collection<User>('users')
         .find<T>(
-          {
-            username: new RegExp(username, 'gi'),
-            active: true,
-          },
+          {username: new RegExp(username, 'gi')},
           {
             projection: {
               _id: 1,
@@ -46,8 +69,8 @@ export const UsersRepository = (connection: Db) => {
       listsData,
       moviesData,
     }: GetUserObject): Promise<Partial<UserFull>> => {
-      const {_id} = await connection.collection<User>('users').findOne<User>(
-        {$and: [{$or: [{_id: userId}, {username}]}, {active: true}]},
+      const user = await connection.collection<User>('users').findOne<User>(
+        {$and: [{$or: [{_id: userId}, {username}]}]},
         {
           projection: {
             _id: 1,
@@ -55,13 +78,15 @@ export const UsersRepository = (connection: Db) => {
         },
       );
 
-      if (!_id)
+      if (!user)
         throw new UserNotFoundError({
           data: {
             username,
             userId,
           },
         });
+
+      const {_id} = user;
 
       // QUERY
       const queryArray: Array<{[k: string]: any}> = [];
@@ -96,13 +121,13 @@ export const UsersRepository = (connection: Db) => {
             maxDepth: 0,
           },
         });
-        addFieldsObject.$addFields.followers = {
+        addFieldsObject.$addFields.follows = {
           $map: {
-            input: '$followers',
-            as: 'follower',
+            input: '$follows',
+            as: 'follow',
             in: {
-              _id: '$$follower._id',
-              username: '$$follower.username',
+              _id: '$$follow._id',
+              username: '$$follow.username',
             },
           },
         };
@@ -119,13 +144,13 @@ export const UsersRepository = (connection: Db) => {
             maxDepth: 0,
           },
         });
-        addFieldsObject.$addFields.follows = {
+        addFieldsObject.$addFields.followers = {
           $map: {
-            input: '$follows',
-            as: 'follow',
+            input: '$followers',
+            as: 'follower',
             in: {
-              _id: '$$follow._id',
-              username: '$$follow.username',
+              _id: '$$follower._id',
+              username: '$$follower.username',
             },
           },
         };
@@ -198,9 +223,7 @@ export const UsersRepository = (connection: Db) => {
         });
       return queriedUserData;
     },
-    // getByEmail: async <T>(email: string): Promise<T> => {
-    //   return;
-    // },
+
     modify: async ({userId, ...userData}: ModifyUserObject): Promise<boolean> => {
       const updatedUser = await connection.collection<User>('users').updateOne(
         {_id: userId},
@@ -213,11 +236,12 @@ export const UsersRepository = (connection: Db) => {
           },
         },
       );
-      if (!updatedUser.matchedCount || !updatedUser.modifiedCount)
-        throw new UserNotFoundError({data: {userId, ...userData}});
+      if (!updatedUser.matchedCount) throw new UserNotFoundError({data: {userId, ...userData}});
+      if (!updatedUser.modifiedCount) throw new UserModifyingError({data: {userId, ...userData}});
+
       return;
     },
-    follow: async ({userId, followId}: {userId: string; followId: string}) => {
+    follow: async ({userId, followId}: {userId: string | ObjectId; followId: ObjectId | string}) => {
       const followed = await connection.collection<User>('users').bulkWrite([
         {
           updateOne: {
@@ -247,7 +271,7 @@ export const UsersRepository = (connection: Db) => {
       if (followed.matchedCount !== 2) throw new FollowingOperationError({data: {userId, followId}});
       return true;
     },
-    unfollow: async ({userId, followId}: {userId: string; followId: string}) => {
+    unfollow: async ({userId, followId}: {userId: string | ObjectId; followId: string | ObjectId}) => {
       const followed = await connection.collection<User>('users').bulkWrite([
         {
           updateOne: {
