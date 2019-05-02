@@ -9,6 +9,7 @@ export const usersFixture = [
     language: 'en',
     active: true,
     follows: [UserIDS.user1, UserIDS.user2, UserIDS.user3],
+    followers: [],
     ratedMovies: [MovieIDS.movie0, MovieIDS.movie1, MovieIDS.movie2, MovieIDS.movie5],
     lists: [
       {
@@ -44,6 +45,7 @@ export const usersFixture = [
     language: 'en',
     active: true,
     follows: [UserIDS.user3, UserIDS.user5],
+    followers: [UserIDS.user0],
     ratedMovies: [MovieIDS.movie1, MovieIDS.movie3, MovieIDS.movie4],
     lists: [
       {
@@ -65,6 +67,7 @@ export const usersFixture = [
     language: 'en',
     active: false,
     follows: [],
+    followers: [UserIDS.user0, UserIDS.user3],
     ratedMovies: [],
     lists: [],
     createdAt: new Date(),
@@ -78,6 +81,7 @@ export const usersFixture = [
     language: 'en',
     active: true,
     follows: [UserIDS.user2, UserIDS.user5],
+    followers: [UserIDS.user0, UserIDS.user1],
     ratedMovies: [MovieIDS.movie3, MovieIDS.movie5],
     lists: [
       {
@@ -99,6 +103,7 @@ export const usersFixture = [
     language: 'en',
     active: true,
     follows: [],
+    followers: [],
     ratedMovies: [],
     lists: [
       {
@@ -120,6 +125,7 @@ export const usersFixture = [
     language: 'es',
     active: true,
     follows: [],
+    followers: [UserIDS.user1, UserIDS.user3],
     ratedMovies: [MovieIDS.movie5],
     lists: [],
     createdAt: new Date(),
