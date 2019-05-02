@@ -38,6 +38,7 @@ export const UsersRepository = (connection: Db) => {
     },
     get: async ({
       userId,
+      username,
       selfId,
       personalData,
       followers,

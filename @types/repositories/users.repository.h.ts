@@ -14,7 +14,8 @@ declare module 'types/users.repository' {
   }
 
   type GetUserObject = {
-    userId: MongoObjectID;
+    userId?: MongoObjectID;
+    username?: string;
     selfId: MongoObjectID;
 
     personalData?: boolean;
