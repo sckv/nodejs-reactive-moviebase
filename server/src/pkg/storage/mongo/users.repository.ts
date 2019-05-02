@@ -46,48 +46,157 @@ export const UsersRepository = (connection: Db) => {
       listsData,
       moviesData,
     }: GetUserObject): Promise<Partial<UserFull>> => {
+      const {_id} = await connection.collection<User>('users').findOne<User>(
+        {$and: [{$or: [{_id: userId}, {username}]}, {active: true}]},
+        {
+          projection: {
+            _id: 1,
+          },
+        },
+      );
+
+      if (!_id)
+        throw new UserNotFoundError({
+          data: {
+            username,
+            userId,
+          },
+        });
+
+      // QUERY
       const queryArray: Array<{[k: string]: any}> = [];
-      const projectObject: {[k: string]: any} = {};
-
-      //TODO: finish dynamic aggregation pipeline..
-      queryArray.push({$match: {_id: userId}});
-      queryArray.push({
-        $graphLookup: {
-          from: 'users',
-          connectFromField: 'id',
-          connectToField: 'follows',
-          depthField: 'follows',
-          as: 'followers',
-          maxDepth: 0,
+      const addFieldsObject: {$addFields: {[k: string]: any}} = {$addFields: {}};
+      const privateDataProject = {
+        $project: {
+          email: 0,
+          language: 0,
         },
-      });
+      };
+
+      queryArray.push({$match: {_id}});
       queryArray.push({
-        $graphLookup: {
-          from: 'users',
-          connectFromField: 'follows',
-          connectToField: 'id',
-          depthField: 'id',
-          as: 'follows',
-          maxDepth: 0,
+        $project: {
+          password: 0,
+          active: 0,
+          createdAt: 0,
+          lastModified: 0,
         },
       });
 
-      if (personalData && userId === selfId) {
-        projectObject.email = 1;
-        projectObject.languageType = 1;
-      }
+      if (!personalData || (personalData && String(_id) !== String(selfId))) queryArray.push(privateDataProject);
 
       if (follows) {
-        projectObject.follows = {
-          $project: {
-            _id: '$follows.id',
-            username: '$follows.username',
+        queryArray.push({
+          $graphLookup: {
+            from: 'users',
+            connectFromField: 'follows',
+            connectToField: '_id',
+            startWith: '$follows',
+            as: 'follows',
+            maxDepth: 0,
+          },
+        });
+        addFieldsObject.$addFields.followers = {
+          $map: {
+            input: '$followers',
+            as: 'follower',
+            in: {
+              _id: '$$follower._id',
+              username: '$$follower.username',
+            },
           },
         };
       }
 
-      const getResult = connection.collection<User>('users').aggregate(queryArray);
-      return;
+      if (followers) {
+        queryArray.push({
+          $graphLookup: {
+            from: 'users',
+            connectFromField: 'followers',
+            connectToField: '_id',
+            startWith: '$followers',
+            as: 'followers',
+            maxDepth: 0,
+          },
+        });
+        addFieldsObject.$addFields.follows = {
+          $map: {
+            input: '$follows',
+            as: 'follow',
+            in: {
+              _id: '$$follow._id',
+              username: '$$follow.username',
+            },
+          },
+        };
+      }
+
+      if (listsData) {
+        addFieldsObject.$addFields.lists = {
+          $map: {
+            input: '$lists',
+            as: 'list',
+            in: {
+              _id: '$$list._id',
+              description: '$$list.description',
+            },
+          },
+        };
+      }
+
+      if (moviesData)
+        queryArray.push({
+          $lookup: {
+            from: 'movies',
+            let: {ratedMovies: '$id'},
+            as: 'ratedMovies',
+            pipeline: [
+              {
+                $match: {'ratedBy.userId': _id},
+              },
+              {$unwind: '$ratedBy'},
+              {
+                $project: {
+                  _id: '$_id',
+                  title: '$title',
+                  poster: '$poster',
+                  rate: '$ratedBy.rate',
+                },
+              },
+              {
+                $group: {
+                  _id: '$_id',
+                  title: {$first: '$title'},
+                  poster: {$first: '$poster'},
+                  rate: {$first: '$rate'},
+                },
+              },
+            ],
+          },
+        });
+
+      if (Object.keys(addFieldsObject.$addFields).length) queryArray.push(addFieldsObject);
+
+      const exclusionProject: {$project: {[k: string]: number}} = {$project: {}};
+      if (!followers) exclusionProject.$project.followers = 0;
+      if (!follows) exclusionProject.$project.follows = 0;
+      if (!listsData) exclusionProject.$project.lists = 0;
+      if (!moviesData) exclusionProject.$project.ratedMovies = 0;
+      if (Object.keys(exclusionProject.$project).length) queryArray.push(exclusionProject);
+
+      const queriedUserData = await connection
+        .collection<User>('users')
+        .aggregate<Partial<UserFull>>(queryArray)
+        .next();
+
+      if (!queriedUserData)
+        throw new UserNotFoundError({
+          data: {
+            username,
+            userId,
+          },
+        });
+      return queriedUserData;
     },
     // getByEmail: async <T>(email: string): Promise<T> => {
     //   return;

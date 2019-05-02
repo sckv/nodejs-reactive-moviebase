@@ -14,13 +14,13 @@ const connectToDatabase = async () => {
       // await InitializeDatabase(db);
       // await db.dropCollection('users');
       // await db.dropCollection('movies');
-      // await db.createCollection('users');
-      // await db.collection('users').createIndex({email: 1}, {unique: true});
+      await db.createCollection('users');
+      await db.collection('users').createIndex({email: 1}, {unique: true});
 
-      // await db.collection('users').insertMany(usersFixture);
+      await db.collection('users').insertMany(usersFixture);
       // await db.collection('users').createIndex({username: 'text'}, {unique: true});
 
-      // await db.collection('movies').insertMany(moviesFixture);
+      await db.collection('movies').insertMany(moviesFixture);
       return connection;
     } catch (error) {
       console.error('Error with database connection', error);
@@ -48,6 +48,14 @@ const makeQuery = async () => {
   // console.log('sessions>>', sessions);
 
   const username = usersFixture[3].username;
+  const securedUserId = db.collection('users').findOne(
+    {$or: [{_id: UserIDS.user3}, {username}]},
+    {
+      projection: {
+        _id: 1,
+      },
+    },
+  );
   const success = await db
     .collection('users')
     .aggregate([
@@ -79,7 +87,7 @@ const makeQuery = async () => {
           as: 'ratedMovies',
           pipeline: [
             {
-              $match: {'ratedBy.userId': '$$ROOT._id'},
+              $match: {'ratedBy.userId': UserIDS.user3},
             },
             {$unwind: '$ratedBy'},
             {
@@ -88,13 +96,6 @@ const makeQuery = async () => {
                 title: '$title',
                 poster: '$poster',
                 rate: '$ratedBy.rate',
-                // ratedBy: {
-                //   $filter: {
-                //     input: '$ratedBy',
-                //     as: 'rate',
-                //     cond: {$eq: ['$$rate.userId', UserIDS.user3]},
-                //   },
-                // },
               },
             },
             {
@@ -127,6 +128,16 @@ const makeQuery = async () => {
               in: {
                 _id: '$$follow._id',
                 username: '$$follow.username',
+              },
+            },
+          },
+          lists: {
+            $map: {
+              input: '$lists',
+              as: 'list',
+              in: {
+                _id: '$$list._id',
+                description: '$$list.description',
               },
             },
           },
