@@ -45,19 +45,17 @@ const moviesFixture = [
     ttid: 'tt0',
     title: 'Movie 0 TEST',
     year: 1007,
+    poster: 'Movie 0 EN POSTER',
     data: {
       en: {
         plot: 'Movie 0 EN PLOT',
         description: 'Movie 0 EN DESCRIPTION',
-        poster: 'Movie 1 EN POSTER',
       },
       es: {
         plot: 'Movie 0 ESP PLOT',
         description: 'Movie 0 ESP DESCRIPCION',
-        poster: 'Movie 0 ESP POSTER',
       },
     },
-
     ratedBy: [
       {
         userId: UserIDS.user0,
@@ -73,19 +71,17 @@ const moviesFixture = [
     ttid: 'tt1',
     title: 'Movie 1 TEST',
     year: 1007,
+    poster: 'Movie 1 POSTER',
     data: {
       en: {
         plot: 'Movie 1 EN PLOT',
         description: 'Movie 1 EN DESCRIPTION',
-        poster: 'Movie 1 EN POSTER',
       },
       es: {
         plot: 'Movie 1 ESP PLOT',
         description: 'Movie 1 ESP DESCRIPCION',
-        poster: 'Movie 1 ESP POSTER',
       },
     },
-
     ratedBy: [
       {
         userId: UserIDS.user0,
@@ -106,19 +102,17 @@ const moviesFixture = [
     ttid: 'tt2',
     title: 'Movie 2 TEST',
     year: 1007,
+    poster: 'Movie 2 POSTER',
     data: {
       en: {
         plot: 'Movie 2 EN PLOT',
         description: 'Movie 2 EN DESCRIPTION',
-        poster: 'Movie 2 EN POSTER',
       },
       es: {
         plot: 'Movie 2 ESP PLOT',
         description: 'Movie 2 ESP DESCRIPCION',
-        poster: 'Movie 2 ESP POSTER',
       },
     },
-
     ratedBy: [
       {
         userId: UserIDS.user0,
@@ -134,19 +128,17 @@ const moviesFixture = [
     ttid: 'tt3',
     title: 'Movie 3 TEST',
     year: 1007,
+    poster: 'Movie 3 POSTER',
     data: {
       en: {
         plot: 'Movie 3 EN PLOT',
         description: 'Movie 3 EN DESCRIPTION',
-        poster: 'Movie 3 EN POSTER',
       },
       es: {
         plot: 'Movie 3 ESP PLOT',
         description: 'Movie 3 ESP DESCRIPCION',
-        poster: 'Movie 3 ESP POSTER',
       },
     },
-
     ratedBy: [
       {
         userId: UserIDS.user1,
@@ -167,19 +159,17 @@ const moviesFixture = [
     ttid: 'tt4',
     title: 'Movie 4 TEST',
     year: 1007,
+    poster: 'Movie 4 POSTER',
     data: {
       en: {
         plot: 'Movie 4 EN PLOT',
         description: 'Movie 4 EN DESCRIPTION',
-        poster: 'Movie 4 EN POSTER',
       },
       es: {
         plot: 'Movie 4 ESP PLOT',
         description: 'Movie 4 ESP DESCRIPCION',
-        poster: 'Movie 4 ESP POSTER',
       },
     },
-
     ratedBy: [
       {
         userId: UserIDS.user1,
@@ -195,19 +185,17 @@ const moviesFixture = [
     ttid: 'tt5',
     title: 'Movie 5 TEST',
     year: 1007,
+    poster: 'Movie 5 ESP POSTER',
     data: {
       en: {
         plot: 'Movie 5 EN PLOT',
         description: 'Movie 5 EN DESCRIPTION',
-        poster: 'Movie 5 EN POSTER',
       },
       es: {
         plot: 'Movie 5 ESP PLOT',
         description: 'Movie 5 ESP DESCRIPCION',
-        poster: 'Movie 5 ESP POSTER',
       },
     },
-
     ratedBy: [
       {
         userId: UserIDS.user0,
@@ -239,6 +227,7 @@ const usersFixture = [
     language: 'en',
     active: true,
     follows: [UserIDS.user1, UserIDS.user2, UserIDS.user3],
+    followers: [],
     ratedMovies: [MovieIDS.movie0, MovieIDS.movie1, MovieIDS.movie2, MovieIDS.movie5],
     lists: [
       {
@@ -274,6 +263,7 @@ const usersFixture = [
     language: 'en',
     active: true,
     follows: [UserIDS.user3, UserIDS.user5],
+    followers: [UserIDS.user0],
     ratedMovies: [MovieIDS.movie1, MovieIDS.movie3, MovieIDS.movie4],
     lists: [
       {
@@ -295,6 +285,7 @@ const usersFixture = [
     language: 'en',
     active: false,
     follows: [],
+    followers: [UserIDS.user0, UserIDS.user3],
     ratedMovies: [],
     lists: [],
     createdAt: new Date(),
@@ -308,6 +299,7 @@ const usersFixture = [
     language: 'en',
     active: true,
     follows: [UserIDS.user2, UserIDS.user5],
+    followers: [UserIDS.user0, UserIDS.user1],
     ratedMovies: [MovieIDS.movie3, MovieIDS.movie5],
     lists: [
       {
@@ -329,6 +321,7 @@ const usersFixture = [
     language: 'en',
     active: true,
     follows: [],
+    followers: [],
     ratedMovies: [],
     lists: [
       {
@@ -350,6 +343,7 @@ const usersFixture = [
     language: 'es',
     active: true,
     follows: [],
+    followers: [UserIDS.user1, UserIDS.user3],
     ratedMovies: [MovieIDS.movie5],
     lists: [],
     createdAt: new Date(),

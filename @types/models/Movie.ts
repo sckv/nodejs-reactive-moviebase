@@ -9,12 +9,12 @@ declare module 'types/Movie.model' {
     ttid: string;
     title: string;
     year: number;
+    poster: string;
     data: Array<
       {
         [k in LanguageType]: {
           plot: string;
           description: string;
-          poster: string;
         }
       }
     >;

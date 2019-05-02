@@ -1,22 +1,21 @@
 import {Db, MongoClient} from 'mongodb';
 
+// Service & Repo
+import {AuthServices} from '../../src/pkg/authorizing/authorizing.services';
+import {AuthRepository} from '../../src/pkg/storage/mongo/auth.repository';
+import {UsersRepository} from '../../src/pkg/storage/mongo/users.repository';
+import {UserControllingServices} from '../../src/pkg/user-controlling/user-controlling.services';
+import {UserIDS} from '../fixtures/IDs';
 import {connectToDatabase} from '../../src/database';
 import {usersFixture} from '../fixtures/users.fixture';
 import {moviesFixture} from '../fixtures/movies.fixture';
 
-// Service & Repo
-import {AuthServices} from '../../src/pkg/authorizing/authorizing.services';
-import {AuthRepository} from '../../src/pkg/storage/mongo/auth.repository';
-
 type ThenArg<T> = T extends Promise<infer U> ? U : T;
-
-jest.setTimeout(25000);
 
 const SESSION_TEST_TOKEN = 'TESTSESSIONTOKEN-X';
 const ACTIVATION_TEST_TOKEN = 'TESTACTIVATIONTOKEN-X';
 const RECOVERY_TEST_TOKEN = 'TESTRECOVERYTOKEN-X';
 const RESET_TEST_TOKEN = 'TESTRESETTOKEN-X';
-
 describe('<-- Authorizing service / repository -->', () => {
   let database: Db;
   let connection: MongoClient;
@@ -28,6 +27,8 @@ describe('<-- Authorizing service / repository -->', () => {
     database = connect.db;
     connection = connect.connection;
     await database.collection('users').insertMany(usersFixture);
+    await database.collection('users').createIndex({email: 1}, {unique: true});
+    await database.collection('users').createIndex({username: 1}, {unique: true});
     await database.collection('movies').insertMany(moviesFixture);
     repository = AuthRepository(database);
     services = await AuthServices(database);
@@ -38,7 +39,7 @@ describe('<-- Authorizing service / repository -->', () => {
     await database.dropCollection('sessions');
 
     await connection.close();
-  }, 1000);
+  }, 2500);
 
   it('gets password by username / repo', async () => {
     const user0 = usersFixture[0];

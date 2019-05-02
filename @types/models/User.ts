@@ -4,7 +4,7 @@ declare module 'types/User.model' {
   type LanguageType = 'es' | 'en';
 
   interface User {
-    _id: string;
+    _id: MongoObjectID;
     username: string;
     password: string;
     email: string;
@@ -24,6 +24,5 @@ declare module 'types/User.model' {
     recoveryToken?: string;
     resetToken?: string;
     createdAt: Date;
-    modifiedAt: Date;
   }
 }
