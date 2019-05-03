@@ -68,7 +68,9 @@ export const UsersRepository = (connection: Db) => {
       follows,
       listsData,
       moviesData,
+      page = 0,
     }: GetUserObject): Promise<Partial<UserFull>> => {
+      const LIMIT_PAGINATION = 30;
       const user = await connection.collection<User>('users').findOne<User>(
         {$and: [{$or: [{_id: userId}, {username}]}]},
         {
@@ -88,17 +90,22 @@ export const UsersRepository = (connection: Db) => {
 
       const {_id} = user;
 
-      // QUERY
+      // monkey-check the input query additional parameters, do not count on personalData
+      const exclusionProject: {$project: {[k: string]: number}} = {$project: {}};
+      if (!followers) exclusionProject.$project.followers = 0;
+      if (!follows) exclusionProject.$project.follows = 0;
+      if (!listsData) exclusionProject.$project.lists = 0;
+      if (!moviesData) exclusionProject.$project.ratedMovies = 0;
+      const exclusions = Object.keys(exclusionProject.$project);
+
+      // query initial array and helper object
       const queryArray: Array<{[k: string]: any}> = [];
       const addFieldsObject: {$addFields: {[k: string]: any}} = {$addFields: {}};
-      const privateDataProject = {
-        $project: {
-          email: 0,
-          language: 0,
-        },
-      };
 
+      // match the required user
       queryArray.push({$match: {_id}});
+
+      // make invisible irrelevant data by default
       queryArray.push({
         $project: {
           password: 0,
@@ -108,8 +115,40 @@ export const UsersRepository = (connection: Db) => {
         },
       });
 
-      if (!personalData || (personalData && String(_id) !== String(selfId))) queryArray.push(privateDataProject);
+      // add limit 20 for the data we retrieve in altogether
+      if (exclusions.length > 1)
+        queryArray.push({
+          $addFields: {
+            follows: {$slice: ['$follows', LIMIT_PAGINATION]},
+            followers: {$slice: ['$followers', LIMIT_PAGINATION]},
+            ratedMovies: {$slice: ['$ratedMovies', LIMIT_PAGINATION]},
+            lists: {$slice: ['$lists', LIMIT_PAGINATION]},
+          },
+        });
 
+      // if there were only single query we can paginate over it
+      // aggregation $slice https://docs.mongodb.com/manual/reference/operator/aggregation/slice/
+      // TODO: test the optional $slicing
+      if (exclusions.length === 1) {
+        const uniqueKey = exclusions[0];
+        const lowerLimit = LIMIT_PAGINATION * page;
+        queryArray.push({
+          $addFields: {
+            [uniqueKey]: {$slice: [`$${uniqueKey}`, lowerLimit, LIMIT_PAGINATION]},
+          },
+        });
+      }
+
+      // exclude personal data if the query is done by another user
+      if (!personalData || (personalData && String(_id) !== String(selfId)))
+        queryArray.push({
+          $project: {
+            email: 0,
+            language: 0,
+          },
+        });
+
+      // add follows aggregation stage, unwind and format the data
       if (follows) {
         queryArray.push({
           $graphLookup: {
@@ -133,6 +172,7 @@ export const UsersRepository = (connection: Db) => {
         };
       }
 
+      // add followers aggregation stage, unwind and format the data
       if (followers) {
         queryArray.push({
           $graphLookup: {
@@ -156,6 +196,7 @@ export const UsersRepository = (connection: Db) => {
         };
       }
 
+      // add lists aggregation stage, unwind and format the data
       if (listsData) {
         addFieldsObject.$addFields.lists = {
           $map: {
@@ -169,6 +210,10 @@ export const UsersRepository = (connection: Db) => {
         };
       }
 
+      /* add movies aggregation stage
+       * it is a foreign `movies` collection
+       * have to match and transform the data to be easier to explore
+       */
       if (moviesData)
         queryArray.push({
           $lookup: {
@@ -200,15 +245,13 @@ export const UsersRepository = (connection: Db) => {
           },
         });
 
+      // additions for the transformations, only if we requested any fields from the document
       if (Object.keys(addFieldsObject.$addFields).length) queryArray.push(addFieldsObject);
 
-      const exclusionProject: {$project: {[k: string]: number}} = {$project: {}};
-      if (!followers) exclusionProject.$project.followers = 0;
-      if (!follows) exclusionProject.$project.follows = 0;
-      if (!listsData) exclusionProject.$project.lists = 0;
-      if (!moviesData) exclusionProject.$project.ratedMovies = 0;
-      if (Object.keys(exclusionProject.$project).length) queryArray.push(exclusionProject);
+      // if there were no additional queries bu the user data, we $project to exclude all the unnecesary fields
+      if (exclusions.length) queryArray.push(exclusionProject);
 
+      // make query
       const queriedUserData = await connection
         .collection<User>('users')
         .aggregate<Partial<UserFull>>(queryArray)

@@ -10,14 +10,12 @@ declare module 'types/Movie.model' {
     title: string;
     year: number;
     poster: string;
-    data: Array<
-      {
-        [k in LanguageType]: {
-          plot: string;
-          description: string;
-        }
+    data: {
+      [k in LanguageType]: {
+        plot: string;
+        description: string;
       }
-    >;
+    };
     ratedBy: Array<{
       userId: MongoObjectID;
       comment: string;

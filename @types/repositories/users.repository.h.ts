@@ -17,7 +17,7 @@ declare module 'types/users.repository' {
     userId?: MongoObjectID;
     username?: string;
     selfId: MongoObjectID;
-
+    page: number;
     personalData?: boolean;
     moviesData?: boolean;
     listsData?: boolean;

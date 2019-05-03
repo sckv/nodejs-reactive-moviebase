@@ -1,6 +1,6 @@
 import {UsersRepository} from '@src/pkg/storage/mongo/users.repository';
 import {mongoConnection} from '@src/database';
-import {RegistrationObject, UserThin, UserFull} from 'types/user-controlling.services';
+import {RegistrationObject, UserThin} from 'types/user-controlling.services';
 import bcrypt from 'bcrypt';
 import isEmail from 'validator/lib/isEmail';
 import {InvalidEmailError} from '@src/errors/application-errors/invalid-email';
@@ -26,13 +26,12 @@ export const UserControllingServices = async (db?: Db) => {
     get: (criterias: GetUserObject) => {
       return UsersRepo.get(criterias);
     },
-    modify: async ({userId, password, language}: ModifyUserObject) => {
-      let encrypted: string;
-      if (password) encrypted = await bcrypt.hash(password, PASSWORD_HASHING_ROUNDS);
+    modify: async ({password, ...userData}: ModifyUserObject) => {
+      const objectToModify: ModifyUserObject = {...userData};
+
+      if (password) objectToModify.password = await bcrypt.hash(password, PASSWORD_HASHING_ROUNDS);
       return UsersRepo.modify({
-        userId,
-        language,
-        password: password ? encrypted : undefined,
+        ...objectToModify,
       });
     },
     follow: async (followData: {userId: string; followId: string}) => {

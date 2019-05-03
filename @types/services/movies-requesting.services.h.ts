@@ -1,5 +1,5 @@
 declare module 'types/movies-requesting.services' {
-  interface Movie {
+  interface MovieRequest {
     _id: string;
     ttid: string;
     title: string;
@@ -11,7 +11,7 @@ declare module 'types/movies-requesting.services' {
     };
   }
 
-  interface MovieThin {
+  interface MovieRequestThin {
     _id: string;
     ttid: string;
     title: string;
@@ -21,7 +21,7 @@ declare module 'types/movies-requesting.services' {
     };
   }
 
-  interface MovieSlim {
+  interface MovieRequestSlim {
     _id: string;
     ttid: string;
     title: string;

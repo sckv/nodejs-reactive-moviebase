@@ -14,13 +14,14 @@ const connectToDatabase = async () => {
       // await InitializeDatabase(db);
       // await db.dropCollection('users');
       // await db.dropCollection('movies');
-      await db.createCollection('users');
-      await db.collection('users').createIndex({email: 1}, {unique: true});
+      // await db.createCollection('users');
+      // await db.collection('users').createIndex({email: 1}, {unique: true});
+      // await db.collection('users').createIndex({username: 1}, {unique: true});
 
-      await db.collection('users').insertMany(usersFixture);
+      // await db.collection('users').insertMany(usersFixture);
       // await db.collection('users').createIndex({username: 'text'}, {unique: true});
 
-      await db.collection('movies').insertMany(moviesFixture);
+      // await db.collection('movies').insertMany(moviesFixture);
       return connection;
     } catch (error) {
       console.error('Error with database connection', error);
@@ -48,18 +49,24 @@ const makeQuery = async () => {
   // console.log('sessions>>', sessions);
 
   const username = usersFixture[3].username;
-  const securedUserId = db.collection('users').findOne(
-    {$or: [{_id: UserIDS.user3}, {username}]},
-    {
-      projection: {
-        _id: 1,
-      },
-    },
-  );
+  // const securedUserId = db.collection('users').findOne(
+  //   {$or: [{_id: UserIDS.user3}, {username}]},
+  //   {
+  //     projection: {
+  //       _id: 1,
+  //     },
+  //   },
+  // );
   const success = await db
     .collection('users')
     .aggregate([
       {$match: {$or: [{_id: UserIDS.user3}, {username}]}},
+      // {
+      //   $addFields: {
+      //     follows: {$slice: ['$follows', 1]},
+      //     followers: {$slice: ['$followers', 1]},
+      //   },
+      // },
       {
         $graphLookup: {
           from: 'users',
@@ -81,6 +88,7 @@ const makeQuery = async () => {
         },
       },
       {
+        // $lookup: {},
         $lookup: {
           from: 'movies',
           let: {ratedMovies: '$id'},
