@@ -5,7 +5,7 @@ import {usersFixture} from '../fixtures/users.fixture';
 import {moviesFixture} from '../fixtures/movies.fixture';
 import {UserNotFoundError} from '../../src/errors/domain-errors/user-not-found';
 import {InvalidEmailError} from '../../src/errors/application-errors/invalid-email';
-import {UserRegisterError} from '../../src/errors/domain-errors/user-register-error';
+import {UserRegisterError} from '../../src/errors/domain-errors/user-register';
 // Service & Repo
 import {UserControllingServices} from '../../src/pkg/user-controlling/user-controlling.services';
 import {UsersRepository} from '../../src/pkg/storage/mongo/users.repository';
@@ -13,7 +13,7 @@ import {UserIDS} from '../fixtures/IDs';
 
 type ThenArg<T> = T extends Promise<infer U> ? U : T;
 
-jest.setTimeout(25000);
+// jest.setTimeout(25000);
 
 export default describe('<-- User control service / repository -->', () => {
   let database: Db;

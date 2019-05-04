@@ -65,7 +65,7 @@ export const AuthRepository = (connection: Db) => {
     /**
      * @throws SessionDoNotExistError
      */
-    closeSession: async (sessionToken: ObjectId): Promise<boolean> => {
+    closeSession: async (sessionToken: string): Promise<boolean> => {
       const success = await connection.collection<Session>('sessions').updateOne(
         {
           $and: [{token: {$eq: sessionToken}}, {sessionClosed: {$exists: false}}],
