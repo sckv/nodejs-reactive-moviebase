@@ -29,7 +29,15 @@ declare module 'types/movies-requesting.services' {
     title: string;
     year: number;
     poster: string;
+    rate: number;
     score?: number;
-    averageRate: number;
+    averageRate?: number;
+  }
+
+  interface MovieRequestSlim {
+    _id: MongoObjectID;
+    title: string;
+    poster: string;
+    rate: number;
   }
 }

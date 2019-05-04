@@ -11,6 +11,7 @@ import {ListModifyingError} from '@src/errors/domain-errors/list-modify';
 import {MovieNotFoundError} from '@src/errors/domain-errors/movie-not-found';
 import {AddingMovieToListError} from '@src/errors/domain-errors/list-add-movie';
 import {RemovingMovieFromListError} from '@src/errors/domain-errors/list-remove-movie';
+import {ListNotFoundError} from '@src/errors/domain-errors/list-not-found';
 
 const LIMIT_PAGINATION = 30;
 
@@ -22,6 +23,9 @@ export const ListsRepository = (db: Db) => {
         {$match: {_id: userId}},
         {
           $project: {
+            title: 1,
+            description: 1,
+            private: 1,
             lists: 1,
           },
         },
@@ -50,12 +54,7 @@ export const ListsRepository = (db: Db) => {
             pipeline: [
               {
                 $match: {
-                  $and: [
-                    {
-                      'ratedBy.userId': userId,
-                    },
-                    {$expr: {$in: ['$_id', '$$movies']}},
-                  ],
+                  $expr: {$in: ['$_id', '$$movies']},
                 },
               },
               {
@@ -90,41 +89,44 @@ export const ListsRepository = (db: Db) => {
         },
       );
       const lists = await db
-        .collection<T>('users')
+        .collection<{lists: T[]}>('users')
         .aggregate(aggregationPipeline)
-        .toArray();
+        .next();
 
-      return lists;
+      return lists.lists;
     },
     get: async <T>(listId: ObjectId, selfId?: ObjectId): Promise<T> => {
       // if (selfId) initialMatcher._id = selfId;
 
-      const listOfUser = await db
+      const userOfList = await db
         .collection('users')
         .findOne<{_id: ObjectId}>({'lists._id': listId}, {projection: {_id: 1}});
 
-      if (!listOfUser) throw new UserNotFoundError({data: {listId}});
-      const {_id} = listOfUser;
+      if (!userOfList) throw new ListNotFoundError({data: {listId}});
+      const {_id} = userOfList;
 
       // initial aggregation object
       const aggregationPipeline: any[] = [
-        {'lists._id': listId},
+        {$match: {'lists._id': listId}},
         {
           $project: {
-            lists: 1,
+            title: 1,
+            description: 1,
+            private: 1,
+            list: {
+              $filter: {
+                input: '$lists',
+                as: 'list',
+                cond: {$eq: ['$$list._id', listId]},
+              },
+            },
           },
         },
-        {$unwind: '$lists'},
-        {
-          // we limit an array of retrieved movies to `LIMIT_PAGINATION`
-          $addFields: {
-            'lists.movies': {$slice: ['$lists.movies', LIMIT_PAGINATION]},
-          },
-        },
+        {$unwind: '$list'},
       ];
 
       // we skipe private movies if it is another user
-      if (!selfId || !_id.equals(selfId)) aggregationPipeline.push({$match: {'lists.private': false}});
+      if (!selfId || !_id.equals(selfId)) aggregationPipeline.push({$match: {'list.private': false}});
 
       // we join with 'movies' and unwrap movieIds to meaningful data
       aggregationPipeline.push(
@@ -132,10 +134,12 @@ export const ListsRepository = (db: Db) => {
           $lookup: {
             from: 'movies',
             let: {
-              movies: '$$CURRENT.lists.movies',
+              // get variables for this pipeline
+              // $$CURRENT refers to a current document being processed
+              movies: '$$CURRENT.list.movies',
               userId: '$$CURRENT._id',
             },
-            as: 'lists.movies',
+            as: 'list.movies',
             pipeline: [
               {
                 $match: {
@@ -175,18 +179,21 @@ export const ListsRepository = (db: Db) => {
           },
         },
         {
-          $group: {
-            _id: '$_id',
-            lists: {$push: '$lists'},
+          $project: {
+            _id: '$list._id',
+            title: '$list.title',
+            description: '$list.description',
+            private: '$list.private',
+            movies: '$list.movies',
           },
         },
       );
-      const lists = await db
+      const list = await db
         .collection<T>('users')
         .aggregate(aggregationPipeline)
         .next();
 
-      return lists;
+      return list;
     },
     create: async ({description, isPrivate, title, selfId}: CreateListObject): Promise<boolean> => {
       try {
@@ -273,6 +280,7 @@ export const ListsRepository = (db: Db) => {
               selfId,
             },
           });
+        return true;
       } catch (error) {
         logger.error('Error creating list', error);
         throw new ListModifyingError({
@@ -282,7 +290,6 @@ export const ListsRepository = (db: Db) => {
           },
         });
       }
-      return;
     },
     addMovie: async ({commentary, listId, movieId, rate, selfId}: AddMovieToListObject): Promise<boolean> => {
       const inserted = await db.collection('movies').updateOne(

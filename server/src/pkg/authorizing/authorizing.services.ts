@@ -32,8 +32,8 @@ export const AuthServices = async (mc?: Db) => {
         });
       }
     },
-    logout: ({sessionId}: {sessionId: string | ObjectId}): Promise<boolean> => {
-      return AuthRepo.closeSession(createObjectId(sessionId));
+    logout: ({sessionToken}: {sessionToken: string}): Promise<boolean> => {
+      return AuthRepo.closeSession(sessionToken);
     },
     getSession: ({sessionToken}: {sessionToken: string}) => {
       return AuthRepo.getSession(sessionToken);
