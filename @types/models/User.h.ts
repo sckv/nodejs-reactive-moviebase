@@ -1,23 +1,24 @@
 declare module 'types/User.model' {
   import {MongoObjectID} from 'types/utils';
+  import {ObjectId} from 'bson';
 
   type LanguageType = 'es' | 'en';
 
   interface User {
-    _id: MongoObjectID;
+    _id: ObjectId;
     username: string;
     password: string;
     email: string;
     language: LanguageType;
-    follows: MongoObjectID[];
-    followers: MongoObjectID[];
-    ratedMovies: MongoObjectID[];
+    follows: ObjectId[];
+    followers: ObjectId[];
+    ratedMovies: ObjectId[];
     lists: Array<{
       _id: string;
       title: string;
       description: string;
       private: boolean;
-      movies: MongoObjectID[];
+      movies: ObjectId[];
     }>;
     active: boolean;
     activationToken?: string;

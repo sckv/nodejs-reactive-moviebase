@@ -1,14 +1,15 @@
 import {Db, ObjectId} from 'mongodb';
 import {RegisterUserObject, SearchUsersObject, GetUserObject, ModifyUserObject} from 'types/users.repository';
-import {UserRegisterError} from '@src/errors/domain-errors/user-register-error';
+import {UserRegisterError} from '@src/errors/domain-errors/user-register';
 import {User} from 'types/User.model';
 import {UserFull} from 'types/user-controlling.services';
 import {UserNotFoundError} from '@src/errors/domain-errors/user-not-found';
 import {FollowingOperationError} from '@src/errors/domain-errors/following';
-import {UserModifyingError} from '@src/errors/domain-errors/user-modifying-error';
+import {UserModifyingError} from '@src/errors/domain-errors/user-modify';
 import {logger} from '@src/utils/logger';
 
 const USERS_PER_PAGE = 30;
+const LIMIT_PAGINATION = 30;
 
 export const UsersRepository = (connection: Db) => {
   return {
@@ -70,7 +71,6 @@ export const UsersRepository = (connection: Db) => {
       moviesData,
       page = 0,
     }: GetUserObject): Promise<Partial<UserFull>> => {
-      const LIMIT_PAGINATION = 30;
       const user = await connection.collection<User>('users').findOne<User>(
         {$and: [{$or: [{_id: userId}, {username}]}]},
         {
@@ -140,7 +140,7 @@ export const UsersRepository = (connection: Db) => {
       }
 
       // exclude personal data if the query is done by another user
-      if (!personalData || (personalData && String(_id) !== String(selfId)))
+      if (!personalData || (personalData && !_id.equals(selfId)))
         queryArray.push({
           $project: {
             email: 0,
@@ -218,7 +218,6 @@ export const UsersRepository = (connection: Db) => {
         queryArray.push({
           $lookup: {
             from: 'movies',
-            let: {ratedMovies: '$id'},
             as: 'ratedMovies',
             pipeline: [
               {
@@ -248,7 +247,8 @@ export const UsersRepository = (connection: Db) => {
       // additions for the transformations, only if we requested any fields from the document
       if (Object.keys(addFieldsObject.$addFields).length) queryArray.push(addFieldsObject);
 
-      // if there were no additional queries bu the user data, we $project to exclude all the unnecesary fields
+      // if there were no additional queries by the user data,
+      // we $project to exclude all the unnecesary fields
       if (exclusions.length) queryArray.push(exclusionProject);
 
       // make query
@@ -284,7 +284,7 @@ export const UsersRepository = (connection: Db) => {
 
       return;
     },
-    follow: async ({userId, followId}: {userId: string | ObjectId; followId: ObjectId | string}) => {
+    follow: async ({userId, followId}: {userId: ObjectId; followId: ObjectId}) => {
       const followed = await connection.collection<User>('users').bulkWrite([
         {
           updateOne: {
@@ -314,7 +314,7 @@ export const UsersRepository = (connection: Db) => {
       if (followed.matchedCount !== 2) throw new FollowingOperationError({data: {userId, followId}});
       return true;
     },
-    unfollow: async ({userId, followId}: {userId: string | ObjectId; followId: string | ObjectId}) => {
+    unfollow: async ({userId, followId}: {userId: ObjectId; followId: ObjectId}) => {
       const followed = await connection.collection<User>('users').bulkWrite([
         {
           updateOne: {

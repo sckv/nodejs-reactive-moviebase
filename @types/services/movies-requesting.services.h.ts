@@ -1,32 +1,35 @@
 declare module 'types/movies-requesting.services' {
+  import {MongoObjectID} from 'types/utils';
+  import {MovieRating} from 'types/Movie.model';
+
   interface MovieRequest {
-    _id: string;
+    _id: MongoObjectID;
     ttid: string;
     title: string;
     year: number;
+    poster: string;
+    rate: string[];
+    comment: string[];
     data: {
       plot: string;
       description: string;
-      poster: string;
     };
+    ratedBy: Array<{
+      userId: MongoObjectID;
+      comment: string;
+      rate: MovieRating;
+    }>;
+    score?: number;
+    averageRate: number;
   }
 
   interface MovieRequestThin {
-    _id: string;
+    _id: MongoObjectID;
     ttid: string;
     title: string;
     year: number;
-    data: {
-      poster: string;
-    };
-  }
-
-  interface MovieRequestSlim {
-    _id: string;
-    ttid: string;
-    title: string;
-    data: {
-      poster: string;
-    };
+    poster: string;
+    score?: number;
+    averageRate: number;
   }
 }

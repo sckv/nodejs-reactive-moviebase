@@ -1,6 +1,7 @@
 declare module 'types/users.repository' {
   import {LanguageType} from 'types/User.model';
   import {MongoObjectID} from 'types/utils';
+  import {ObjectId} from 'bson';
 
   interface RegisterUserObject {
     username: string;
@@ -14,9 +15,9 @@ declare module 'types/users.repository' {
   }
 
   type GetUserObject = {
-    userId?: MongoObjectID;
+    userId?: ObjectId;
     username?: string;
-    selfId: MongoObjectID;
+    selfId: ObjectId;
     page: number;
     personalData?: boolean;
     moviesData?: boolean;
@@ -26,7 +27,7 @@ declare module 'types/users.repository' {
   };
 
   interface ModifyUserObject {
-    userId: MongoObjectID;
+    userId: ObjectId;
     password?: string;
     language?: LanguageType;
   }

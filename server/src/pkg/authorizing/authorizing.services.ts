@@ -3,9 +3,10 @@ import {InvalidPasswordError} from '@src/errors/application-errors/invalid-passw
 import {AuthRepository} from '@src/pkg/storage/mongo/auth.repository';
 import {generateToken} from '@src/utils/generate-token';
 import bcrypt from 'bcrypt';
-import {NewPasswordObject} from 'types/auth.repository';
 import {LoginObject, LoginResponseObject} from 'types/authorizing.services';
-import {Db} from 'mongodb';
+import {Db, ObjectId} from 'mongodb';
+import {createObjectId} from '@src/utils/create-objectid';
+import {MongoObjectID} from 'types/utils';
 
 const SESSION_TOKEN_LENGTH = 76;
 const ACTIVATION_RESET_TOKEN_LENGTH = 96;
@@ -31,15 +32,15 @@ export const AuthServices = async (mc?: Db) => {
         });
       }
     },
-    logout: ({sessionId}: {sessionId: string}): Promise<boolean> => {
-      return AuthRepo.closeSession(sessionId);
+    logout: ({sessionId}: {sessionId: string | ObjectId}): Promise<boolean> => {
+      return AuthRepo.closeSession(createObjectId(sessionId));
     },
     getSession: ({sessionToken}: {sessionToken: string}) => {
       return AuthRepo.getSession(sessionToken);
     },
-    generateActivationToken: async ({userId}: {userId: string}) => {
+    generateActivationToken: async ({userId}: {userId: string | ObjectId}) => {
       return AuthRepo.setActivationPublicToken({
-        userId,
+        userId: createObjectId(userId),
         activationToken: await generateToken(ACTIVATION_RESET_TOKEN_LENGTH),
       });
     },
@@ -55,8 +56,16 @@ export const AuthServices = async (mc?: Db) => {
         resetToken: await generateToken(ACTIVATION_RESET_TOKEN_LENGTH),
       });
     },
-    reSetNewPassword: async ({userId, password, resetToken}: NewPasswordObject) => {
-      return AuthRepo.setPassword({userId, password, resetToken});
+    reSetNewPassword: async ({
+      userId,
+      password,
+      resetToken,
+    }: {
+      resetToken?: string;
+      userId?: ObjectId | MongoObjectID;
+      password: string;
+    }) => {
+      return AuthRepo.setPassword({userId: createObjectId(userId), password, resetToken});
     },
   };
 };
