@@ -13,7 +13,7 @@ import {UserIDS} from '../fixtures/IDs';
 
 type ThenArg<T> = T extends Promise<infer U> ? U : T;
 
-// jest.setTimeout(25000);
+jest.setTimeout(25000);
 
 export default describe('<-- Movies control service / repository -->', () => {
   let database: Db;
@@ -23,7 +23,7 @@ export default describe('<-- Movies control service / repository -->', () => {
 
   beforeAll(async () => {
     const connect = await connectToDatabase();
-    database = connect.db;
+    database = connect.connection.db('movies-test');
     connection = connect.connection;
 
     await database.collection('users').insertMany(usersFixture);

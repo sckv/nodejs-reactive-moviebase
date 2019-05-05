@@ -11,7 +11,7 @@
     "test:client": "cross-env NODE_ENV=test jest --config=configs/jest.config.client.js",
     "test:client:coverage": "cross-env NODE_ENV=test jest --config=configs/jest.config.client.js --coverage",
     "test:client:watch": "cross-env NODE_ENV=test jest --config=configs/jest.config.client.js --watchAll",
-    "test:server": "cross-env NODE_ENV=test jest --config=configs/jest.config.server.js --forceExit --detectOpenHandles --runInBand",
+    "test:server": "cross-env NODE_ENV=test jest --config=configs/jest.config.server.js --forceExit --detectOpenHandles",
     "test:server:coverage": "cross-env NODE_ENV=test jest --config=configs/jest.config.server.js --coverage",
     "test:server:watch": "cross-env NODE_ENV=test jest --config=configs/jest.config.server.js --watchAll",
     "prettify": "prettier --write \"**/{src,__tests__}/**/*.{ts,tsx,js}\"",

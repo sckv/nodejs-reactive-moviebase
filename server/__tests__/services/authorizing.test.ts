@@ -17,6 +17,8 @@ const ACTIVATION_TEST_TOKEN = 'TESTACTIVATIONTOKEN-X';
 const RECOVERY_TEST_TOKEN = 'TESTRECOVERYTOKEN-X';
 const RESET_TEST_TOKEN = 'TESTRESETTOKEN-X';
 
+jest.setTimeout(25000);
+
 describe('<-- Authorizing service / repository -->', () => {
   let database: Db;
   let connection: MongoClient;
@@ -25,7 +27,7 @@ describe('<-- Authorizing service / repository -->', () => {
 
   beforeAll(async () => {
     const connect = await connectToDatabase();
-    database = connect.db;
+    database = connect.connection.db('authorizing-test');
     connection = connect.connection;
     await database.collection('users').insertMany(usersFixture);
     await database.collection('users').createIndex({email: 1}, {unique: true});
