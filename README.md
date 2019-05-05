@@ -28,3 +28,20 @@ Microservices pretend to determine an exact context boundaries to the DDD model 
 ## Infrastructure
 
 Whole application is dockerized and managed through `docker-compose`, node process manager is `pm2`
+
+## Application structure
+
+- It is divided by two subdirectories, `client` and `server`.
+- `@types` is for the project typings, to be able reuse them across front/back
+- `configs` are jest, babel configs
+- `docker` docker configuration
+
+#### Server
+
+- `launch` contains server launching fabric for different microservices what are going to be executed.
+- `services` contain external / independent services
+- `handlers` contain all controllers to which the routes will claim for
+- `routes` files with routing for express
+- `pkg` it is the main directory for the application services/repositories
+- `pkg/storage` different repositories for each different DB motor we implement
+- `pkg/{verbose}` self-explainable services
