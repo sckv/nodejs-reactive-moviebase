@@ -1,11 +1,12 @@
 import {UsersRepository} from '@src/pkg/storage/mongo/users.repository';
 import {mongoConnection} from '@src/database';
-import {RegistrationObject, UserThin, UserFull} from 'types/user-controlling.services';
+import {RegistrationObject, UserThin, ModifyUserObjectService} from 'types/user-controlling.services';
 import bcrypt from 'bcrypt';
 import isEmail from 'validator/lib/isEmail';
 import {InvalidEmailError} from '@src/errors/application-errors/invalid-email';
 import {GetUserObject, ModifyUserObject} from 'types/users.repository';
 import {Db} from 'mongodb';
+import {createObjectId} from '@src/utils/create-objectid';
 
 export const PASSWORD_HASHING_ROUNDS = 10;
 
@@ -26,20 +27,22 @@ export const UserControllingServices = async (db?: Db) => {
     get: (criterias: GetUserObject) => {
       return UsersRepo.get(criterias);
     },
-    modify: async ({userId, password, language}: ModifyUserObject) => {
-      let encrypted: string;
-      if (password) encrypted = await bcrypt.hash(password, PASSWORD_HASHING_ROUNDS);
-      return UsersRepo.modify({
-        userId,
+    modify: async ({password, language, userId}: ModifyUserObjectService) => {
+      const objectToModify: ModifyUserObject = {
         language,
-        password: password ? encrypted : undefined,
+        userId: createObjectId(userId),
+      };
+
+      if (password) objectToModify.password = await bcrypt.hash(password, PASSWORD_HASHING_ROUNDS);
+      return UsersRepo.modify({
+        ...objectToModify,
       });
     },
-    follow: async (followData: {userId: string; followId: string}) => {
-      return UsersRepo.follow(followData);
+    follow: async ({userId, followId}: {userId: string; followId: string}) => {
+      return UsersRepo.follow({userId: createObjectId(userId), followId: createObjectId(followId)});
     },
-    unfollow: async (unfollowData: {userId: string; followId: string}) => {
-      return UsersRepo.unfollow(unfollowData);
+    unfollow: async ({userId, followId}: {userId: string; followId: string}) => {
+      return UsersRepo.unfollow({userId: createObjectId(userId), followId: createObjectId(followId)});
     },
   };
 };

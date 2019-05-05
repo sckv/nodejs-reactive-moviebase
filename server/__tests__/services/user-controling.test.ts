@@ -5,7 +5,7 @@ import {usersFixture} from '../fixtures/users.fixture';
 import {moviesFixture} from '../fixtures/movies.fixture';
 import {UserNotFoundError} from '../../src/errors/domain-errors/user-not-found';
 import {InvalidEmailError} from '../../src/errors/application-errors/invalid-email';
-import {UserRegisterError} from '../../src/errors/domain-errors/user-register-error';
+import {UserRegisterError} from '../../src/errors/domain-errors/user-register';
 // Service & Repo
 import {UserControllingServices} from '../../src/pkg/user-controlling/user-controlling.services';
 import {UsersRepository} from '../../src/pkg/storage/mongo/users.repository';
@@ -23,7 +23,7 @@ export default describe('<-- User control service / repository -->', () => {
 
   beforeAll(async () => {
     const connect = await connectToDatabase();
-    database = connect.db;
+    database = connect.connection.db('users-test');
     connection = connect.connection;
 
     await database.collection('users').insertMany(usersFixture);

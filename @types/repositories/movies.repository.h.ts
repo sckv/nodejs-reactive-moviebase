@@ -2,28 +2,26 @@ declare module 'types/movies.repository' {
   import {LanguageType} from 'types/User.model';
 
   interface SearchMoviesObject {
-    language: LanguageType;
+    language?: LanguageType;
     page?: number;
     pageSize?: number;
-    title?: string;
-    year?: string;
-    sort?: string;
+    criteria?: string;
+    sort?: 'hitsAsc' | 'hitsDesc' | 'latest' | 'oldest' | 'topRated' | 'worstRated';
   }
 
   interface MovieCreateObject {
     ttid: string;
     title: string;
     year: number;
+    poster: string;
     data: {
       es: {
         plot: string;
         description: string;
-        poster: string;
       };
       en: {
         plot: string;
         description: string;
-        poster: string;
       };
     };
   }

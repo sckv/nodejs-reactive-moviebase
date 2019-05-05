@@ -1,12 +1,12 @@
 declare module 'types/listing.services' {
-  import {MovieThin} from 'types/movies-requesting.services';
+  import {MovieRequestSlim} from 'types/movies-requesting.services';
 
   interface ListEntry {
     _id: string;
     title: string;
     description: string;
     private: boolean;
-    movies: MovieThin[];
+    movies: MovieRequestSlim[];
   }
 
   interface ListEntryThin {

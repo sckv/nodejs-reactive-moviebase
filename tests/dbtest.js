@@ -14,13 +14,20 @@ const connectToDatabase = async () => {
       // await InitializeDatabase(db);
       // await db.dropCollection('users');
       // await db.dropCollection('movies');
-      await db.createCollection('users');
-      await db.collection('users').createIndex({email: 1}, {unique: true});
 
-      await db.collection('users').insertMany(usersFixture);
+      // await db.createCollection('users');
+      // await db.collection('users').createIndex({email: 1}, {unique: true});
+      // await db.collection('users').createIndex({username: 1}, {unique: true});
+
+      // await db.collection('users').insertMany(usersFixture);
       // await db.collection('users').createIndex({username: 'text'}, {unique: true});
 
-      await db.collection('movies').insertMany(moviesFixture);
+      // await db.collection('movies').insertMany(moviesFixture);
+      // await db
+      //   .collection('movies')
+      //   .createIndex({year: 'text', title: 'text', data: 'text'}, {default_language: 'english'});
+      // await db.collection('movies').createIndex({ttid: 1}, {unique: true});
+
       return connection;
     } catch (error) {
       console.error('Error with database connection', error);
@@ -41,111 +48,36 @@ const makeQuery = async () => {
   const {db} = await connectToDatabase();
   console.log('connected to db');
 
-  // const sessions = await db
-  //   .collection('sessions')
-  //   .find({})
-  //   .toArray();
-  // console.log('sessions>>', sessions);
-
-  const username = usersFixture[3].username;
-  const securedUserId = db.collection('users').findOne(
-    {$or: [{_id: UserIDS.user3}, {username}]},
-    {
-      projection: {
-        _id: 1,
-      },
-    },
-  );
   const success = await db
-    .collection('users')
+    .collection('movies')
     .aggregate([
-      {$match: {$or: [{_id: UserIDS.user3}, {username}]}},
-      {
-        $graphLookup: {
-          from: 'users',
-          connectFromField: 'follows',
-          connectToField: '_id',
-          startWith: '$follows',
-          as: 'follows',
-          maxDepth: 0,
-        },
-      },
-      {
-        $graphLookup: {
-          from: 'users',
-          connectFromField: 'followers',
-          connectToField: '_id',
-          startWith: '$followers',
-          as: 'followers',
-          maxDepth: 0,
-        },
-      },
-      {
-        $lookup: {
-          from: 'movies',
-          let: {ratedMovies: '$id'},
-          as: 'ratedMovies',
-          pipeline: [
-            {
-              $match: {'ratedBy.userId': UserIDS.user3},
-            },
-            {$unwind: '$ratedBy'},
-            {
-              $project: {
-                _id: '$_id',
-                title: '$title',
-                poster: '$poster',
-                rate: '$ratedBy.rate',
-              },
-            },
-            {
-              $group: {
-                _id: '$_id',
-                title: {$first: '$title'},
-                poster: {$first: '$poster'},
-                rate: {$first: '$rate'},
-              },
-            },
-          ],
-        },
-      },
+      {$match: {$text: {$search: 'Movie 2 ESP POSTER'}}},
+      // { $skip: page > 0 ? (page - 1) * pageSize : 0 },
+      // { $limit: pageSize },
       {
         $addFields: {
-          followers: {
-            $map: {
-              input: '$followers',
-              as: 'follower',
-              in: {
-                _id: '$$follower._id',
-                username: '$$follower.username',
-              },
-            },
+          // plot: `$data.${language}.plot`,
+          // description: `$data.${language}.description`,
+          score: {$meta: 'textScore'},
+          averageRate: {
+            $avg: '$ratedBy.rate',
           },
-          follows: {
-            $map: {
-              input: '$follows',
-              as: 'follow',
-              in: {
-                _id: '$$follow._id',
-                username: '$$follow.username',
-              },
-            },
-          },
-          lists: {
-            $map: {
-              input: '$lists',
-              as: 'list',
-              in: {
-                _id: '$$list._id',
-                description: '$$list.description',
-              },
-            },
-          },
+        },
+      },
+      {$sort: {score: {$meta: 'textScore'}}},
+      {
+        $project: {
+          _id: 1,
+          ttid: 1,
+          title: 1,
+          year: 1,
+          poster: 1,
+          averageRate: 1,
         },
       },
     ])
-    .next();
-  console.log('susers>>', success);
+    .toArray();
+  console.log(success);
 };
 
 makeQuery();
