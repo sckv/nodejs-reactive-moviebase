@@ -23,5 +23,7 @@ declare module 'types/utils' {
 
   type MongoObjectID = string;
 
+  type ThenArg<T> = T extends Promise<infer U> ? U : T;
+
   // type RepositoryMapper<T> = (connection: Db) => {[k in keyof T]: <A, R>(args: A) => Promise<R>};
 }

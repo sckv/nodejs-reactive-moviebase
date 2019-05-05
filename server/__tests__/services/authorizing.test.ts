@@ -3,9 +3,9 @@ import {Db, MongoClient} from 'mongodb';
 // Service & Repo
 import {AuthServices} from '../../src/pkg/authorizing/authorizing.services';
 import {AuthRepository} from '../../src/pkg/storage/mongo/auth.repository';
-import {UsersRepository} from '../../src/pkg/storage/mongo/users.repository';
-import {UserControllingServices} from '../../src/pkg/user-controlling/user-controlling.services';
-import {UserIDS} from '../fixtures/IDs';
+// import {UsersRepository} from '../../src/pkg/storage/mongo/users.repository';
+// import {UserControllingServices} from '../../src/pkg/user-controlling/user-controlling.services';
+// import {UserIDS} from '../fixtures/IDs';
 import {connectToDatabase} from '../../src/database';
 import {usersFixture} from '../fixtures/users.fixture';
 import {moviesFixture} from '../fixtures/movies.fixture';
@@ -16,6 +16,9 @@ const SESSION_TEST_TOKEN = 'TESTSESSIONTOKEN-X';
 const ACTIVATION_TEST_TOKEN = 'TESTACTIVATIONTOKEN-X';
 const RECOVERY_TEST_TOKEN = 'TESTRECOVERYTOKEN-X';
 const RESET_TEST_TOKEN = 'TESTRESETTOKEN-X';
+
+jest.setTimeout(25000);
+
 describe('<-- Authorizing service / repository -->', () => {
   let database: Db;
   let connection: MongoClient;
@@ -24,7 +27,7 @@ describe('<-- Authorizing service / repository -->', () => {
 
   beforeAll(async () => {
     const connect = await connectToDatabase();
-    database = connect.db;
+    database = connect.connection.db('authorizing-test');
     connection = connect.connection;
     await database.collection('users').insertMany(usersFixture);
     await database.collection('users').createIndex({email: 1}, {unique: true});
