@@ -1,21 +1,20 @@
 declare module 'types/movies-requesting.services' {
   import {MongoObjectID} from 'types/utils';
   import {MovieRating} from 'types/Movie.model';
+  import {ObjectId} from 'bson';
 
   interface MovieRequest {
-    _id: MongoObjectID;
+    _id: ObjectId;
     ttid: string;
     title: string;
     year: number;
     poster: string;
     rate: string[];
     comment: string[];
-    data: {
-      plot: string;
-      description: string;
-    };
+    plot: string;
+    description: string;
     ratedBy: Array<{
-      userId: MongoObjectID;
+      userId: ObjectId;
       comment: string;
       rate: MovieRating;
     }>;
@@ -24,7 +23,7 @@ declare module 'types/movies-requesting.services' {
   }
 
   interface MovieRequestThin {
-    _id: MongoObjectID;
+    _id: ObjectId;
     ttid: string;
     title: string;
     year: number;
@@ -35,7 +34,7 @@ declare module 'types/movies-requesting.services' {
   }
 
   interface MovieRequestSlim {
-    _id: MongoObjectID;
+    _id: ObjectId;
     title: string;
     poster: string;
     rate: number;

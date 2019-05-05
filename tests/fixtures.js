@@ -185,7 +185,7 @@ const moviesFixture = [
     ttid: 'tt5',
     title: 'Movie 5 TEST',
     year: 1007,
-    poster: 'Movie 5 ESP POSTER',
+    poster: 'Movie 5 POSTER',
     data: {
       en: {
         plot: 'Movie 5 EN PLOT',

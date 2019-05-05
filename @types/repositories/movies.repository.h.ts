@@ -2,7 +2,7 @@ declare module 'types/movies.repository' {
   import {LanguageType} from 'types/User.model';
 
   interface SearchMoviesObject {
-    language: LanguageType;
+    language?: LanguageType;
     page?: number;
     pageSize?: number;
     criteria?: string;
@@ -22,7 +22,6 @@ declare module 'types/movies.repository' {
       en: {
         plot: string;
         description: string;
-        poster: string;
       };
     };
   }
