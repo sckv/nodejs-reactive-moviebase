@@ -60,7 +60,7 @@ export default describe('<-- Listing control service / repository -->', () => {
     expect(lists).toEqual(expect.arrayContaining(user0UnwindedLists));
   });
 
-  it('gets a list by id if not private', async () => {
+  it('gets a public list by id', async () => {
     const list = usersFixture[0].lists[0];
     const listById = await services.get({listId: list._id});
 
@@ -69,21 +69,21 @@ export default describe('<-- Listing control service / repository -->', () => {
     expect(listById.movies).toEqual(expect.arrayContaining(user0UnwindedLists[0].movies));
   });
 
-  it('do not gets a list by id if it is private', async () => {
+  it('does not get private listById', async () => {
     const list = usersFixture[0].lists[1];
     const listById = await services.get({listId: list._id});
 
     expect(listById).toBeNull();
   });
 
-  it('do not gets a list by id if it is private and requested by other user', async () => {
+  it('does not get private listById while requested by other user', async () => {
     const list = usersFixture[0].lists[1];
     const listById = await services.get({listId: list._id, selfId: usersFixture[1]._id});
 
     expect(listById).toBeNull();
   });
 
-  it('gets a list by id if it is private and requested by owner', async () => {
+  it('gets private listById while requested by owner', async () => {
     const list = usersFixture[0].lists[1];
     const user = usersFixture[0];
     const listById = await services.get({listId: list._id, selfId: user._id});
@@ -114,7 +114,7 @@ export default describe('<-- Listing control service / repository -->', () => {
     expect(listEntry).toBeDefined();
   });
 
-  it('modify a list', async () => {
+  it('modifies a list', async () => {
     const newListObject = {
       title: 'NEW LIST FOR TESTING MOD',
       description: 'NEW LSIT DESCRIPTION FOR TESTING MOD',
@@ -131,6 +131,44 @@ export default describe('<-- Listing control service / repository -->', () => {
 
     expect(updatedList).toBeTruthy();
     expect(listsOld.length).toBe(listsNew.length);
+    expect(listEntry).toBeDefined();
+  });
+
+  it('deletes a list', async () => {
+    const user = usersFixture[0];
+    const list = user.lists[0];
+    const listsOld = await repository.getByUser(user._id, user._id);
+    const updatedList = await services.delete(list._id, user._id);
+    const listsNew = await repository.getByUser(user._id, user._id);
+
+    const listEntry = listsNew.find((l: any) => l.title === list.title && l.description === list.description);
+
+    expect(updatedList).toBeTruthy();
+    expect(listsOld.length).toBeGreaterThan(listsNew.length);
+    expect(listEntry).toBeUndefined();
+  });
+
+  it('adds a movie to the list', async () => {
+    const user = usersFixture[0];
+    const list = user.lists[2];
+    const movieRateObject = {
+      listId: list._id,
+      selfId: user._id,
+      commentary: 'TOP TEST COMMENT',
+      rate: 5,
+      movieId: MovieIDS.movie3,
+    };
+
+    const oldListById = await repository.get<any>(list._id);
+    const updatedList = await services.addMovie(movieRateObject);
+    const newListById = await repository.get<any>(list._id);
+
+    const listEntry = newListById.movies.find(
+      (l: any) => l.rate === movieRateObject.rate && l._id.equals(movieRateObject.movieId),
+    );
+
+    expect(updatedList).toBeTruthy();
+    expect(oldListById.movies.length).toBeLessThan(newListById.movies.length);
     expect(listEntry).toBeDefined();
   });
 });
@@ -204,23 +242,3 @@ const user0UnwindedLists = [
     ],
   },
 ];
-
-const user3FullData = {
-  _id: new ObjectId('5cc85a6a5e736fbf95f22149'),
-  username: 'testguy3',
-  email: 'test3@email.com',
-  language: 'en',
-  follows: [
-    {_id: new ObjectId('5cc85a7379079fb9b6380554'), username: 'testguy5'},
-    {_id: new ObjectId('5cc85971bf674494253f9a11'), username: 'testguy2'},
-  ],
-  followers: [
-    {_id: new ObjectId('5cc85a65cbe99c36e2bec3fa'), username: 'testguy0'},
-    {_id: new ObjectId('5cc8587c2eceae102c1a8fdf'), username: 'testguy1'},
-  ],
-  ratedMovies: [
-    {_id: new ObjectId('5cc85a9f68fe8abf3707f2df'), title: 'Movie 5 TEST', poster: 'Movie 5 ESP POSTER', rate: 3},
-    {_id: new ObjectId('5cc85a960bdd8bcdc13c1098'), title: 'Movie 3 TEST', poster: 'Movie 3 POSTER', rate: 5},
-  ],
-  lists: [{_id: new ObjectId('5cc85aca12e4c481c02b3c54'), description: 'Test List 5 of User3 description'}],
-};

@@ -12,6 +12,7 @@ import {MovieNotFoundError} from '@src/errors/domain-errors/movie-not-found';
 import {AddingMovieToListError} from '@src/errors/domain-errors/list-add-movie';
 import {RemovingMovieFromListError} from '@src/errors/domain-errors/list-remove-movie';
 import {ListNotFoundError} from '@src/errors/domain-errors/list-not-found';
+import {AddToListAddedMovieError} from '@src/errors/domain-errors/list-add-same-movie';
 
 const LIMIT_PAGINATION = 30;
 
@@ -299,6 +300,10 @@ export const ListsRepository = (db: Db) => {
       }
     },
     addMovie: async ({commentary, listId, movieId, rate, selfId}: AddMovieToListObject): Promise<boolean> => {
+      const findRate = await db
+        .collection('movies')
+        .findOne({_id: movieId, 'ratedBy.userId': selfId}, {projection: {_id: 1}});
+      if (findRate) throw new AddToListAddedMovieError({data: {listId, movieId}});
       const inserted = await db.collection('movies').updateOne(
         {_id: movieId},
         {
