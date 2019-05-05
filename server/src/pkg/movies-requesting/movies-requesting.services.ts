@@ -9,7 +9,7 @@ import {MovieRequestThin, MovieRequest} from 'types/movies-requesting.services';
 import {LanguageType} from 'types/User.model';
 
 // We let injectable mongoclientDB ONLY for testing purposes
-export const MoviesRequestingServices = async (mc?: Db) => {
+export const MoviesRequestingServices = (mc?: Db) => {
   const MoviesRepo = MoviesRepository(mc || mongoConnection);
   return {
     addToDatabase: (movieCreateObject: MovieCreateObject | MovieCreateObject[]): Promise<boolean> => {

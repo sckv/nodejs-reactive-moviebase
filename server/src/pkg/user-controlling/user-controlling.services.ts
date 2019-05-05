@@ -10,7 +10,7 @@ import {createObjectId} from '@src/utils/create-objectid';
 
 export const PASSWORD_HASHING_ROUNDS = 10;
 
-export const UserControllingServices = async (db?: Db) => {
+export const UserControllingServices = (db?: Db) => {
   const UsersRepo = UsersRepository(db || mongoConnection);
   return {
     register: async ({username, password, email}: RegistrationObject): Promise<boolean> => {

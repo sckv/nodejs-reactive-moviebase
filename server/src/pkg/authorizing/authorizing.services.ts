@@ -12,7 +12,7 @@ const SESSION_TOKEN_LENGTH = 76;
 const ACTIVATION_RESET_TOKEN_LENGTH = 96;
 
 // We let injectable mongoclientDB ONLY for testing purposes
-export const AuthServices = async (mc?: Db) => {
+export const AuthServices = (mc?: Db) => {
   const AuthRepo = AuthRepository(mc || mongoConnection);
   // const UsersRepo = UsersRepository(connection);
   return {
