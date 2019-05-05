@@ -54,7 +54,13 @@ export const ListsRepository = (db: Db) => {
             pipeline: [
               {
                 $match: {
-                  $expr: {$in: ['$_id', '$$movies']},
+                  $expr: {
+                    $cond: {
+                      if: {$ne: ['$$movies', null]},
+                      then: {$in: ['$_id', '$$movies']},
+                      else: {$ne: ['$_id', 0]},
+                    },
+                  },
                 },
               },
               {
@@ -202,7 +208,7 @@ export const ListsRepository = (db: Db) => {
             _id: selfId,
           },
           {
-            $addToSet: {lists: {_id: createObjectId(), title, private: isPrivate, description}},
+            $addToSet: {lists: {_id: createObjectId(), title, private: isPrivate, description, movies: []}},
             $currentDate: {
               lastModified: true,
               createdAt: {$type: 'timestamp'},
@@ -214,6 +220,7 @@ export const ListsRepository = (db: Db) => {
         if (!inserted.modifiedCount) throw new UserNotFoundError({data: {selfId}});
         return true;
       } catch (error) {
+        console.log('Error creating list', error);
         logger.error('Error creating list', error);
         throw new ListInsertError({data: {description, isPrivate, title, selfId}});
       }
@@ -224,7 +231,7 @@ export const ListsRepository = (db: Db) => {
       const {description, isPrivate, listId, selfId, title} = listData;
       const updateObject = {};
       if (description) updateObject['lists.$[lists].description'] = description;
-      if (typeof isPrivate === 'boolean') updateObject['lists.$[lists].isPrivate'] = isPrivate;
+      if (typeof isPrivate === 'boolean') updateObject['lists.$[lists].private'] = isPrivate;
       if (title) updateObject['lists.$[lists].title'] = title;
 
       try {

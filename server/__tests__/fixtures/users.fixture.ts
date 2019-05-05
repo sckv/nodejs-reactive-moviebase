@@ -23,7 +23,7 @@ export const usersFixture = [
         _id: ListIDS.list1,
         title: 'Test List 1 of User0',
         description: 'Test List 1 of User0 description',
-        private: false,
+        private: true,
         movies: [MovieIDS.movie0],
       },
       {

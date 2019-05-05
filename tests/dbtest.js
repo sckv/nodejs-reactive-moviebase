@@ -44,77 +44,27 @@ const makeQuery = async () => {
   const {db} = await connectToDatabase();
   console.log('connected to db');
 
-  const success = await db
-    .collection('users')
-    .aggregate([
-      {$match: {_id: usersFixture[0]._id}},
-      {
-        $project: {
-          title: 1,
-          description: 1,
-          private: 1,
-          list: {
-            $filter: {
-              input: '$lists',
-              as: 'list',
-              cond: {$eq: ['$$list._id', usersFixture[0].lists[0]._id]},
-            },
-          },
-        },
-      },
-      {$unwind: '$list'},
-      {
-        $lookup: {
-          from: 'movies',
-          let: {
-            movies: '$$CURRENT.list.movies',
-            userId: '$$CURRENT._id',
-          },
-          as: 'list.movies',
-          pipeline: [
-            {
-              $match: {
-                $expr: {$in: ['$_id', '$$movies']},
-              },
-            },
-            {
-              // filter the movies rated only by that user
-              $addFields: {
-                ratedBy: {
-                  $filter: {
-                    input: '$ratedBy',
-                    as: 'rate',
-                    cond: {$eq: ['$$rate.userId', '$$userId']},
-                  },
-                },
-              },
-            },
-            {$unwind: '$ratedBy'},
-            {
-              $project: {
-                _id: '$_id',
-                title: '$title',
-                poster: '$poster',
-                rate: '$ratedBy.rate',
-              },
-            },
-          ],
-        },
-      },
-
-      {
-        $project: {
-          _id: '$list._id',
-          // lists: 1,
-          title: '$list.title',
-          description: '$list.description',
-          private: '$list.private',
-          movies: '$list.movies',
-        },
-      },
-    ])
-    .next();
-  console.log(success);
+  // const success = await db.collection('users').updateOne(
+  //   {_id: usersFixture[0]._id},
+  //   {
+  //     $set: {
+  //       'lists.$[lists].description': 'NEW LSIT DESCRIPTION FOR TESTING MOD',
+  //       'lists.$[lists].isPrivate': true,
+  //       'lists.$[lists].title': 'NEW LIST FOR TESTING MOD',
+  //     },
+  //     $currentDate: {
+  //       lastModified: true,
+  //     },
+  //   },
+  //   {
+  //     arrayFilters: [
+  //       {
+  //         'lists._id': {$eq: listId},
+  //       },
+  //     ],
+  //   },
+  // );
+  // console.log(success);
 };
 
 makeQuery();
