@@ -47,11 +47,11 @@ export const CacheRepository = (cache: Redis) => {
         throw new CacheClearingSessionError({data: {token}, log: error});
       }
     },
-    getFromCache: async (urlHash: string): Promise<CacheDigestableMessage> => {
+    getFromCache: async <T>(urlHash: string): Promise<CacheDigestableMessage<T>> => {
       try {
         const chunk = await cache.get(CACHE_PREFIX + urlHash);
 
-        return chunk ? {data: jsonSafeParse(chunk)} : null;
+        return chunk ? {data: jsonSafeParse<T>(chunk)} : null;
       } catch (error) {
         throw new CacheGettingFromError({data: {urlHash}, log: error});
       }

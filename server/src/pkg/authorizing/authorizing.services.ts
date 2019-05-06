@@ -41,20 +41,23 @@ export const AuthServices = (mc?: Db) => {
     getSession: ({sessionToken}: {sessionToken: string}) => {
       return AuthRepo.getSession(sessionToken);
     },
+    activate: (activationToken: string) => {
+      return AuthRepo.activate(activationToken);
+    },
     generateActivationToken: async ({userId}: {userId: string | ObjectId}) => {
-      return AuthRepo.setActivationPublicToken({
+      return await AuthRepo.setActivationPublicToken({
         userId: createObjectId(userId),
         activationToken: await generateToken(ACTIVATION_RESET_TOKEN_LENGTH),
       });
     },
     generateRecoveryToken: async ({email}: {email: string}) => {
-      return AuthRepo.setRecoveryPublicToken({
+      return await AuthRepo.setRecoveryPublicToken({
         email,
         recoveryToken: await generateToken(ACTIVATION_RESET_TOKEN_LENGTH),
       });
     },
     checkRecoveryAndSetResetToken: async ({recoveryToken}: {recoveryToken: string}) => {
-      return AuthRepo.matchRecoveryAndSetResetToken({
+      return await AuthRepo.matchRecoveryAndSetResetToken({
         recoveryToken,
         resetToken: await generateToken(ACTIVATION_RESET_TOKEN_LENGTH),
       });

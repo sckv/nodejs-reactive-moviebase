@@ -157,8 +157,8 @@ export const AuthRepository = (connection: Db) => {
     /**
      * @throws UserNotFoundError
      */
-    activate: async (activationToken: string): Promise<boolean> => {
-      const success = await connection.collection<User>('users').updateOne(
+    activate: async (activationToken: string): Promise<{username: string; email: string}> => {
+      const success = await connection.collection<User>('users').findOneAndUpdate(
         {activationToken},
         {
           $set: {active: true},
@@ -168,8 +168,8 @@ export const AuthRepository = (connection: Db) => {
         },
       );
 
-      if (!success.matchedCount && !success.modifiedCount) throw new UserNotFoundError({data: {activationToken}});
-      return true;
+      if (!success.ok) throw new UserNotFoundError({data: {activationToken}});
+      return {username: success.value.username, email: success.value.email};
     },
 
     /**
@@ -178,7 +178,7 @@ export const AuthRepository = (connection: Db) => {
     setRecoveryPublicToken: async ({
       recoveryToken,
       email,
-    }: SetRecoveryTokenObject): Promise<{recoveryToken: string}> => {
+    }: SetRecoveryTokenObject): Promise<{recoveryToken: string; username: string}> => {
       const success = await connection.collection<User>('users').updateOne(
         {email},
         {
@@ -190,7 +190,9 @@ export const AuthRepository = (connection: Db) => {
       );
 
       if (!success.matchedCount) throw new UserNotFoundError({data: {email}});
-      return {recoveryToken};
+
+      const {username} = await connection.collection<User>('users').findOne({email}, {projection: {username: 1}});
+      return {recoveryToken, username};
     },
 
     /**
@@ -235,7 +237,6 @@ export const AuthRepository = (connection: Db) => {
       );
 
       if (!updatedUser.matchedCount) throw new UserNotFoundError({data: {userId}});
-
       return true;
     },
   };

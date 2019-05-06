@@ -13,9 +13,9 @@ export const PASSWORD_HASHING_ROUNDS = 10;
 export const UserControllingServices = (db?: Db) => {
   const UsersRepo = UsersRepository(db || mongoConnection);
   return {
-    register: async ({username, password, email}: RegistrationObject): Promise<boolean> => {
+    register: async ({username, password, email}: RegistrationObject) => {
       if (!isEmail(String(email))) throw new InvalidEmailError({data: {email, username}});
-      return UsersRepo.register({
+      return await UsersRepo.register({
         username,
         password: await bcrypt.hash(String(password).trim(), PASSWORD_HASHING_ROUNDS),
         email,
