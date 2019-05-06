@@ -5,10 +5,15 @@ import pinoLogger from 'express-pino-logger';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import {uniqueRequestId} from '@src/middlewares/request-id';
+import {errorsHandler} from '@src/middlewares/error-handler';
+import {session} from '@src/middlewares/session';
 
 const api = express();
 
+api.use(errorsHandler);
 api.use(uniqueRequestId);
+api.use(session);
+
 api.use(helmet());
 api.use(pinoLogger());
 api.use(cors({maxAge: 1728000}));

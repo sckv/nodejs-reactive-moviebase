@@ -5,7 +5,7 @@ import {hashUrl} from '@src/utils/hash-url';
 import {jsonSafeParse} from '@src/utils/json-safe-parse';
 import {logger} from '@src/utils/logger';
 import {Cache} from '@src/redis';
-import {CacheRepository} from '@src/pkg/storage/redis/cache.repository';
+import {CacheServices} from '@src/pkg/cache/cache.services';
 
 const RedisSubscription = Cache.duplicate();
 
@@ -15,15 +15,15 @@ export const cachingService = () => {
 
     const {data, url} = jsonSafeParse<CacheDigestableMessage>(message);
     const hashedUrl = hashUrl(url);
-    const oldEntry = await CacheRepository(Cache).getFromCache({key: hashedUrl});
+    const oldEntry = await CacheServices.getFromCache(hashedUrl);
     if (oldEntry && isEqual(oldEntry.data, data)) {
       //TODO: CHANGE FOR PINO
       logger.info('cache: cache:digest contents are the same', data, oldEntry);
       return;
     }
 
-    await CacheRepository(Cache).setToCache({
-      key: hashedUrl,
+    await CacheServices.setToCache({
+      urlHash: hashedUrl,
       data: {url, data},
     });
   });

@@ -7,6 +7,7 @@ import {LoginObject, LoginResponseObject} from 'types/authorizing.services';
 import {Db, ObjectId} from 'mongodb';
 import {createObjectId} from '@src/utils/create-objectid';
 import {MongoObjectID} from 'types/utils';
+import {CacheServices} from '@src/pkg/cache/cache.services';
 
 const SESSION_TOKEN_LENGTH = 76;
 const ACTIVATION_RESET_TOKEN_LENGTH = 96;
@@ -22,6 +23,7 @@ export const AuthServices = (mc?: Db) => {
       if (await bcrypt.compare(password, userPassword.password)) {
         const sessionToken = await generateToken(SESSION_TOKEN_LENGTH);
         const {userId, language} = await AuthRepo.setSession({username, sessionToken});
+        await CacheServices.setSession({userId, sessionToken, language});
         return {userId, token: sessionToken, language};
       } else {
         throw new InvalidPasswordError({
@@ -32,8 +34,9 @@ export const AuthServices = (mc?: Db) => {
         });
       }
     },
-    logout: ({sessionToken}: {sessionToken: string}): Promise<boolean> => {
-      return AuthRepo.closeSession(sessionToken);
+    logout: async ({sessionToken}: {sessionToken: string}): Promise<boolean> => {
+      await AuthRepo.closeSession(sessionToken);
+      return await CacheServices.clearSession(sessionToken);
     },
     getSession: ({sessionToken}: {sessionToken: string}) => {
       return AuthRepo.getSession(sessionToken);
