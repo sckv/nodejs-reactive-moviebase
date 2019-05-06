@@ -15,3 +15,5 @@ export const logout: CustomRequestHandler = async (req, res, next) => {
   await AuthServices().logout(sessionToken);
   res.status(200).cookie('__session', undefined, {maxAge: 1, httpOnly: true, path: '/', sameSite: 'Strict'});
 };
+
+// export const;

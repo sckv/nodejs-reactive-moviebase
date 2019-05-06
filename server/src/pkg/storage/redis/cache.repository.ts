@@ -11,6 +11,7 @@ import {CacheSettingToError} from '@src/errors/cache-errors/set-to-cache';
 import {CacheGettingSessionError} from '@src/errors/cache-errors/get-session';
 import {CacheAnnounceSubscriptionError} from '@src/errors/cache-errors/announce-subscription';
 import {CacheExistSubscriptionError} from '@src/errors/cache-errors/exists-subscription';
+import {CacheGettingFromError} from '@src/errors/cache-errors/get-from-cache';
 
 const SESSION_PREFIX = 'session:';
 const CACHE_PREFIX = 'cache:';
@@ -52,7 +53,7 @@ export const CacheRepository = (cache: Redis) => {
 
         return chunk ? {data: jsonSafeParse(chunk)} : null;
       } catch (error) {
-        throw new Error('error getting information from cache');
+        throw new CacheGettingFromError({data: {urlHash}, log: error});
       }
     },
     setToCache: async (setToObject: {
@@ -63,12 +64,14 @@ export const CacheRepository = (cache: Redis) => {
       try {
         const {urlHash, data, timeout} = setToObject;
 
-        let args: any[] = [CACHE_PREFIX + urlHash, JSON.stringify(data.data)];
-        if (typeof timeout === 'number') args = args.concat('EX', timeout);
-        const setted = await cache.set.apply(args);
+        let setted;
+        if (typeof timeout === 'number')
+          setted = cache.set(CACHE_PREFIX + urlHash, JSON.stringify(data.data), 'EX', timeout);
+        else setted = cache.set(CACHE_PREFIX + urlHash, JSON.stringify(data.data));
 
         return setted ? true : false;
       } catch (error) {
+        console.log(error);
         throw new CacheSettingToError({data: {setToObject}, log: error});
       }
     },
