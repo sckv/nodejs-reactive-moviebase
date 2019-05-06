@@ -2,6 +2,7 @@ declare module 'types/utils' {
   import {LanguageType} from 'types/User.model';
   import {Request, RequestHandler, Response, NextFunction, Express} from 'express';
   import {Db, ObjectId} from 'mongodb';
+  import {MailData} from '@sendgrid/helpers/classes/mail';
 
   interface CustomRequest extends Request {
     id: string;
@@ -31,5 +32,6 @@ declare module 'types/utils' {
 
   type ThenArg<T> = T extends Promise<infer U> ? U : T;
 
+  type EmailSendData = Pick<MailData, 'to' | 'subject' | 'html' | 'text'>;
   // type RepositoryMapper<T> = (connection: Db) => {[k in keyof T]: <A, R>(args: A) => Promise<R>};
 }

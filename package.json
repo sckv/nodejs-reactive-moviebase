@@ -38,8 +38,10 @@
   "dependencies": {
     "@emotion/core": "^10.0.10",
     "@emotion/styled": "^10.0.10",
+    "@sendgrid/mail": "^6.4.0",
     "axios": "^0.18.0",
     "bcrypt": "^3.0.6",
+    "bull": "^3.8.1",
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
     "express": "^4.16.4",
@@ -66,6 +68,7 @@
     "@babel/core": "^7.4.4",
     "@babel/preset-env": "^7.4.4",
     "@types/bcrypt": "^3.0.0",
+    "@types/bull": "^3.5.13",
     "@types/express": "^4.16.1",
     "@types/helmet": "^0.0.43",
     "@types/ioredis": "^4.0.10",

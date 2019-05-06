@@ -16,4 +16,8 @@ export const logout: CustomRequestHandler = async (req, res, next) => {
   res.status(200).cookie('__session', undefined, {maxAge: 1, httpOnly: true, path: '/', sameSite: 'Strict'});
 };
 
-// export const;
+export const forgot: CustomRequestHandler = async (req, res, next) => {
+  const {email} = req.body;
+  const {recoveryToken} = await AuthServices().generateRecoveryToken({email});
+  // TODO: send to bull to EMAIL
+};
