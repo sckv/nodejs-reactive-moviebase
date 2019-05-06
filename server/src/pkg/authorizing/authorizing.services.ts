@@ -21,8 +21,8 @@ export const AuthServices = (mc?: Db) => {
 
       if (await bcrypt.compare(password, userPassword.password)) {
         const sessionToken = await generateToken(SESSION_TOKEN_LENGTH);
-        const {userId} = await AuthRepo.setSession({username, sessionToken});
-        return {userId, token: sessionToken};
+        const {userId, language} = await AuthRepo.setSession({username, sessionToken});
+        return {userId, token: sessionToken, language};
       } else {
         throw new InvalidPasswordError({
           data: {

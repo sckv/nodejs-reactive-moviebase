@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import path from 'path';
+// import path from 'path';
 import pinoLogger from 'express-pino-logger';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';

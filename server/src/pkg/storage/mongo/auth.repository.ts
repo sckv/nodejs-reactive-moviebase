@@ -11,7 +11,7 @@ import {UserNotFoundError} from '@src/errors/domain-errors/user-not-found';
 import {ErrorsList} from '@src/errors/errors-list';
 import {SessionNotSetError} from '@src/errors/domain-errors/session-not-set';
 import {SessionDoNotExistError} from '@src/errors/domain-errors/session-do-not-exist';
-import {User} from 'types/User.model';
+import {User, LanguageType} from 'types/User.model';
 import {Session} from 'types/Session.model';
 
 export const AuthRepository = (connection: Db) => {
@@ -35,13 +35,16 @@ export const AuthRepository = (connection: Db) => {
     /**
      * @throws SessionNotSetError, UserNotFoundError
      */
-    setSession: async ({username, sessionToken}: NewSessionObject): Promise<{userId: ObjectId}> => {
+    setSession: async ({
+      username,
+      sessionToken,
+    }: NewSessionObject): Promise<{userId: ObjectId; language: LanguageType}> => {
       const user = await connection
         .collection<User>('users')
-        .findOne<Pick<User, '_id'>>({username, active: true}, {projection: {_id: 1}});
+        .findOne<Pick<User, '_id' | 'language'>>({username, active: true}, {projection: {_id: 1, language: 1}});
 
       if (!user._id) throw new UserNotFoundError({data: {username}});
-      const {_id} = user;
+      const {_id, language} = user;
 
       const session = await connection.collection<Session>('sessions').updateOne(
         {
@@ -59,7 +62,7 @@ export const AuthRepository = (connection: Db) => {
       if (!session.result)
         throw new SessionNotSetError({data: {username, sessionToken}, message: ErrorsList.SESSION_NOT_SET});
 
-      return {userId: _id};
+      return {userId: _id, language};
     },
 
     /**
