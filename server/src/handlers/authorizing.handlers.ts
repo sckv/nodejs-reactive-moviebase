@@ -42,11 +42,11 @@ export const checkRecoveryToken: CustomRequestHandler = async (req, res) => {
   res.status(200).send({resetToken});
 };
 
-export const restore: CustomRequestHandler = async (req, res) => {
-  const {token} = req.params;
-  const {resetToken} = await AuthServices().checkRecoveryAndSetResetToken({recoveryToken: token});
-  res.status(200).send({resetToken});
-};
+// export const restore: CustomRequestHandler = async (req, res) => {
+//   const {token} = req.params;
+//   const {resetToken} = await AuthServices().checkRecoveryAndSetResetToken({recoveryToken: token});
+//   res.status(200).send({resetToken});
+// };
 
 export const resetPassword: CustomRequestHandler = async (req, res) => {
   const {token} = req.params;

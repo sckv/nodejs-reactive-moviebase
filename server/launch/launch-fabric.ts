@@ -2,19 +2,19 @@ import path from 'path';
 import fs from 'fs';
 import spdy from 'spdy';
 import {api} from '@src/server';
-import {logger} from '@src/utils/logger';
+// import {logger} from '@src/utils/logger';
 
 const backPath = path.join(process.cwd(), 'server');
 const routesPath = path.join(backPath, 'build', 'src', 'routes');
 
-type LaunchSettings = {port: string | number; routesDir: string; serviceName: string};
+type LaunchSettings = {port?: string | number; routesDir: string; serviceName: string};
 
 const options = {
   key: fs.readFileSync(path.join(backPath, 'cert/server.key')),
   cert: fs.readFileSync(path.join(backPath, 'cert/server.crt')),
 };
 
-export const launchFabric = ({port, routesDir, serviceName}: LaunchSettings) => {
+export const launchFabric = ({port = 8000, routesDir, serviceName}: LaunchSettings) => {
   try {
     fs.readdirSync(path.join(routesPath, routesDir)).map(file => {
       const filePath = path.join(routesPath, routesDir, file);
