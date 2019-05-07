@@ -10,6 +10,7 @@ declare module 'types/utils' {
       userId: ObjectId;
       language: LanguageType;
     };
+    initTime: number;
   }
 
   type CustomRequestHandler = (req: CustomRequest, res: Response, next: NextFunction) => any;

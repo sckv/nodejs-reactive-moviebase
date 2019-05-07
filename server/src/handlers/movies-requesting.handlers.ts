@@ -7,13 +7,15 @@ import {Cache} from '@src/redis';
 import {searchMovies, plotMovie, translateMovieText} from '@src/services/external-movies-service';
 import {MovieRequestThin, MovieRequest} from 'types/movies-requesting.services';
 import {MovieSearchResult} from 'types/external-movies';
+import {mongoConnection} from '@src/database';
 
 // if we have CRITERIA and SORTING we subscribe to changes
 // otherwise we make a call to the API and get movies from IMDB
 // we retrieve the movie and add it to db
 export const searchMovie: CustomRequestHandler = async (req, res) => {
-  const {l, s, c, p, ps} = req.params;
+  const {l, s, c, p, ps} = req.query;
 
+  console.log('MONGO CONNECTION??', mongoConnection);
   const hashedUrl = hashUrl(req.originalUrl);
 
   if (c && s) {
@@ -54,6 +56,7 @@ export const searchMovie: CustomRequestHandler = async (req, res) => {
       });
     }
   } else {
+    if (!c) return res.send(200);
     const imdbData = await searchMovies(c);
     if (!imdbData && !imdbData.length) return res.status(200).send([]);
 

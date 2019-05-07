@@ -59,10 +59,10 @@
     "react-dom": "^16.8.6",
     "react-hot-loader": "^4.8.4",
     "react-router-dom": "^5.0.0",
-    "request": "^2.88.0",
-    "request-promise-native": "^1.0.7",
     "spdy": "^4.0.0",
     "uuid": "^3.3.2",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.7",
     "validator": "^10.11.0"
   },
   "devDependencies": {
@@ -110,7 +110,6 @@
     "gulp-babel": "^8.0.0",
     "gulp-clean": "^0.4.0",
     "gulp-nodemon": "^2.4.2",
-    "gulp-sourcemaps": "^2.6.5",
     "gulp-transform": "^3.0.5",
     "gulp-typescript": "^5.0.1",
     "html-loader": "^0.5.5",

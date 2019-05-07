@@ -10,16 +10,17 @@ import {session} from '@src/middlewares/session';
 
 const api = express();
 
-api.use(errorsHandler);
+api.use(cookieParser());
 api.use(uniqueRequestId);
+api.use(pinoLogger());
+
 api.use(session);
 
 api.use(helmet());
-api.use(pinoLogger());
 api.use(cors({maxAge: 1728000}));
 api.use(express.urlencoded({extended: true}));
 api.use(express.json({limit: '1mb'}));
-api.use(cookieParser());
+api.use(errorsHandler);
 
 api.set('json spaces', 4);
 

@@ -4,9 +4,7 @@ declare module 'types/external-movies' {
     title: string;
     year: number;
     image: {
-      url: string;
-      height: number;
-      width: number;
+      url: string | null;
     };
   }
 

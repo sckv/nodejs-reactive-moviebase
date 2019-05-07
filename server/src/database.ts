@@ -11,23 +11,29 @@ export const connectToDatabase = async (): Promise<{db: Db; connection: MongoCli
     try {
       connection = await MongoClient.connect(mongoUrl, {useNewUrlParser: true});
       await InitializeDatabase(connection.db('moviebase'));
-      return connection;
+      console.log('CONNECTED DATABASE', connection);
+      return true;
     } catch (error) {
       logger.error('Error with database connection');
     }
   };
-  await tryConnect();
+  const result = await tryConnect();
   connection &&
     connection.on('error', () => {
       setTimeout(async () => await tryConnect(), 5000);
     });
-  return {
-    db: connection.db('moviebase'),
-    connection,
-  };
+  if (result) {
+    return {
+      db: connection.db('moviebase'),
+      connection,
+    };
+  }
 };
 
-let resolvedConnection: Db;
-connectToDatabase().then(res => (resolvedConnection = res.db));
+export let mongoConnection: Db;
+connectToDatabase().then(res => {
+  console.log('resolving to mongoconnection', res);
+  mongoConnection = res.db;
+});
 
-export const mongoConnection = resolvedConnection;
+// export let mongoConnection = resolvedConnection;
