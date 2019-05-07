@@ -34,7 +34,7 @@ class RedisServiceClass {
   }
 
   private async pushToListeners(key: string) {
-    const rawData = await this.rListener.hget(key, 'data');
+    const rawData = await this.rListener.get(key);
     const data = jsonSafeParse(rawData);
 
     if (this.emitter.listeners(key).length) {
@@ -69,7 +69,7 @@ class RedisServiceClass {
   }
 }
 
-export const RedisService = RedisServiceClass.Instance as RedisService;
+export const RedisStreamingService = RedisServiceClass.Instance as RedisService;
 
 export interface RedisService {
   subscribeTo(

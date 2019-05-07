@@ -38,13 +38,13 @@ export const register: CustomRequestHandler = async (req, res) => {
       </p>
     </html>`,
   });
-  res.sendStatus(200);
+  return res.sendStatus(200);
 };
 
 export const searchUsers: CustomRequestHandler = async (req, res) => {
   const {un, page} = req.params;
   const usersList = await UserControllingServices().search({username: un, page});
-  res.status(200).send(usersList);
+  return res.status(200).send(usersList);
 };
 
 export const getUserData: CustomRequestHandler = async (req, res) => {
@@ -65,7 +65,7 @@ export const getUserData: CustomRequestHandler = async (req, res) => {
     });
     await CacheServices.setToCache<typeof userData>({urlHash: hashedUrl, timeout: 10, data: {data: userData}});
   }
-  res.status(200).send(userData);
+  return res.status(200).send(userData);
 };
 
 export const modifyUser: CustomRequestHandler = async (req, res) => {
@@ -77,14 +77,27 @@ export const modifyUser: CustomRequestHandler = async (req, res) => {
     language,
     password,
   });
-  res.status(200).send(user);
+  return res.status(200).send(user);
 };
 
-// export const deleteUser: CustomRequestHandler = async (req, res) => {
-// const user = await UserControllingServices().de({
-//   userId,
-//   language,
-//   password,
-// });
-// res.status(200).send(user);
-// };
+export const followUser: CustomRequestHandler = async (req, res) => {
+  const {followId} = req.body;
+  const {userId} = req.auth;
+  if (userId.equals(createObjectId(followId))) return res.sendStatus(400);
+  await UserControllingServices().follow({
+    userId,
+    followId,
+  });
+  return res.status(200);
+};
+
+export const unfollowUser: CustomRequestHandler = async (req, res) => {
+  const {followId} = req.body;
+  const {userId} = req.auth;
+  if (userId.equals(createObjectId(followId))) return res.sendStatus(400);
+  await UserControllingServices().unfollow({
+    userId,
+    followId,
+  });
+  return res.status(200);
+};

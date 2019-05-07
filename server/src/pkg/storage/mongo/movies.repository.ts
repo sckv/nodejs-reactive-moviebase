@@ -49,17 +49,18 @@ export const MoviesRepository = (connection: Db) => {
       sort,
     }: SearchMoviesObject): Promise<MovieRequestThin[]> => {
       const $sort: {[k: string]: any} = {};
+      let aggregationPipeline: any[] = [];
       if (sort === 'hitsAsc' || sort === 'hitsDesc') {
         $sort.hits = sort === 'hitsAsc' ? 1 : 0;
       } else if (sort === 'latest' || sort === 'oldest') {
         $sort.createdAt = sort === 'latest' ? 1 : 0;
       } else if (sort === 'topRated' || sort === 'worstRated') {
         $sort.rate = sort === 'topRated' ? 0 : 1;
+      } else if (criteria) {
+        $sort.score = {$meta: 'textScore'};
+        aggregationPipeline.push({$match: {$text: {$search: criteria}}});
       }
-      $sort.score = {$meta: 'textScore'};
-
-      const aggregationPipeline = [
-        {$match: {$text: {$search: criteria}}},
+      aggregationPipeline = aggregationPipeline.concat(
         {$skip: page > 0 ? (page - 1) * pageSize : 0},
         {$limit: pageSize},
         {
@@ -83,7 +84,7 @@ export const MoviesRepository = (connection: Db) => {
             averageRate: 1,
           },
         },
-      ];
+      );
 
       const searchResult = await connection
         .collection<MovieRequestThin>('movies')
@@ -229,13 +230,13 @@ export const MoviesRepository = (connection: Db) => {
       ttid: string;
       fullMovie?: boolean;
       language?: LanguageType;
-    }): Promise<{movieId: ObjectID} | MovieRequest> => {
+    }): Promise<{movieId: ObjectID} | MovieRequest | null> => {
       const aggregationPipeline: Array<{[k: string]: any}> = [{$match: {ttid}}];
 
       if (fullMovie)
         aggregationPipeline.push({
           $project: {
-            plot: '$data.en.plot',
+            plot: `$data.${language}.plot`,
             description: `$data.${language}.description`,
             poster: '$poster',
             ttid: '$ttid',
@@ -255,7 +256,8 @@ export const MoviesRepository = (connection: Db) => {
         .aggregate(aggregationPipeline)
         .next();
 
-      if (!movie) throw new MovieNotFoundError({data: {ttid}});
+      if (!movie) return null;
+      //throw new MovieNotFoundError({data: {ttid}});
 
       return fullMovie ? movie : {movieId: movie._id};
     },
