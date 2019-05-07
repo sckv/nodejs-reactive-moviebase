@@ -16,10 +16,12 @@ const redis = new ioredis({
 jest.setTimeout(25000);
 
 export default describe('<-- Cache service -->', () => {
-  beforeAll(() => {
+  beforeAll(async () => {
+    await redis.flushall();
     cachingService();
   }, 3000);
-  afterAll(() => {
+  afterAll(async () => {
+    await redis.flushall();
     redis.disconnect();
   });
 
@@ -30,9 +32,11 @@ export default describe('<-- Cache service -->', () => {
 
     const hashedUrl = REDIS_CACHE_KEY_PREFIX + hashUrl(fixture.url);
 
-    const data = await redis.get(hashedUrl);
-    if (!data) fail();
-    expect(jsonSafeParse(data)).toEqual(fixture.data);
-    done();
+    setTimeout(async () => {
+      const data = await redis.get(hashedUrl);
+      if (!data) fail();
+      expect(jsonSafeParse(data)).toEqual(fixture.data);
+      done();
+    }, 500);
   }, 8000);
 });

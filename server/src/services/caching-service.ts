@@ -13,9 +13,12 @@ export const cachingService = () => {
   RedisSubscription.on('message', async (channel, message) => {
     if (channel !== 'digest:cache') return;
 
+    console.log('passed message', message);
+    console.log('passed channel', channel);
     const {data, url} = jsonSafeParse<CacheDigestableMessage>(message);
     const hashedUrl = hashUrl(url);
     const oldEntry = await CacheServices.getFromCache(hashedUrl);
+    console.log('old entry', oldEntry);
     if (oldEntry && isEqual(oldEntry.data, data)) {
       //TODO: CHANGE FOR PINO
       logger.info('cache: cache:digest contents are the same', data, oldEntry);
