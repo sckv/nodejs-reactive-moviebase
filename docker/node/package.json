@@ -1,27 +1,7 @@
 {
-  "name": "nodejs-reactive-moviebase",
+  "name": "nodejs-reactive-moviebase-prod",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {
-    "build:client": "rimraf ./client/build && cd client && cross-env NODE_ENV=production webpack --mode production --config config/webpack.prod.js --color -p --progress --hide-modules --display-optimization-bailout",
-    "build:client:gulp": "cross-env NODE_ENV=production gulp build:client",
-    "build:client:clean": "rimraf ./client/build",
-    "serve:dev:server": "cross-env NODE_ENV=development gulp nodemon:server",
-    "serve:dev:client": "cd client && cross-env NODE_ENV=development REACT_PORT=4200 node config/webpack.devServer.js",
-    "test:client": "cross-env NODE_ENV=test jest --config=configs/jest.config.client.js",
-    "test:client:coverage": "cross-env NODE_ENV=test jest --config=configs/jest.config.client.js --coverage",
-    "test:client:watch": "cross-env NODE_ENV=test jest --config=configs/jest.config.client.js --watchAll",
-    "test:server": "cross-env NODE_ENV=test jest --config=configs/jest.config.server.js --forceExit --detectOpenHandles",
-    "test:server:coverage": "cross-env NODE_ENV=test jest --config=configs/jest.config.server.js --coverage",
-    "test:server:watch": "cross-env NODE_ENV=test jest --config=configs/jest.config.server.js --watchAll",
-    "prettify": "prettier --write \"**/{src,__tests__}/**/*.{ts,tsx,js}\"",
-    "lint:ts:client": "cd client && tslint --fix -p tsconfig.json -c tslint.json '{src,__tests__}/**/*.{tsx,ts}'",
-    "start": "node index",
-    "transpile:client": "cd client && tsc --noEmit",
-    "transpile:server": "cd server && tsc --noEmit",
-    "resolve": "cd client && babel build --out-dir build",
-    "run:test": "cross-env REDIS_PORT=6379 REDIS_HOST=localhost REDIS_DB=0 node server/build/services/cachingService.js"
-  },
   "engines": {
     "node": ">=10.0.0"
   },
