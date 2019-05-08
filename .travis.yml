@@ -11,12 +11,16 @@ env:
 
 services:
   - redis-server
-  - mongodb
+  – mongodb
 
 before_install:
   - curl -o- -L https://yarnpkg.com/install.sh | bash
   - export PATH="$HOME/.yarn/bin:$PATH"
 cache: yarn
+
+before_script:
+  - sleep 15
+  - mongo mydb_test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
 
 script:
   - yarn test:server

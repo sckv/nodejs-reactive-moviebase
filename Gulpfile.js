@@ -51,7 +51,7 @@ gulp.task('compile:server', () => {
 
 gulp.task('nodemon:server', () => {
   return nodemon({
-    script: 'server/build/start.js',
+    script: 'server/build/launch/movies.js',
     watch: 'server/src',
     ext: 'ts',
     tasks: ['compile:server'],
