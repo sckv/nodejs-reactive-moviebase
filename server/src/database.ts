@@ -30,10 +30,14 @@ export const connectToDatabase = async (): Promise<{db: Db; connection: MongoCli
   }
 };
 
-export let mongoConnection: Db;
-connectToDatabase().then(res => {
-  // console.log('resolving to mongoconnection', res);
-  mongoConnection = res.db;
-});
+let resolvedConnection: Db;
+connectToDatabase().then(res => (resolvedConnection = res.db));
 
-// export let mongoConnection = resolvedConnection;
+export const mongoConnection = resolvedConnection;
+// export let mongoConnection: Db;
+// connectToDatabase().then(res => {
+//   // console.log('resolving to mongoconnection', res);
+//   mongoConnection = res.db;
+// });
+
+// // export let mongoConnection = resolvedConnection;
