@@ -5,7 +5,7 @@ import {LanguageType} from 'types/User.model';
 import {Movie} from 'types/Movie.model';
 import {MovieInsertError} from '@src/errors/domain-errors/movie-insert';
 import {logger} from '@src/utils/logger';
-import {MovieNotFoundError} from '@src/errors/domain-errors/movie-not-found';
+// import {MovieNotFoundError} from '@src/errors/domain-errors/movie-not-found';
 import {MovieRequest, MovieRequestThin} from 'types/movies-requesting.services';
 
 const LIMIT_PAGINATION = 30;
@@ -28,11 +28,10 @@ export const MoviesRepository = (connection: Db) => {
           {
             $currentDate: {
               lastModified: true,
-              createdAt: {$type: 'timestamp'},
+              createdAt: {$type: 'date'},
             },
           },
         );
-        // console.log('IUnserted update', updated);
 
         return true;
       } catch (error) {
@@ -50,29 +49,29 @@ export const MoviesRepository = (connection: Db) => {
     }: SearchMoviesObject): Promise<MovieRequestThin[]> => {
       const $sort: {[k: string]: any} = {};
       let aggregationPipeline: any[] = [];
+
+      const $addFields: any = {
+        plot: `$data.${language}.plot`,
+        description: `$data.${language}.description`,
+        averageRate: {
+          $avg: '$ratedBy.rate',
+        },
+      };
       if (sort === 'hitsAsc' || sort === 'hitsDesc') {
-        $sort.hits = sort === 'hitsAsc' ? 1 : 0;
+        $sort.hits = sort === 'hitsAsc' ? -1 : 1;
       } else if (sort === 'latest' || sort === 'oldest') {
-        $sort.createdAt = sort === 'latest' ? 1 : 0;
+        $sort.createdAt = sort === 'latest' ? -1 : 1;
       } else if (sort === 'topRated' || sort === 'worstRated') {
-        $sort.rate = sort === 'topRated' ? 0 : 1;
+        $sort.rate = sort === 'topRated' ? -1 : 1;
       } else if (criteria) {
         $sort.score = {$meta: 'textScore'};
         aggregationPipeline.push({$match: {$text: {$search: criteria}}});
+        $addFields.score = {$meta: 'textScore'};
       }
       aggregationPipeline = aggregationPipeline.concat(
         {$skip: page > 0 ? (page - 1) * pageSize : 0},
         {$limit: pageSize},
-        {
-          $addFields: {
-            plot: `$data.${language}.plot`,
-            description: `$data.${language}.description`,
-            score: {$meta: 'textScore'},
-            averageRate: {
-              $avg: '$ratedBy.rate',
-            },
-          },
-        },
+        {$addFields},
         {$sort},
         {
           $project: {
@@ -93,13 +92,12 @@ export const MoviesRepository = (connection: Db) => {
 
       return searchResult;
     },
-    watchSearch: ({language = 'es', criteria}: {language?: LanguageType; criteria: string}) => {
+    watchSearch: ({language = 'es', criteria = ''}: {language?: LanguageType; criteria: string}) => {
+      // TODO: refine the object, value to combine/filter it upstairs
       return connection.collection<Movie>('movies').watch(
         [
-          {$match: {$text: {$search: criteria}}},
           {
             $addFields: {
-              score: {$meta: 'textScore'},
               plot: `$data.${language}.plot`,
               description: `$data.${language}.description`,
               averageRate: {
@@ -108,7 +106,7 @@ export const MoviesRepository = (connection: Db) => {
             },
           },
         ],
-        {fullDocument: 'updateLookup'},
+        // {fullDocument: 'updateLookup'},
       );
     },
     get: async ({
@@ -167,7 +165,8 @@ export const MoviesRepository = (connection: Db) => {
         .aggregate(aggregationPipeline)
         .next();
 
-      if (!movie) throw new MovieNotFoundError({data: {movieId, language}});
+      if (!movie) return null;
+      //  throw new MovieNotFoundError({data: {movieId, language}});
       return movie;
     },
     getMovieWatch: ({

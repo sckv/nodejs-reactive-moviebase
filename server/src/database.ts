@@ -1,21 +1,20 @@
 import {MongoClient, Db} from 'mongodb';
-import {logger} from '@src/utils/logger';
-import {InitializeDatabase} from '@src/initialize-database';
+// import {logger} from '@src/utils/logger';
+// import {InitializeDatabase} from '@src/initialize-database';
 
 const mongoUrl = `mongodb://${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_DATABASE}`;
 
 export const connectToDatabase = async (): Promise<{db: Db; connection: MongoClient}> => {
   let connection: MongoClient = null;
-
   const tryConnect = async () => {
     try {
-      connection = await MongoClient.connect(mongoUrl, {useNewUrlParser: true});
+      connection = await MongoClient.connect(mongoUrl, {useNewUrlParser: true, replicaSet: 'rs'});
       console.log('CONNECTED DATABASE');
-      await InitializeDatabase(connection.db('moviebase'));
-
+      // await InitializeDatabase(connection.db('moviebase'));
+      // console.log('initialized DATABASE');
       return true;
     } catch (error) {
-      logger.error('Error with database connection');
+      console.error('Error with database connection', error);
     }
   };
   const result = await tryConnect();
@@ -31,14 +30,7 @@ export const connectToDatabase = async (): Promise<{db: Db; connection: MongoCli
   }
 };
 
-let resolvedConnection: Db;
-connectToDatabase().then(res => (resolvedConnection = res.db));
-
-// export let mongoConnection: Db;
-// connectToDatabase().then(res => {
-//   // console.log('resolving to mongoconnection', res);
-//   mongoConnection = res.db;
-// });
-export const mongoConnection = resolvedConnection;
-
-// // export let mongoConnection = resolvedConnection;
+export let mongoConnection: Db;
+connectToDatabase().then(res => {
+  mongoConnection = res.db;
+});

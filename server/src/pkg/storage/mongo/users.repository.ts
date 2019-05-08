@@ -29,7 +29,7 @@ export const UsersRepository = (connection: Db) => {
               active: false,
             },
             $currentDate: {
-              createdAt: {$type: 'timestamp'},
+              createdAt: {$type: 'date'},
               lastModified: true,
             },
           },

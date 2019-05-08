@@ -7,68 +7,84 @@ import {Cache} from '@src/redis';
 import {searchMovies, plotMovie, translateMovieText} from '@src/services/external-movies-service';
 import {MovieRequestThin, MovieRequest} from 'types/movies-requesting.services';
 import {MovieSearchResult} from 'types/external-movies';
-import {mongoConnection} from '@src/database';
+import {convertToBuffer} from '@src/utils/convert-to-buffer';
 
 // if we have CRITERIA and SORTING we subscribe to changes
 // otherwise we make a call to the API and get movies from IMDB
 // we retrieve the movie and add it to db
 export const searchMovie: CustomRequestHandler = async (req, res) => {
   const {l, s, c, p, ps} = req.query;
+  console.log('searching for a movie in imdb', c, s);
 
-  console.log('MONGO CONNECTION??', mongoConnection);
+  // console.log('MONGO CONNECTION??', mongoConnection);
   const hashedUrl = hashUrl(req.originalUrl);
 
-  if (c && s) {
+  res.setHeader('Content-Type', 'application/json');
+
+  if ((c && s) || s) {
     function listenerFn(data: any) {
-      res.write(data);
+      res.write(convertToBuffer(data));
     }
 
-    req.on('close', () => {
-      res.send(200);
+    req.on('close', async () => {
+      // res.sendStatus(200);
       RedisStreamingService.unsubscribeFrom(hashedUrl, listenerFn);
-      throw new Error('User disconnected');
+      await CacheServices.clearSubscription(hashedUrl);
+      // throw new Error('User disconnected');
     });
 
     const redisSubscription = RedisStreamingService.subscribeTo(hashedUrl);
-
-    const entryData = MoviesRequestingServices().search({
+    // console.log('subscribed to ', hashedUrl);
+    const entryData = await MoviesRequestingServices().search({
       criteria: c,
       language: l,
       page: p,
       pageSize: ps,
       sort: s,
     });
-    res.write(entryData);
+    // console.log('searched for ', entryData);
+    res.write(convertToBuffer(entryData));
+
+    // console.log('call force subscription consume for ');
 
     redisSubscription.consume(hashedUrl, listenerFn);
-    redisSubscription.force();
+    // redisSubscription.force();
 
+    // console.log('search if in redis exists subscription for that collection');
     const isSubscribingFromBD = await CacheServices.existsSubscription(hashedUrl);
+    // console.log('exists>?', isSubscribingFromBD);
+
     if (!isSubscribingFromBD) {
+      // console.log('subscribing to mongo change');
       const streamingChange = MoviesRequestingServices().watchSearch({
         criteria: c,
         language: l,
       });
 
-      streamingChange.on('data', chunk => {
-        Cache.publish('cache:digest', JSON.stringify({url: req.originalUrl, data: chunk}));
-        res.write(chunk);
+      streamingChange.on('change', chunk => {
+        // console.log('recieving chunks from bd', chunk);
+
+        // Cache.publish('cache:digest', JSON.stringify({url: req.originalUrl, data: chunk}));
+        // console.log('writing to express stream');
+        res.write(convertToBuffer(chunk._data));
       });
     }
   } else {
-    if (!c) return res.send(200);
-    const imdbData = await searchMovies(c);
-    if (!imdbData && !imdbData.length) return res.status(200).send([]);
+    let results = [];
 
-    const firstMovie = imdbData[0];
-    const getMovieIfExist = await MoviesRequestingServices().getByTtid({ttid: firstMovie.ttid});
+    // console.log('searching for a movie in imdb');
+    if (c) {
+      const imdbData = await searchMovies(c);
+      // console.log('result imd movies', imdbData);
+      if (!imdbData && !imdbData.length) return res.status(200).send([]);
 
-    if (!getMovieIfExist) {
-      await translateAndAddNewMovie(imdbData);
-
-      const searchForAMovie = await MoviesRequestingServices().search({criteria: c});
-
-      let results = [];
+      const firstMovie = imdbData[0];
+      const getMovieIfExist = await MoviesRequestingServices().getByTtid({ttid: firstMovie.ttid});
+      // console.log('get if movie exist', getMovieIfExist);
+      if (!getMovieIfExist) {
+        await translateAndAddNewMovie(imdbData);
+        // console.log('translated and addded movie');
+      }
       if (imdbData.length > 20)
         results = imdbData.slice(0, 5).map<MovieRequestThin>(mo => ({
           ttid: mo.ttid,
@@ -87,6 +103,8 @@ export const searchMovie: CustomRequestHandler = async (req, res) => {
           title: mo.title,
           year: mo.year,
         }));
+      const searchForAMovie = await MoviesRequestingServices().search({criteria: c});
+      // console.log('searched movies from db', searchForAMovie);
       results = results.concat(searchForAMovie);
 
       return res.status(200).send(results);

@@ -212,7 +212,7 @@ export const ListsRepository = (db: Db) => {
             $addToSet: {lists: {_id: createObjectId(), title, private: isPrivate, description, movies: []}},
             $currentDate: {
               lastModified: true,
-              createdAt: {$type: 'timestamp'},
+              createdAt: {$type: 'date'},
             },
           },
           {upsert: true},

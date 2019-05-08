@@ -10,7 +10,7 @@ import {LanguageType} from 'types/User.model';
 
 // We let injectable mongoclientDB ONLY for testing purposes
 export const MoviesRequestingServices = (mc?: Db) => {
-  const MoviesRepo = MoviesRepository(mc || mongoConnection);
+  const MoviesRepo = MoviesRepository(mongoConnection || mc);
   return {
     addToDatabase: (movieCreateObject: MovieCreateObject | MovieCreateObject[]): Promise<boolean> => {
       return MoviesRepo.add(movieCreateObject);
@@ -60,7 +60,11 @@ export const MoviesRequestingServices = (mc?: Db) => {
       fullMovie?: boolean;
       language?: LanguageType;
     }): Promise<MovieRequest | {movieId: ObjectID}> => {
-      return MoviesRepo.getByTtid({ttid});
+      return MoviesRepo.getByTtid({
+        ttid,
+        fullMovie,
+        language,
+      });
     },
   };
 };

@@ -21,6 +21,7 @@ class RedisServiceClass {
 
   constructor() {
     this.rPoller = RedisPoller;
+    this.rListener = RedisPoller.duplicate();
     this.eventsHandler();
   }
 

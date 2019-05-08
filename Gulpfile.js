@@ -54,7 +54,16 @@ gulp.task('nodemon:server', () => {
     script: 'server/build/launch/movies.js',
     watch: 'server/src',
     ext: 'ts',
-    env: {MONGO_HOST: 'localhost', MONGO_PORT: 27017, MONGO_DATABASE: 'moviebase', NODE_ENV: 'development'},
+    env: {
+      MONGO_HOST: 'localhost',
+      MONGO_PORT: 27017,
+      MONGO_DATABASE: 'moviebase',
+      NODE_ENV: 'development',
+      GOOGLE_TRANSLATE_API: '',
+      OMDB_API_KEY: '',
+      REDIS_HOST: 'localhost',
+      REDIS_PORT: 6379,
+    },
     tasks: ['compile:server'],
     done: false,
   });
