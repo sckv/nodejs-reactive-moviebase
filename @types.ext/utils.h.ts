@@ -1,9 +1,15 @@
 declare module 'types/utils' {
+  import {LanguageType} from 'types/User.model';
   import {Request, RequestHandler, Response, NextFunction, Express} from 'express';
-  import {Db} from 'mongodb';
+  import {Db, ObjectId} from 'mongodb';
+  import {MailData} from '@sendgrid/helpers/classes/mail';
 
   interface CustomRequest extends Request {
     id: string;
+    auth: {
+      userId: ObjectId;
+      language: LanguageType;
+    };
   }
 
   type CustomRequestHandler = (req: CustomRequest, res: Response, next: NextFunction) => any;
@@ -13,7 +19,8 @@ declare module 'types/utils' {
   type ErrorProps = {
     code?: number;
     message?: string;
-    data: {[k: string]: any};
+    data?: {[k: string]: any};
+    log?: Error;
   };
 
   interface ExtendedError {
@@ -25,5 +32,6 @@ declare module 'types/utils' {
 
   type ThenArg<T> = T extends Promise<infer U> ? U : T;
 
+  type EmailSendData = Pick<MailData, 'to' | 'subject' | 'html' | 'text'>;
   // type RepositoryMapper<T> = (connection: Db) => {[k in keyof T]: <A, R>(args: A) => Promise<R>};
 }

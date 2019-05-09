@@ -19,7 +19,7 @@ declare module 'types/auth.repository' {
   };
 
   type SessionObject = {
-    username: string;
+    sessionToken: string;
     userId: ObjectId;
     language: LanguageType;
   };

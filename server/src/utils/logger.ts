@@ -1,7 +1,7 @@
 import pino from 'pino';
 import path from 'path';
 
-const DESTINATION = path.resolve(path.join(process.cwd(), 'logs'));
+const DESTINATION = path.resolve(path.join(process.cwd(), 'logs', 'log.log'));
 
 const createLogger = () => {
   const loggerInstance = pino(pino.extreme(DESTINATION));

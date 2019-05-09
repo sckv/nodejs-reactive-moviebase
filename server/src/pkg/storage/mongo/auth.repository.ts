@@ -11,14 +11,11 @@ import {UserNotFoundError} from '@src/errors/domain-errors/user-not-found';
 import {ErrorsList} from '@src/errors/errors-list';
 import {SessionNotSetError} from '@src/errors/domain-errors/session-not-set';
 import {SessionDoNotExistError} from '@src/errors/domain-errors/session-do-not-exist';
-import {User} from 'types/User.model';
+import {User, LanguageType} from 'types/User.model';
 import {Session} from 'types/Session.model';
 
 export const AuthRepository = (connection: Db) => {
   return {
-    /**
-     * @throws UserNotFoundError
-     */
     getPasswordByUsername: async (username: string): Promise<{password: string}> => {
       const {password} = await connection.collection('users').findOne<{password: string}>(
         {username, active: true},
@@ -32,16 +29,16 @@ export const AuthRepository = (connection: Db) => {
       return {password};
     },
 
-    /**
-     * @throws SessionNotSetError, UserNotFoundError
-     */
-    setSession: async ({username, sessionToken}: NewSessionObject): Promise<{userId: ObjectId}> => {
+    setSession: async ({
+      username,
+      sessionToken,
+    }: NewSessionObject): Promise<{userId: ObjectId; language: LanguageType}> => {
       const user = await connection
         .collection<User>('users')
-        .findOne<Pick<User, '_id'>>({username, active: true}, {projection: {_id: 1}});
+        .findOne<Pick<User, '_id' | 'language'>>({username, active: true}, {projection: {_id: 1, language: 1}});
 
       if (!user._id) throw new UserNotFoundError({data: {username}});
-      const {_id} = user;
+      const {_id, language} = user;
 
       const session = await connection.collection<Session>('sessions').updateOne(
         {
@@ -51,7 +48,7 @@ export const AuthRepository = (connection: Db) => {
         {
           $currentDate: {
             lastModified: true,
-            createdAt: {$type: 'timestamp'},
+            createdAt: {$type: 'date'},
           },
         },
         {upsert: true},
@@ -59,12 +56,9 @@ export const AuthRepository = (connection: Db) => {
       if (!session.result)
         throw new SessionNotSetError({data: {username, sessionToken}, message: ErrorsList.SESSION_NOT_SET});
 
-      return {userId: _id};
+      return {userId: _id, language};
     },
 
-    /**
-     * @throws SessionDoNotExistError
-     */
     closeSession: async (sessionToken: string): Promise<boolean> => {
       const success = await connection.collection<Session>('sessions').updateOne(
         {
@@ -73,7 +67,7 @@ export const AuthRepository = (connection: Db) => {
         {
           $currentDate: {
             lastModified: true,
-            createdAt: {$type: 'timestamp'},
+            createdAt: {$type: 'date'},
             sessionClosed: {$type: 'timestamp'},
           },
         },
@@ -82,9 +76,6 @@ export const AuthRepository = (connection: Db) => {
       return true;
     },
 
-    /**
-     * @throws SessionDoNotExistError
-     */
     getSession: async (sessionToken: string): Promise<SessionObject> => {
       const sessionObject = await connection
         .collection<User>('users')
@@ -130,9 +121,6 @@ export const AuthRepository = (connection: Db) => {
       return sessionObject;
     },
 
-    /**
-     * @throws UserNotFoundError
-     */
     setActivationPublicToken: async ({
       userId,
       activationToken,
@@ -151,11 +139,8 @@ export const AuthRepository = (connection: Db) => {
       return {activationToken};
     },
 
-    /**
-     * @throws UserNotFoundError
-     */
-    activate: async (activationToken: string): Promise<boolean> => {
-      const success = await connection.collection<User>('users').updateOne(
+    activate: async (activationToken: string): Promise<{username: string; email: string}> => {
+      const success = await connection.collection<User>('users').findOneAndUpdate(
         {activationToken},
         {
           $set: {active: true},
@@ -165,17 +150,14 @@ export const AuthRepository = (connection: Db) => {
         },
       );
 
-      if (!success.matchedCount && !success.modifiedCount) throw new UserNotFoundError({data: {activationToken}});
-      return true;
+      if (!success.ok) throw new UserNotFoundError({data: {activationToken}});
+      return {username: success.value.username, email: success.value.email};
     },
 
-    /**
-     * @throws UserNotFoundError
-     */
     setRecoveryPublicToken: async ({
       recoveryToken,
       email,
-    }: SetRecoveryTokenObject): Promise<{recoveryToken: string}> => {
+    }: SetRecoveryTokenObject): Promise<{recoveryToken: string; username: string}> => {
       const success = await connection.collection<User>('users').updateOne(
         {email},
         {
@@ -187,12 +169,11 @@ export const AuthRepository = (connection: Db) => {
       );
 
       if (!success.matchedCount) throw new UserNotFoundError({data: {email}});
-      return {recoveryToken};
+
+      const {username} = await connection.collection<User>('users').findOne({email}, {projection: {username: 1}});
+      return {recoveryToken, username};
     },
 
-    /**
-     * @throws UserNotFoundError
-     */
     matchRecoveryAndSetResetToken: async ({
       recoveryToken,
       resetToken,
@@ -213,9 +194,6 @@ export const AuthRepository = (connection: Db) => {
       return {resetToken};
     },
 
-    /**
-     * @throws UserNotFoundError
-     */
     setPassword: async ({userId, password, resetToken}: NewPasswordObject): Promise<boolean> => {
       let option;
       if (userId) option = {_id: userId};
@@ -232,7 +210,6 @@ export const AuthRepository = (connection: Db) => {
       );
 
       if (!updatedUser.matchedCount) throw new UserNotFoundError({data: {userId}});
-
       return true;
     },
   };

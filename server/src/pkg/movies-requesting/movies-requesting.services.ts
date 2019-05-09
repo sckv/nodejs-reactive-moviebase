@@ -9,8 +9,8 @@ import {MovieRequestThin, MovieRequest} from 'types/movies-requesting.services';
 import {LanguageType} from 'types/User.model';
 
 // We let injectable mongoclientDB ONLY for testing purposes
-export const MoviesRequestingServices = async (mc?: Db) => {
-  const MoviesRepo = MoviesRepository(mc || mongoConnection);
+export const MoviesRequestingServices = (mc?: Db) => {
+  const MoviesRepo = MoviesRepository(mongoConnection || mc);
   return {
     addToDatabase: (movieCreateObject: MovieCreateObject | MovieCreateObject[]): Promise<boolean> => {
       return MoviesRepo.add(movieCreateObject);
@@ -51,8 +51,20 @@ export const MoviesRequestingServices = async (mc?: Db) => {
         movieId: createObjectId(movieId),
       });
     },
-    getByTtid: ({ttid}: {ttid: string}): Promise<MovieRequest | {movieId: ObjectID}> => {
-      return MoviesRepo.getByTtid({ttid});
+    getByTtid: ({
+      ttid,
+      fullMovie = false,
+      language = 'es',
+    }: {
+      ttid: string;
+      fullMovie?: boolean;
+      language?: LanguageType;
+    }): Promise<MovieRequest | {movieId: ObjectID}> => {
+      return MoviesRepo.getByTtid({
+        ttid,
+        fullMovie,
+        language,
+      });
     },
   };
 };

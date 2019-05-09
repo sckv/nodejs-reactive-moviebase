@@ -1,13 +1,18 @@
 FROM node:11.12.0-alpine
 
 ENV LANG=C.UTF-8
+
 WORKDIR /app
+
+COPY package.json ./package.json
+
+RUN npm install pm2 -g
 
 RUN apk add --no-cache --virtual .gyp \
   python \
   make \
   g++ \
-  && npm install --only=production \
+  && npm install --production \
   && apk del .gyp
 
 RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases/download" && \
@@ -47,6 +52,3 @@ RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases
   "$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
   "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
   "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
-
-CMD ["npm", "run", "cluster"]
-

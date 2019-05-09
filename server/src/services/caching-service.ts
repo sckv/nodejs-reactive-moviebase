@@ -1,43 +1,32 @@
 import isEqual from 'fast-deep-equal';
-import IOredis from 'ioredis';
 import {CacheDigestableMessage} from 'types/cache';
 
 import {hashUrl} from '@src/utils/hash-url';
-import {REDIS_CACHE_KEY_PREFIX} from './redis-polling-service';
 import {jsonSafeParse} from '@src/utils/json-safe-parse';
 import {logger} from '@src/utils/logger';
+import {Cache} from '@src/redis';
+import {CacheServices} from '@src/pkg/cache/cache.services';
 
-const {REDIS_PORT, REDIS_HOST, REDIS_DB} = process.env;
-
-const RedisConnection = new IOredis({
-  port: +REDIS_PORT || 6379,
-  host: REDIS_HOST || 'localhost',
-  db: +REDIS_DB || 0,
-});
-
-const RedisSubscription = RedisConnection.duplicate();
-
-RedisConnection.on('ready', () => {
-  RedisConnection.config('SET', 'notify-keyspace-events', 'K');
-});
+const RedisSubscription = Cache.duplicate();
 
 export const cachingService = () => {
   RedisSubscription.on('message', async (channel, message) => {
     if (channel !== 'digest:cache') return;
-
     const {data, url} = jsonSafeParse<CacheDigestableMessage>(message);
-    const prefixedUrl = REDIS_CACHE_KEY_PREFIX + hashUrl(url);
-    const oldEntry = await RedisConnection.hget(prefixedUrl, 'data');
-    if (oldEntry && isEqual(jsonSafeParse(oldEntry), data)) {
+    // console.log('recieved data ', data, url);
+
+    const hashedUrl = hashUrl(url);
+    const oldEntry = await CacheServices.getFromCache(hashedUrl);
+    if (oldEntry && isEqual(oldEntry.data, data)) {
       //TODO: CHANGE FOR PINO
-      logger.info('cache: cache:digest contents are the same', data, oldEntry);
+      logger.info('digest:cache contents are the same', data, oldEntry);
       return;
     }
 
-    //@ts-ignore
-    await RedisConnection.hset(prefixedUrl, 'url', url, 'data', JSON.stringify(data));
-    // DO WE NEED IT HERE?
-    // await RedisConnection.expire(prefixedUrl, 60);
+    await CacheServices.setToCache({
+      urlHash: hashedUrl,
+      data: {url, data},
+    });
   });
   RedisSubscription.subscribe('digest:cache');
 };

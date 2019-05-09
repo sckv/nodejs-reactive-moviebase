@@ -7,12 +7,13 @@ import {LoginObject, LoginResponseObject} from 'types/authorizing.services';
 import {Db, ObjectId} from 'mongodb';
 import {createObjectId} from '@src/utils/create-objectid';
 import {MongoObjectID} from 'types/utils';
+import {CacheServices} from '@src/pkg/cache/cache.services';
 
 const SESSION_TOKEN_LENGTH = 76;
 const ACTIVATION_RESET_TOKEN_LENGTH = 96;
 
 // We let injectable mongoclientDB ONLY for testing purposes
-export const AuthServices = async (mc?: Db) => {
+export const AuthServices = (mc?: Db) => {
   const AuthRepo = AuthRepository(mc || mongoConnection);
   // const UsersRepo = UsersRepository(connection);
   return {
@@ -21,8 +22,9 @@ export const AuthServices = async (mc?: Db) => {
 
       if (await bcrypt.compare(password, userPassword.password)) {
         const sessionToken = await generateToken(SESSION_TOKEN_LENGTH);
-        const {userId} = await AuthRepo.setSession({username, sessionToken});
-        return {userId, token: sessionToken};
+        const {userId, language} = await AuthRepo.setSession({username, sessionToken});
+        await CacheServices.setSession({userId, sessionToken, language});
+        return {userId, token: sessionToken, language};
       } else {
         throw new InvalidPasswordError({
           data: {
@@ -32,26 +34,30 @@ export const AuthServices = async (mc?: Db) => {
         });
       }
     },
-    logout: ({sessionToken}: {sessionToken: string}): Promise<boolean> => {
-      return AuthRepo.closeSession(sessionToken);
+    logout: async ({sessionToken}: {sessionToken: string}): Promise<boolean> => {
+      await AuthRepo.closeSession(sessionToken);
+      return await CacheServices.clearSession(sessionToken);
     },
     getSession: ({sessionToken}: {sessionToken: string}) => {
       return AuthRepo.getSession(sessionToken);
     },
+    activate: (activationToken: string) => {
+      return AuthRepo.activate(activationToken);
+    },
     generateActivationToken: async ({userId}: {userId: string | ObjectId}) => {
-      return AuthRepo.setActivationPublicToken({
+      return await AuthRepo.setActivationPublicToken({
         userId: createObjectId(userId),
         activationToken: await generateToken(ACTIVATION_RESET_TOKEN_LENGTH),
       });
     },
     generateRecoveryToken: async ({email}: {email: string}) => {
-      return AuthRepo.setRecoveryPublicToken({
+      return await AuthRepo.setRecoveryPublicToken({
         email,
         recoveryToken: await generateToken(ACTIVATION_RESET_TOKEN_LENGTH),
       });
     },
     checkRecoveryAndSetResetToken: async ({recoveryToken}: {recoveryToken: string}) => {
-      return AuthRepo.matchRecoveryAndSetResetToken({
+      return await AuthRepo.matchRecoveryAndSetResetToken({
         recoveryToken,
         resetToken: await generateToken(ACTIVATION_RESET_TOKEN_LENGTH),
       });
