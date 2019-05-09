@@ -1,14 +1,7 @@
-import IOredis, {Redis} from 'ioredis';
+import {Redis} from 'ioredis';
 import EventEmitter from 'events';
 import {jsonSafeParse} from '@src/utils';
-
-const {REDIS_PORT, REDIS_HOST, REDIS_DB} = process.env;
-
-const RedisPoller = new IOredis({
-  port: +REDIS_PORT || 6379,
-  host: REDIS_HOST || 'localhost',
-  db: +REDIS_DB || 0,
-});
+import {Cache} from '@src/redis';
 
 export const REDIS_CACHE_KEY_PREFIX = 'cache:';
 
@@ -20,21 +13,24 @@ class RedisServiceClass {
   private rListener: Redis;
 
   constructor() {
-    this.rPoller = RedisPoller;
+    this.rPoller = Cache.duplicate();
+    this.rListener = Cache.duplicate();
     this.eventsHandler();
   }
 
   private eventsHandler() {
-    this.rPoller.subscribe('__keyevent@0__:hset');
-    this.rPoller.on('message', (_, key) => {
-      if (this.subscriptionsList.includes(key)) {
-        this.pushToListeners(key);
-      }
+    this.rPoller.on('ready', () => {
+      this.rPoller.subscribe('__keyevent@0__:set');
+      this.rPoller.on('message', (_, key) => {
+        if (this.subscriptionsList.includes(key)) {
+          this.pushToListeners(key);
+        }
+      });
     });
   }
 
   private async pushToListeners(key: string) {
-    const rawData = await this.rListener.hget(key, 'data');
+    const rawData = await this.rListener.get(key);
     const data = jsonSafeParse(rawData);
 
     if (this.emitter.listeners(key).length) {
@@ -49,16 +45,18 @@ class RedisServiceClass {
     }
 
     return {
-      consume: this.emitter.on,
+      consume: (hashedUrl, listenerFn) => this.emitter.on(REDIS_CACHE_KEY_PREFIX + hashedUrl, listenerFn),
       force: () => this.pushToListeners(hash),
     };
   }
 
   public unsubscribeFrom(hash: string, listener: (...args: any[]) => void) {
-    const indexOfHash = this.subscriptionsList.indexOf(hash);
+    const prefixedHash = REDIS_CACHE_KEY_PREFIX + hash;
+    const indexOfHash = this.subscriptionsList.indexOf(prefixedHash);
     if (indexOfHash > -1) {
-      this.subscriptionsList.splice(indexOfHash, 1);
-      this.emitter.removeListener(hash, listener);
+      // unsubscribe from events, prevent memory leaking
+      if (this.emitter.listeners(prefixedHash).length === 1) this.subscriptionsList.splice(indexOfHash, 1);
+      this.emitter.removeListener(prefixedHash, listener);
       return true;
     }
     return false;
@@ -69,8 +67,7 @@ class RedisServiceClass {
   }
 }
 
-export const RedisService = RedisServiceClass.Instance as RedisService;
-
+export const RedisStreamingService = RedisServiceClass.Instance as RedisService;
 export interface RedisService {
   subscribeTo(
     hash: string,

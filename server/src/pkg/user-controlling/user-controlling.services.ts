@@ -5,17 +5,17 @@ import bcrypt from 'bcrypt';
 import isEmail from 'validator/lib/isEmail';
 import {InvalidEmailError} from '@src/errors/application-errors/invalid-email';
 import {GetUserObject, ModifyUserObject} from 'types/users.repository';
-import {Db} from 'mongodb';
+import {Db, ObjectId} from 'mongodb';
 import {createObjectId} from '@src/utils/create-objectid';
 
 export const PASSWORD_HASHING_ROUNDS = 10;
 
-export const UserControllingServices = async (db?: Db) => {
+export const UserControllingServices = (db?: Db) => {
   const UsersRepo = UsersRepository(db || mongoConnection);
   return {
-    register: async ({username, password, email}: RegistrationObject): Promise<boolean> => {
+    register: async ({username, password, email}: RegistrationObject) => {
       if (!isEmail(String(email))) throw new InvalidEmailError({data: {email, username}});
-      return UsersRepo.register({
+      return await UsersRepo.register({
         username,
         password: await bcrypt.hash(String(password).trim(), PASSWORD_HASHING_ROUNDS),
         email,
@@ -38,10 +38,10 @@ export const UserControllingServices = async (db?: Db) => {
         ...objectToModify,
       });
     },
-    follow: async ({userId, followId}: {userId: string; followId: string}) => {
+    follow: async ({userId, followId}: {userId: string | ObjectId; followId: string | ObjectId}) => {
       return UsersRepo.follow({userId: createObjectId(userId), followId: createObjectId(followId)});
     },
-    unfollow: async ({userId, followId}: {userId: string; followId: string}) => {
+    unfollow: async ({userId, followId}: {userId: string | ObjectId; followId: string | ObjectId}) => {
       return UsersRepo.unfollow({userId: createObjectId(userId), followId: createObjectId(followId)});
     },
   };

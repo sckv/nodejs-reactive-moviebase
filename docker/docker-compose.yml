@@ -9,42 +9,145 @@ services:
     networks:
       - backendmesh
     tty: true
+    volumes:
+      - mongo-data:/etc/mongo
 
-  node:
-    context: ./node
+  redis:
+    image: redis:4.0.5-alpine
+    restart: on-failure
+    command: ["redis-server", "--appendonly", "yes"]
+    hostname: redis
+    networks:
+      - backendmesh
+    tty: true
+    volumes:
+      - redis-data:/data
+
+  movies:
+    build:
+      context: ./node
+    # entrypoint: /usr/entrypoint.sh
     restart: on-failure
     networks:
       - backendmesh
     tty: true
+    env_file:
+      - ../.env
+    volumes:
+      - /home/k/university/dra/PROJECT/server/build:/app
+      - /home/k/university/dra/PROJECT/pm2:/app/pm2
+      - /home/k/university/dra/PROJECT/server/cert:/app/cert
+      - /home/k/university/dra/PROJECT/package.json:/app/package.json
+      - /app/node_modules
+    command: pm2-runtime /app/pm2/movies.config.js
+
+  cache:
+    build:
+      context: ./node
+    restart: on-failure
+    networks:
+      - backendmesh
+    tty: true
+    env_file:
+      - ../.env
+    volumes:
+      - /home/k/university/dra/PROJECT/server/build:/app
+      - /home/k/university/dra/PROJECT/pm2:/app/pm2
+      - /home/k/university/dra/PROJECT/server/cert:/app/cert
+      - /home/k/university/dra/PROJECT/package.json:/app/package.json
+      - /app/node_modules
+    command: pm2-runtime /app/pm2/cache.config.js
+
+  auth:
+    build:
+      context: ./node
+    restart: on-failure
+    networks:
+      - backendmesh
+    tty: true
+    env_file:
+      - ../.env
+    volumes:
+      - /home/k/university/dra/PROJECT/server/build:/app
+      - /home/k/university/dra/PROJECT/pm2:/app/pm2
+      - /home/k/university/dra/PROJECT/server/cert:/app/cert
+      - /home/k/university/dra/PROJECT/package.json:/app/package.json
+      - /app/node_modules
+    command: pm2-runtime /app/pm2/auth.config.js
+
+  listing:
+    build:
+      context: ./node
+    restart: on-failure
+    networks:
+      - backendmesh
+    tty: true
+    env_file:
+      - ../.env
+    volumes:
+      - /home/k/university/dra/PROJECT/server/build:/app
+      - /home/k/university/dra/PROJECT/pm2:/app/pm2
+      - /home/k/university/dra/PROJECT/server/cert:/app/cert
+      - /home/k/university/dra/PROJECT/package.json:/app/package.json
+      - /app/node_modules
+    command: pm2-runtime /app/pm2/listing.config.js
+
+  users:
+    build:
+      context: ./node
+    restart: on-failure
+    networks:
+      - backendmesh
+    tty: true
+    env_file:
+      - ../.env
+    volumes:
+      - /home/k/university/dra/PROJECT/server/build:/app
+      - /home/k/university/dra/PROJECT/pm2:/app/pm2
+      - /home/k/university/dra/PROJECT/server/cert:/app/cert
+      - /home/k/university/dra/PROJECT/package.json:/app/package.json
+      - /app/node_modules
+    command: pm2-runtime /app/pm2/users.config.js
 
   envoy:
-    context: ./envoy
+    build:
+      context: ./envoy
     restart: on-failure
-    expose:
-      - 80:80
-      - 443:443
+    ports:
+      - "80:80"
+      - "443:443"
     networks:
       - backendmesh
     command: /usr/local/bin/envoy -c /etc/envoy.yaml
     volumes:
       - ./envoy/envoy.yaml:/etc/envoy.yaml
     tty: true
+    depends_on:
+      # - users
+      # - listing
+      # - auth
+      - movies
 
-  front:
-    context: ./nginx
-    restart: on-failure
-    networks:
-      - backendmesh
-    volumes:
-      # - ~/nginx_certs:/etc/nginx/certs
-      # - ~/letsencrypt_www:/var/www/letsencrypt
-      - ~/app:/var/www
-      - ~/app-logs/nginx:/var/log/nginx
-      - ./nginx/sites:/etc/nginx/sites-available
-    tty: true
+  # front:
+  #   build:
+  #     context: ./nginx
+  #   restart: on-failure
+  #   networks:
+  #     - backendmesh
+  #   volumes:
+  #     # - ~/nginx_certs:/etc/nginx/certs
+  #     # - ~/letsencrypt_www:/var/www/letsencrypt
+  #     - ~/app:/var/www
+  #     - ~/app-logs/nginx:/var/log/nginx
+  #     - ./nginx/sites:/etc/nginx/sites-available
+  #   tty: true
 
 volumes:
   data:
+    driver: local
+  redis-data:
+    driver: local
+  mongo-data:
     driver: local
 
 networks:

@@ -11,12 +11,13 @@
     "strictFunctionTypes": false,
     "strictPropertyInitialization": false,
     "rootDir": ".",
+    "sourceRoot": ".",
     "baseUrl": ".",
     "paths": {
       "@config/*": ["src/config/*"],
       "@src/*": ["src/*"]
     }
   },
-  "include": ["../@types/**/*", "launch", "src/**/*", "cert"],
+  "include": ["../@types/**/*", "launch", "@types", "src/**/*", "cert"],
   "exclude": ["build", "__tests__/**/*"]
 }

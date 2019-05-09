@@ -13,7 +13,7 @@ const LIMIT_PAGINATION = 30;
 
 export const UsersRepository = (connection: Db) => {
   return {
-    register: async (registerData: RegisterUserObject): Promise<boolean> => {
+    register: async (registerData: RegisterUserObject): Promise<{userId: ObjectId}> => {
       try {
         const registration = await connection
           .collection<Partial<User>>('users')
@@ -29,14 +29,17 @@ export const UsersRepository = (connection: Db) => {
               active: false,
             },
             $currentDate: {
-              createdAt: {$type: 'timestamp'},
+              createdAt: {$type: 'date'},
               lastModified: true,
             },
           },
         );
 
         if (!updating.modifiedCount) throw new UserModifyingError({data: {registerData}});
-        return true;
+        const account = await connection
+          .collection<User>('users')
+          .findOne({username: registerData.username}, {projection: {_id: 1}});
+        return {userId: account._id};
       } catch (e) {
         logger.error(e);
         throw new UserRegisterError({data: {registerData}});

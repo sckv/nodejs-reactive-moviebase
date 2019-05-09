@@ -16,34 +16,27 @@ const redis = new ioredis({
 jest.setTimeout(25000);
 
 export default describe('<-- Cache service -->', () => {
-  beforeAll(() => {
+  beforeAll(async () => {
+    await redis.flushall();
     cachingService();
-  }, 5000);
-  afterAll(() => {
+  }, 3000);
+  afterAll(async () => {
+    await redis.flushall();
     redis.disconnect();
   });
 
   it('receive and decode payload', async done => {
     const fixture = {url: '/test', data: {test: 'object', nice: ['array']}};
 
-    await new Promise(resolve =>
-      setTimeout(async () => {
-        await redis.publish('digest:cache', JSON.stringify(fixture));
-        resolve();
-      }, 2000),
-    );
+    await redis.publish('digest:cache', JSON.stringify(fixture));
 
     const hashedUrl = REDIS_CACHE_KEY_PREFIX + hashUrl(fixture.url);
 
-    await new Promise(resolve =>
-      setTimeout(async () => {
-        const [data, url] = await redis.hmget(hashedUrl, 'data', 'url');
-        if (!data || !url) fail();
-        expect(jsonSafeParse(data)).toEqual(fixture.data);
-        expect(url).toEqual(fixture.url);
-        resolve();
-        done();
-      }, 3000),
-    );
+    setTimeout(async () => {
+      const data = await redis.get(hashedUrl);
+      if (!data) fail();
+      expect(jsonSafeParse(data)).toEqual(fixture.data);
+      done();
+    }, 500);
   }, 8000);
 });

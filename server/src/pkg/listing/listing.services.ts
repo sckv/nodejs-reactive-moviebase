@@ -9,7 +9,7 @@ import {CreateListObject, AddMovieToListObject} from 'types/lists.repository';
 import {Omit} from 'utility-types';
 
 // We let injectable mongoclientDB ONLY for testing purposes
-export const ListingServices = async (mc?: Db) => {
+export const ListingServices = (mc?: Db) => {
   const ListsRepo = ListsRepository(mc || mongoConnection);
   return {
     getByUserId: ({
