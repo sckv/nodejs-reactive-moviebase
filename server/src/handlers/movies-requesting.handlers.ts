@@ -3,7 +3,6 @@ import {hashUrl} from '@src/utils';
 import {CacheServices} from '@src/pkg/cache/cache.services';
 import {RedisStreamingService} from '@src/services/redis-polling-service';
 import {MoviesRequestingServices} from '@src/pkg/movies-requesting/movies-requesting.services';
-import {Cache} from '@src/redis';
 import {searchMovies, plotMovie, translateMovieText} from '@src/services/external-movies-service';
 import {MovieRequestThin, MovieRequest} from 'types/movies-requesting.services';
 import {MovieSearchResult} from 'types/external-movies';
@@ -16,25 +15,12 @@ export const searchMovie: CustomRequestHandler = async (req, res) => {
   const {l, s, c, p, ps} = req.query;
   console.log('searching for a movie in imdb', c, s);
 
-  // console.log('MONGO CONNECTION??', mongoConnection);
   const hashedUrl = hashUrl(req.originalUrl);
 
   res.setHeader('Content-Type', 'application/json');
 
   if ((c && s) || s) {
-    function listenerFn(data: any) {
-      res.write(convertToBuffer(data));
-    }
-
-    req.on('close', async () => {
-      // res.sendStatus(200);
-      RedisStreamingService.unsubscribeFrom(hashedUrl, listenerFn);
-      await CacheServices.clearSubscription(hashedUrl);
-      // throw new Error('User disconnected');
-    });
-
-    const redisSubscription = RedisStreamingService.subscribeTo(hashedUrl);
-    // console.log('subscribed to ', hashedUrl);
+    const isSubscribingFromBD = await CacheServices.existsSubscription(hashedUrl);
     const entryData = await MoviesRequestingServices().search({
       criteria: c,
       language: l,
@@ -42,51 +28,56 @@ export const searchMovie: CustomRequestHandler = async (req, res) => {
       pageSize: ps,
       sort: s,
     });
-    // console.log('searched for ', entryData);
+
     res.write(convertToBuffer(entryData));
 
-    // console.log('call force subscription consume for ');
-
-    redisSubscription.consume(hashedUrl, listenerFn);
-    // redisSubscription.force();
-
-    // console.log('search if in redis exists subscription for that collection');
-    const isSubscribingFromBD = await CacheServices.existsSubscription(hashedUrl);
-    // console.log('exists>?', isSubscribingFromBD);
-
     if (!isSubscribingFromBD) {
-      // console.log('subscribing to mongo change');
       const streamingChange = MoviesRequestingServices().watchSearch({
         criteria: c,
         language: l,
       });
 
-      streamingChange.on('change', chunk => {
-        // console.log('recieving chunks from bd', chunk);
+      await CacheServices.announceSubscription(hashedUrl);
 
-        // Cache.publish('cache:digest', JSON.stringify({url: req.originalUrl, data: chunk}));
-        // console.log('writing to express stream');
-        res.write(convertToBuffer(chunk._data));
+      streamingChange.on('change', async chunk => {
+        if (chunk.operationType !== 'insert') return;
+        await CacheServices.publishToDigest({url: req.originalUrl, data: chunk.fullDocument});
+        res.write(convertToBuffer(chunk.fullDocument));
       });
+
+      req.on('close', async () => {
+        await CacheServices.clearSubscription(hashedUrl);
+        streamingChange.close();
+      });
+    } else {
+      function listenerFn(data: any) {
+        res.write(convertToBuffer(data));
+      }
+
+      req.on('close', async () => {
+        RedisStreamingService.unsubscribeFrom(hashedUrl, listenerFn);
+      });
+
+      const redisSubscription = RedisStreamingService.subscribeTo(hashedUrl);
+      redisSubscription.consume(hashedUrl, listenerFn);
     }
   } else {
     let results = [];
 
-    // console.log('searching for a movie in imdb');
     if (c) {
       const imdbData = await searchMovies(c);
-      // console.log('result imd movies', imdbData);
+
       if (!imdbData && !imdbData.length) return res.status(200).send([]);
 
       const firstMovie = imdbData[0];
       const getMovieIfExist = await MoviesRequestingServices().getByTtid({ttid: firstMovie.ttid});
-      // console.log('get if movie exist', getMovieIfExist);
+
       if (!getMovieIfExist) {
         await translateAndAddNewMovie(imdbData);
-        // console.log('translated and addded movie');
       }
+
       if (imdbData.length > 20)
-        results = imdbData.slice(0, 5).map<MovieRequestThin>(mo => ({
+        results = imdbData.slice(0, 20).map<MovieRequestThin>(mo => ({
           ttid: mo.ttid,
           poster: mo.image.url,
           rate: 0,
@@ -103,9 +94,6 @@ export const searchMovie: CustomRequestHandler = async (req, res) => {
           title: mo.title,
           year: mo.year,
         }));
-      const searchForAMovie = await MoviesRequestingServices().search({criteria: c});
-      // console.log('searched movies from db', searchForAMovie);
-      results = results.concat(searchForAMovie);
 
       return res.status(200).send(results);
     }
@@ -116,29 +104,15 @@ export const getMovieById: CustomRequestHandler = async (req, res) => {
   const {movieId} = req.params;
   const hashedUrl = hashUrl(req.originalUrl);
 
-  function listenerFn(data: any) {
-    res.write(data);
-  }
-
-  req.on('close', () => {
-    res.send(200);
-    RedisStreamingService.unsubscribeFrom(hashedUrl, listenerFn);
-    throw new Error('User disconnected');
-  });
-
   const movieData = await MoviesRequestingServices().getById({
     movieId,
     language: req.auth ? req.auth.language : undefined,
     selfId: req.auth ? req.auth.userId : undefined,
   });
-  res.write(movieData);
-
-  const redisSubscription = RedisStreamingService.subscribeTo(hashedUrl);
-
-  redisSubscription.consume(hashedUrl, listenerFn);
-  redisSubscription.force();
+  res.write(convertToBuffer(movieData));
 
   const isSubscribingFromBD = await CacheServices.existsSubscription(hashedUrl);
+
   if (!isSubscribingFromBD) {
     const streamingChange = MoviesRequestingServices().watchById({
       movieId,
@@ -146,17 +120,37 @@ export const getMovieById: CustomRequestHandler = async (req, res) => {
       selfId: req.auth ? req.auth.userId : undefined,
     });
 
-    streamingChange.on('data', chunk => {
-      Cache.publish('cache:digest', JSON.stringify({url: req.originalUrl, data: chunk}));
-      res.write(chunk);
+    await CacheServices.announceSubscription(hashedUrl);
+
+    streamingChange.on('data', async chunk => {
+      await CacheServices.publishToDigest({url: req.originalUrl, data: chunk.fullDocument});
+      res.write(convertToBuffer(chunk.fullDocument));
     });
+
+    req.on('close', async () => {
+      await CacheServices.clearSubscription(hashedUrl);
+      streamingChange.close();
+    });
+  } else {
+    function listenerFn(data: any) {
+      res.write(convertToBuffer(data));
+    }
+
+    req.on('close', () => {
+      RedisStreamingService.unsubscribeFrom(hashedUrl, listenerFn);
+    });
+
+    const redisSubscription = RedisStreamingService.subscribeTo(hashedUrl);
+
+    redisSubscription.consume(hashedUrl, listenerFn);
+    redisSubscription.force();
   }
 };
 
 export const getMovieByTtid: CustomRequestHandler = async (req, res) => {
   const {ttid} = req.params;
   let movie = (await MoviesRequestingServices().getByTtid({ttid, fullMovie: true})) as MovieRequest;
-  if (!movie._id) {
+  if (!movie) {
     const imdbData = await searchMovies(ttid);
     if (!imdbData && !imdbData.length) return res.status(200).send([]);
     await translateAndAddNewMovie(imdbData);

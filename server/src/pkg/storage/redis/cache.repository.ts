@@ -75,6 +75,14 @@ export const CacheRepository = (cache: Redis) => {
         throw new CacheSettingToError({data: {setToObject}, log: error});
       }
     },
+    publishToCacheChannel: async <T>(msg: CacheDigestableMessage<T>) => {
+      try {
+        const result = cache.publish('digest:cache', JSON.stringify(msg));
+        return !!result;
+      } catch (error) {
+        console.log('error publishing to cache channel', error);
+      }
+    },
     clearFromCache: async (urlHash: string): Promise<boolean> => {
       try {
         const cleared = await cache.del(CACHE_PREFIX + urlHash);

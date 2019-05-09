@@ -94,20 +94,24 @@ export const MoviesRepository = (connection: Db) => {
     },
     watchSearch: ({language = 'es', criteria = ''}: {language?: LanguageType; criteria: string}) => {
       // TODO: refine the object, value to combine/filter it upstairs
-      return connection.collection<Movie>('movies').watch(
-        [
-          {
-            $addFields: {
-              plot: `$data.${language}.plot`,
-              description: `$data.${language}.description`,
-              averageRate: {
-                $avg: '$ratedBy.rate',
-              },
+      return connection.collection<Movie>('movies').watch([
+        {
+          $project: {
+            _id: 1,
+            operationType: 1,
+            documentKey: 1,
+            fullDocument: {
+              _id: '$fullDocument._id',
+              poster: '$fullDocument.poster',
+              title: '$fullDocument.title',
+              ttid: '$fullDocument.ttid',
+              year: '$fullDocument.year',
+              plot: `$fullDocument.data.${language}.plot`,
+              description: `$fullDocument.data.${language}.description`,
             },
           },
-        ],
-        // {fullDocument: 'updateLookup'},
-      );
+        },
+      ]);
     },
     get: async ({
       movieId,
@@ -179,12 +183,12 @@ export const MoviesRepository = (connection: Db) => {
       selfId?: ObjectId;
     }) => {
       return connection.collection('movies').watch([
-        {$match: {_id: movieId}},
+        {$match: {'fullDocument._id': movieId}},
         {
           $addFields: {
             rate: {
               $filter: {
-                input: '$ratedBy',
+                input: '$fullDocument.ratedBy',
                 as: 'rate',
                 cond: {$eq: ['$$rate.userId', selfId]},
               },
@@ -193,32 +197,26 @@ export const MoviesRepository = (connection: Db) => {
         },
         {
           $project: {
-            plot: '$data.en.plot',
-            description: `$data.${language}.description`,
-            poster: '$poster',
-            ttid: '$ttid',
-            title: '$title',
-            year: '$year',
-            comment: '$rate.comment',
-            rate: '$rate.rate',
+            plot: '$fullDocument.data.en.plot',
+            description: `$fullDocument.data.${language}.description`,
+            poster: '$fullDocument.poster',
+            ttid: '$fullDocument.ttid',
+            title: '$fullDocument.title',
+            year: '$fullDocument.year',
+            comment: '$fullDocument.rate.comment',
+            rate: '$fullDocument.rate.rate',
             ratedBy: {
               $filter: {
-                input: '$ratedBy',
+                input: '$fullDocument.ratedBy',
                 as: 'rate',
                 cond: {$ne: ['$$rate.userId', selfId]},
               },
             },
             averageRate: {
-              $avg: '$ratedBy.rate',
+              $avg: '$fullDocument.ratedBy.rate',
             },
           },
         },
-        // retrieve unlimited rates
-        // {
-        //   $addFields: {
-        //     ratedBy: {$slice: ['$ratedBy', 5]},
-        //   },
-        // },
       ]);
     },
     getByTtid: async ({

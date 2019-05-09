@@ -12,13 +12,14 @@ const RedisSubscription = Cache.duplicate();
 export const cachingService = () => {
   RedisSubscription.on('message', async (channel, message) => {
     if (channel !== 'digest:cache') return;
-
     const {data, url} = jsonSafeParse<CacheDigestableMessage>(message);
+    // console.log('recieved data ', data, url);
+
     const hashedUrl = hashUrl(url);
     const oldEntry = await CacheServices.getFromCache(hashedUrl);
     if (oldEntry && isEqual(oldEntry.data, data)) {
       //TODO: CHANGE FOR PINO
-      logger.info('cache: cache:digest contents are the same', data, oldEntry);
+      logger.info('digest:cache contents are the same', data, oldEntry);
       return;
     }
 

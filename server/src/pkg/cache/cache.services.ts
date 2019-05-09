@@ -10,6 +10,7 @@ export const CacheServices = {
   getFromCache: <T = any>(urlHash: string) => CacheRepository(Cache).getFromCache<T>(urlHash),
   setToCache: <T = any>(data: {urlHash: string; data: CacheDigestableMessage<T>; timeout?: number}) =>
     CacheRepository(Cache).setToCache(data),
+  publishToDigest: (data: CacheDigestableMessage) => CacheRepository(Cache).publishToCacheChannel(data),
   clearFromCache: (urlHash: string) => CacheRepository(Cache).clearFromCache(urlHash),
   announceSubscription: (urlHash: string) => CacheRepository(Cache).announceSubscription(urlHash),
   existsSubscription: (urlHash: string) => CacheRepository(Cache).existsSubscription(urlHash),

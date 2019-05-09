@@ -9,7 +9,7 @@ export const connectToDatabase = async (): Promise<{db: Db; connection: MongoCli
   const tryConnect = async () => {
     try {
       connection = await MongoClient.connect(mongoUrl, {useNewUrlParser: true, replicaSet: 'rs'});
-      console.log('CONNECTED DATABASE');
+      // console.log('CONNECTED DATABASE');
       // await InitializeDatabase(connection.db('moviebase'));
       // console.log('initialized DATABASE');
       return true;

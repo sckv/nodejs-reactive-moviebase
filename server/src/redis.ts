@@ -8,7 +8,7 @@ const instance = new IOredis({
 });
 
 instance.on('ready', () => {
-  instance.config('SET', 'notify-keyspace-events', 'K');
+  instance.config('SET', 'notify-keyspace-events', 'AKE');
 });
 
 export const Cache = instance;
