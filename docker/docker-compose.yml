@@ -3,14 +3,18 @@ services:
   mongo:
     image: mongo:4.0.6-xenial
     restart: on-failure
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: exampl
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME: root
+    #   MONGO_INITDB_ROOT_PASSWORD: exampl
     networks:
       - backendmesh
     tty: true
+    hostname: mongo
     volumes:
       - mongo-data:/etc/mongo
+    command: --replSet rs --bind_ip_all
+    ports:
+      - 27017:27017
 
   redis:
     image: redis:4.0.5-alpine
@@ -22,6 +26,28 @@ services:
     tty: true
     volumes:
       - redis-data:/data
+    ports:
+      - 6379:6379
+
+  envoy:
+    build:
+      context: ./envoy
+    restart: on-failure
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8081:8081"
+    networks:
+      - backendmesh
+    command: /usr/local/bin/envoy -c /etc/envoy.yaml
+    volumes:
+      - ./envoy/envoy.yaml:/etc/envoy.yaml
+    tty: true
+    # depends_on:
+    #   - users
+    #   - listing
+    #   - auth
+    #   - movies
 
   movies:
     build:
@@ -34,12 +60,14 @@ services:
     env_file:
       - ../.env
     volumes:
-      - /home/k/university/dra/PROJECT/server/build:/app
-      - /home/k/university/dra/PROJECT/pm2:/app/pm2
-      - /home/k/university/dra/PROJECT/server/cert:/app/cert
-      - /home/k/university/dra/PROJECT/package.json:/app/package.json
+      - ../server/build:/app
+      - ../pm2:/app/pm2
+      - ../server/cert:/app/cert
+      - ../package.json:/app/package.json
       - /app/node_modules
     command: pm2-runtime /app/pm2/movies.config.js
+    depends_on:
+      - mongo
 
   cache:
     build:
@@ -51,12 +79,14 @@ services:
     env_file:
       - ../.env
     volumes:
-      - /home/k/university/dra/PROJECT/server/build:/app
-      - /home/k/university/dra/PROJECT/pm2:/app/pm2
-      - /home/k/university/dra/PROJECT/server/cert:/app/cert
-      - /home/k/university/dra/PROJECT/package.json:/app/package.json
+      - ../server/build:/app
+      - ../pm2:/app/pm2
+      - ../server/cert:/app/cert
+      - ../package.json:/app/package.json
       - /app/node_modules
     command: pm2-runtime /app/pm2/cache.config.js
+    depends_on:
+      - redis
 
   auth:
     build:
@@ -68,10 +98,10 @@ services:
     env_file:
       - ../.env
     volumes:
-      - /home/k/university/dra/PROJECT/server/build:/app
-      - /home/k/university/dra/PROJECT/pm2:/app/pm2
-      - /home/k/university/dra/PROJECT/server/cert:/app/cert
-      - /home/k/university/dra/PROJECT/package.json:/app/package.json
+      - ../server/build:/app
+      - ../pm2:/app/pm2
+      - ../server/cert:/app/cert
+      - ../package.json:/app/package.json
       - /app/node_modules
     command: pm2-runtime /app/pm2/auth.config.js
 
@@ -85,10 +115,10 @@ services:
     env_file:
       - ../.env
     volumes:
-      - /home/k/university/dra/PROJECT/server/build:/app
-      - /home/k/university/dra/PROJECT/pm2:/app/pm2
-      - /home/k/university/dra/PROJECT/server/cert:/app/cert
-      - /home/k/university/dra/PROJECT/package.json:/app/package.json
+      - ../server/build:/app
+      - ../pm2:/app/pm2
+      - ../server/cert:/app/cert
+      - ../package.json:/app/package.json
       - /app/node_modules
     command: pm2-runtime /app/pm2/listing.config.js
 
@@ -102,33 +132,15 @@ services:
     env_file:
       - ../.env
     volumes:
-      - /home/k/university/dra/PROJECT/server/build:/app
-      - /home/k/university/dra/PROJECT/pm2:/app/pm2
-      - /home/k/university/dra/PROJECT/server/cert:/app/cert
-      - /home/k/university/dra/PROJECT/package.json:/app/package.json
+      - ../server/build:/app
+      - ../pm2:/app/pm2
+      - ../server/cert:/app/cert
+      - ../package.json:/app/package.json
       - /app/node_modules
     command: pm2-runtime /app/pm2/users.config.js
 
-  envoy:
-    build:
-      context: ./envoy
-    restart: on-failure
-    ports:
-      - "80:80"
-      - "443:443"
-    networks:
-      - backendmesh
-    command: /usr/local/bin/envoy -c /etc/envoy.yaml
-    volumes:
-      - ./envoy/envoy.yaml:/etc/envoy.yaml
-    tty: true
-    depends_on:
-      # - users
-      # - listing
-      # - auth
-      - movies
 
-  # front:
+  # nginx:
   #   build:
   #     context: ./nginx
   #   restart: on-failure
