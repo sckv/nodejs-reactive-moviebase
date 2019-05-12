@@ -20,6 +20,8 @@ export const searchMovie: CustomRequestHandler = async (req, res) => {
   res.setHeader('Content-Type', 'application/json');
 
   if ((c && s) || s) {
+    res.setHeader('Transfer-Encoding', 'chunked');
+
     const isSubscribingFromBD = await CacheServices.existsSubscription(hashedUrl);
     const entryData = await MoviesRequestingServices().search({
       criteria: c,

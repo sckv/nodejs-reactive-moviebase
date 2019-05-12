@@ -11,6 +11,7 @@ declare module 'types/utils' {
       language: LanguageType;
     };
     initTime: number;
+    log: any;
   }
 
   type CustomRequestHandler = (req: CustomRequest, res: Response, next: NextFunction) => any;

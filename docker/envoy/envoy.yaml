@@ -12,6 +12,7 @@ static_resources:
           "@type": type.googleapis.com/envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager
           codec_type: auto
           stat_prefix: ingress_http
+          stream_idle_timeout: 1800s
           access_log:
             - name: envoy.file_access_log
               typed_config:
@@ -75,7 +76,7 @@ static_resources:
                 filename: "/etc/server.key"
   clusters:
   - name: auth_service
-    connect_timeout: 5s
+    connect_timeout: 0.25s
     type: strict_dns
     lb_policy: round_robin
     tls_context:
@@ -93,7 +94,7 @@ static_resources:
                 address: auth
                 port_value: 443
   - name: movies_service
-    connect_timeout: 5s
+    connect_timeout: 0.25s
     type: strict_dns
     lb_policy: round_robin
     tls_context:
@@ -111,7 +112,7 @@ static_resources:
                 address: movies
                 port_value: 443
   - name: listing_service
-    connect_timeout: 5s
+    connect_timeout: 0.25s
     type: strict_dns
     lb_policy: round_robin
     tls_context:
@@ -129,7 +130,7 @@ static_resources:
                 address: listing
                 port_value: 443
   - name: users_service
-    connect_timeout: 5s
+    connect_timeout: 0.25s
     type: strict_dns
     lb_policy: round_robin
     tls_context:

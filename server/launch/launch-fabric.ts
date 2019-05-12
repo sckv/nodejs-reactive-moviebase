@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import spdy from 'spdy';
 import {api} from '@src/server';
+// import http2 from 'http2';
 
 let backPath;
 let routesPath;
@@ -16,8 +17,15 @@ if (process.env.NODE_ENV !== 'production') {
 type LaunchSettings = {port?: string | number; routesDir: string; serviceName: string};
 
 const options = {
+  // key: fs.readFileSync(path.join(backPath, 'cert/server-key.pem')),
+  // cert: fs.readFileSync(path.join(backPath, 'cert/server-crt.pem')),
+  // ca: fs.readFileSync(path.join(backPath, 'cert/ca-crt.pem')),
+  // requestCert: false,
+  // rejectUnauthorized: false,
+  // allowHTTP1: true,
   key: fs.readFileSync(path.join(backPath, 'cert/server.key')),
   cert: fs.readFileSync(path.join(backPath, 'cert/server.crt')),
+
   protocols: ['h2', 'http/1.1'],
 };
 
@@ -34,9 +42,11 @@ export const launchFabric = ({port = 443, routesDir, serviceName}: LaunchSetting
     process.exit(1);
   }
 
-  return spdy.createServer(options, api).listen(port, () => {
+  const createdServer = spdy.createServer(options, api).listen(port, () => {
     if (process.env.NODE_ENV !== 'test') {
       console.error(`${serviceName} listening on ${port} port!`);
     }
   });
+  createdServer.setTimeout(0);
+  return createdServer;
 };
