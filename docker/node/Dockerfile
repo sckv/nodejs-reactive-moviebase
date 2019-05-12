@@ -1,4 +1,4 @@
-FROM node:11.12.0-alpine
+FROM node:lts-alpine
 
 ENV LANG=C.UTF-8
 

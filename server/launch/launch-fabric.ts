@@ -18,9 +18,10 @@ type LaunchSettings = {port?: string | number; routesDir: string; serviceName: s
 const options = {
   key: fs.readFileSync(path.join(backPath, 'cert/server.key')),
   cert: fs.readFileSync(path.join(backPath, 'cert/server.crt')),
+  protocols: ['h2', 'http/1.1'],
 };
 
-export const launchFabric = ({port = 8000, routesDir, serviceName}: LaunchSettings) => {
+export const launchFabric = ({port = 443, routesDir, serviceName}: LaunchSettings) => {
   try {
     fs.readdirSync(path.join(routesPath, routesDir)).map(file => {
       if (path.extname(file) === '.js') {

@@ -6,7 +6,6 @@ const index: RouteController = app => {
   });
   app.route('/health').post((request, res) => {
     res.status(200).send(request.body);
-    // res.sendStatus(200);
   });
 };
 export = index;
