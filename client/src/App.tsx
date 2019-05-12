@@ -39,7 +39,11 @@ export const App = () => {
           });
       console.log('timeout started');
     }, 1000);
+
+    return () => clearInterval(timer);
   }, []);
+
   console.log('data is>>>', data);
+
   return <div>HELLO</div>;
 };
