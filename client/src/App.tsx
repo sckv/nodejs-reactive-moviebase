@@ -1,49 +1,51 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
+import { Provider } from 'react-redux';
+import { store } from '@src/store/create-store';
+import { Store } from 'redux';
+import { Global } from '@emotion/core';
+import { Typography } from '@material-ui/core';
+import { AppLoadingWrapper, AppLoadingSquare, ThemedCircular, globalStyles } from '@src/App.styles';
+import { useStreamFetch } from '@src/utils/use-stream-fetch';
+import { MoviesApi } from '@src/api/movies.api';
+import { HeaderBar } from '@src/ui/header-bar';
 
+let rendered = 0;
 export const App = () => {
-  const [data, setData] = useState<any[]>([]);
-  const abort = new AbortController();
+  const [resolvedStore, setStore] = useState<Store>(null as any);
+  const [moviesData, setMoviesData] = useState<any>([]);
 
+  rendered++;
   useEffect(() => {
-    let reader: ReadableStreamDefaultReader<Uint8Array> | null;
-    fetch('https://localhost/api/movies?s=latest', {
-      keepalive: true,
-      method: 'GET',
-      mode: 'cors',
-      // credentials: 'include',
-      signal: abort.signal,
-    })
-      .then(res => res.body)
-      .then(body => {
-        reader = body ? body.getReader() : null;
-      });
-    const timer = setInterval(() => {
-      if (!reader) clearInterval(timer);
-      else
-        reader
-          .read()
-          .then(({done, value}) => {
-            if (done) {
-              console.log('is done');
-              reader!.cancel();
-              clearInterval(timer);
-              return;
-            }
-            const parsed = JSON.parse(new TextDecoder('utf-8').decode(value));
-            console.log('parsed chunk', parsed);
-            setData(d => d.concat(parsed));
-          })
-          .catch(err => {
-            console.log('Request finished', err);
-            clearInterval(timer);
-          });
-      console.log('timeout started');
-    }, 1000);
-
-    return () => clearInterval(timer);
+    const awaitForStore = async () => {
+      const resolved = await store();
+      console.log('resolved store>> ', resolved);
+      setStore(resolved);
+    };
+    awaitForStore();
   }, []);
 
-  console.log('data is>>>', data);
+  useStreamFetch(() => MoviesApi.searchStream({ sort: 'latest' }) as any, setMoviesData);
 
-  return <div>HELLO</div>;
+  // TODO: fix typings
+
+  console.log('data is>>>', moviesData);
+  console.log('rendered>> ', rendered);
+
+  if (resolvedStore) {
+    return (
+      <Provider store={resolvedStore}>
+        <Global styles={globalStyles} />
+        <HeaderBar />
+        <div>HELLO</div>
+      </Provider>
+    );
+  }
+  return (
+    <AppLoadingWrapper>
+      <AppLoadingSquare>
+        <ThemedCircular />
+        <Typography>Accediendo a la aplicación....</Typography>
+      </AppLoadingSquare>
+    </AppLoadingWrapper>
+  );
 };

@@ -2,7 +2,7 @@ import { env } from '@src/global/env';
 import { reducers } from '@src/store/root-reducer';
 import { loadState } from '@src/utils/persist-state';
 import { routerMiddleware } from 'connected-react-router';
-import createHistory from 'history/createBrowserHistory';
+import { createBrowserHistory } from 'history';
 import { applyMiddleware, compose, createStore, DeepPartial } from 'redux';
 import thunk from 'redux-thunk';
 
@@ -13,7 +13,7 @@ declare global {
   }
 }
 
-export const history = createHistory();
+export const history = createBrowserHistory();
 
 const composeEnhancers =
   typeof window === 'object' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ && env !== 'production'

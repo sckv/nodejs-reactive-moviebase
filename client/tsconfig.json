@@ -14,13 +14,14 @@
     "noFallthroughCasesInSwitch": true,
     "strictBindCallApply": true,
     "outDir": "build",
-    "rootDir": "src",
+    // "rootDir": "src",
     "baseUrl": ".",
+    "rootDirs": ["src", "../@types/**/*"],
     "paths": {
       "@app/*": ["src/app/*"],
       "@src/*": ["src/*"]
     }
   },
-  "include": ["../@types/**/*", "src/**/*"],
+  "include": ["src", "../@types"],
   "exclude": ["../node_modules", "build", "src/**/*.test.tsx"]
 }

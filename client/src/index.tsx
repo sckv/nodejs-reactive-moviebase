@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {App} from '@src/App';
-import {env} from '@src/global/env';
-import {createMuiTheme} from '@material-ui/core/styles';
+import { App } from '@src/App';
+import { env } from '@src/global/env';
+import { createMuiTheme } from '@material-ui/core/styles';
 import blue from '@material-ui/core/colors/blue';
 import green from '@material-ui/core/colors/green';
-import {ThemeProvider} from '@material-ui/styles';
+import { ThemeProvider } from '@material-ui/styles';
 
 const theme = createMuiTheme({
   palette: {
