@@ -11,13 +11,13 @@ import { HeaderBar } from '@src/ui/header-bar';
 import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
-import { hot } from 'react-hot-loader';
+// import { hot } from 'react-hot-loader';
 import { lightGreen } from '@material-ui/core/colors';
 import { ErrorHandler } from '@src/ui/error-handler';
 import { Router } from '@src/Routes';
 
 // const rendered = 0;
-export const AppBase = () => {
+export const App = () => {
   const [resolvedStore, setStore] = useState<Store>(null as any);
   // const [moviesData, setMoviesData] = useState<any>([]);
 
@@ -67,5 +67,3 @@ const theme = createMuiTheme({
     secondary: blue,
   },
 });
-
-export default hot(module)(AppBase);

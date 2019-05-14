@@ -79,12 +79,13 @@ export const HeaderBar = () => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isMenuOpen, setMenuOpen] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [debouncedQuery] = useDebounce(query, 400);
+  const [debouncedQuery] = useDebounce(query, 700);
 
-  const handleMenuClose = () => {
+  const handleMenuClose = (ttid: string) => {
     setQuery('');
     setMenuOpen(false);
     inputRef.current!.blur();
+    MoviesApi.getByTtid(ttid).then(res => (res ? console.log('gotten by ttid', res.data) : null));
   };
 
   useEffect(() => {
@@ -99,6 +100,7 @@ export const HeaderBar = () => {
       });
     }
   }, [debouncedQuery]);
+
   return (
     <div className={classes.root}>
       <AppBar position="static">
@@ -141,7 +143,7 @@ export const HeaderBar = () => {
               onClose={handleMenuClose}
             >
               {invoke(list, 'map', (li: MovieRequestThin, idx: number) => (
-                <MenuItem onClick={handleMenuClose} key={(li._id as any) || idx}>
+                <MenuItem onClick={() => handleMenuClose(li.ttid)} key={(li._id as any) || idx}>
                   <MenuItemContaioner>
                     <div>
                       <img src={li.poster} />

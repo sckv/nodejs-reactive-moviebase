@@ -12,7 +12,7 @@ import { convertToBuffer } from '@src/utils/convert-to-buffer';
 // otherwise we make a call to the API and get movies from IMDB
 // we retrieve the movie and add it to db
 export const searchMovie: CustomRequestHandler = async (req, res) => {
-  const { l = 'en', s, c, p, ps } = req.query;
+  const { l, s, c, p, ps } = req.query;
   console.log('searching for a movie in imdb', c, s);
 
   const hashedUrl = hashUrl(req.originalUrl);
@@ -74,27 +74,33 @@ export const searchMovie: CustomRequestHandler = async (req, res) => {
       const getMovieIfExist = await MoviesRequestingServices().getByTtid({ ttid: firstMovie.ttid });
 
       if (!getMovieIfExist) {
-        await translateAndAddNewMovie(imdbData);
+        translateAndAddNewMovie(imdbData);
       }
 
       if (imdbData.length > 20)
-        results = imdbData.slice(0, 20).map<MovieRequestThin>(mo => ({
-          ttid: mo.ttid,
-          poster: mo.image.url,
-          rate: 0,
-          _id: null,
-          title: mo.title,
-          year: mo.year,
-        }));
+        results = imdbData.slice(0, 20).map<MovieRequestThin>(
+          mo =>
+            ({
+              ttid: mo.ttid,
+              poster: mo.image.url,
+              rate: 0,
+              _id: null,
+              title: mo.title,
+              year: mo.year,
+            } as any),
+        );
       else
-        results = imdbData.map<MovieRequestThin>(mo => ({
-          ttid: mo.ttid,
-          poster: mo.image.url,
-          rate: 0,
-          _id: null,
-          title: mo.title,
-          year: mo.year,
-        }));
+        results = imdbData.map<MovieRequestThin>(
+          mo =>
+            ({
+              ttid: mo.ttid,
+              poster: mo.image.url,
+              rate: 0,
+              _id: null,
+              title: mo.title,
+              year: mo.year,
+            } as any),
+        );
 
       return res.status(200).send(results);
     }
@@ -150,6 +156,12 @@ export const getMovieById: CustomRequestHandler = async (req, res) => {
 
 export const getMovieByTtid: CustomRequestHandler = async (req, res) => {
   const { ttid } = req.params;
+
+  const urlHash = hashUrl(req.originalUrl);
+
+  const cached = await CacheServices.getFromCache(urlHash);
+  if (cached) return res.status(200).send(cached);
+
   let movie = (await MoviesRequestingServices().getByTtid({ ttid, fullMovie: true })) as MovieRequest;
   if (!movie) {
     const imdbData = await searchMovies(ttid);
@@ -157,6 +169,7 @@ export const getMovieByTtid: CustomRequestHandler = async (req, res) => {
     await translateAndAddNewMovie(imdbData);
     movie = (await MoviesRequestingServices().getByTtid({ ttid, fullMovie: true })) as MovieRequest;
   }
+  CacheServices.publishToDigest({ url: req.originalUrl, data: movie });
   return res.status(200).send(movie);
 };
 

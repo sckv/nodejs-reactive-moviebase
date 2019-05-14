@@ -5,7 +5,7 @@ import { LanguageType } from 'types/User.model';
 
 const host = process.env.WEB_HOSTNAME || 'localhost';
 
-const moviesApiUrl = `https://${host}/api/movies`;
+const moviesApiUrl = `https://${host}/api/movies/`;
 
 export const MoviesApi = {
   searchCriteria: (criteria: string) => SecureFetcher(fetcher.get({ url: moviesApiUrl, params: { c: criteria } })),
@@ -28,4 +28,7 @@ export const MoviesApi = {
         params: { s: sort, c: criteria, l: language, ps: pageSize, p: page },
       }),
     ),
+  getByTtid: (ttid: string) => SecureFetcher(fetcher.get({ url: `${moviesApiUrl}${ttid}/by-ttid` })),
+  getById: (_id: string) => SecureFetcher(fetcher.get({ url: `${moviesApiUrl}${_id}` })),
+
 };
