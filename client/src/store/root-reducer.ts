@@ -5,6 +5,7 @@ import { AppStoreState } from '@src/store/store';
 import { AuthReducer } from '@src/store/reducers/auth.reducer';
 import { MovieReducer } from '@src/store/reducers/movie.reducer';
 
+
 export const reducers = (history: History): Reducer => {
   const appReducers: Reducer = (state, action) => {
     if (action.type === {}) state = undefined;

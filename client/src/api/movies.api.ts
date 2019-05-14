@@ -30,4 +30,5 @@ export const MoviesApi = {
     ),
   getByTtid: (ttid: string) => SecureFetcher(fetcher.get({ url: `${moviesApiUrl}${ttid}/by-ttid` })),
   getById: (_id: string) => SecureFetcher(fetcher.get({ url: `${moviesApiUrl}${_id}` })),
+
 };

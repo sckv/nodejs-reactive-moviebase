@@ -156,6 +156,7 @@ export const getMovieById: CustomRequestHandler = async (req, res) => {
 
 export const getMovieByTtid: CustomRequestHandler = async (req, res) => {
   const { ttid } = req.params;
+
   const urlHash = hashUrl(req.originalUrl);
 
   const cached = await CacheServices.getFromCache(urlHash);

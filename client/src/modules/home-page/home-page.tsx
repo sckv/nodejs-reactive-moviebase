@@ -2,6 +2,7 @@ import { Container, Grid, Typography } from '@material-ui/core';
 import { MoviesApi } from '@src/api/movies.api';
 import { MovieCard } from '@src/modules/home-page/components/home-movie-tile';
 import { useStreamFetch } from '@src/utils/use-stream-fetch';
+
 import React, { useState, useEffect } from 'react';
 import { MovieRequestThin } from 'types/movies-requesting.services';
 import { SearchMoviesObject } from 'types/movies.repository';

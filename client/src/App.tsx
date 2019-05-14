@@ -67,5 +67,3 @@ const theme = createMuiTheme({
     secondary: blue,
   },
 });
-
-// export default App;

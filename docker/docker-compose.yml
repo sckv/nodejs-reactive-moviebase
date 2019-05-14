@@ -82,6 +82,7 @@ services:
     depends_on:
       - redis
 
+
   email:
     build:
       context: ./node
