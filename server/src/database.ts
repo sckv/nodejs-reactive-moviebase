@@ -7,7 +7,7 @@ const mongoUrl = `mongodb://${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/
 export const connectToDatabase = async (): Promise<{ db: Db; connection: MongoClient }> => {
   let connection: MongoClient = null;
   const configOptions: any = { useNewUrlParser: true };
-  if (process.env.NODE_ENV === 'test') configOptions.replicaSet = 'rs';
+  if (process.env.NODE_ENV !== 'test') configOptions.replicaSet = 'rs';
   const tryConnect = async () => {
     try {
       connection = (await MongoClient.connect(mongoUrl, configOptions)) as any;
