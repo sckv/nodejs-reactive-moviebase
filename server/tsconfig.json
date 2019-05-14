@@ -10,7 +10,7 @@
     "strictNullChecks": false,
     "strictFunctionTypes": false,
     "strictPropertyInitialization": false,
-    "rootDir": ".",
+    "rootDirs": [".", "../@types/**/*"],
     "sourceRoot": ".",
     "baseUrl": ".",
     "paths": {
@@ -18,6 +18,6 @@
       "@src/*": ["src/*"]
     }
   },
-  "include": ["../@types/**/*", "launch", "@types", "src/**/*", "cert"],
+  "include": ["src", "launch", "../@types/**/*", "cert"],
   "exclude": ["build", "__tests__/**/*"]
 }

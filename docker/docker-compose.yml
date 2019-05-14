@@ -12,7 +12,7 @@ services:
     hostname: mongo
     volumes:
       - mongo-data:/etc/mongo
-    command: --replSet rs --bind_ip_all
+    command: ["--replSet", "rs", "--bind_ip_all"]
     ports:
       - 27017:27017
 
@@ -43,16 +43,10 @@ services:
     volumes:
       - ./envoy/envoy.yaml:/etc/envoy.yaml
     tty: true
-    # depends_on:
-    #   - users
-    #   - listing
-    #   - auth
-    #   - movies
 
   movies:
     build:
       context: ./node
-    # entrypoint: /usr/entrypoint.sh
     restart: on-failure
     networks:
       - backendmesh
@@ -104,6 +98,8 @@ services:
       - ../package.json:/app/package.json
       - /app/node_modules
     command: pm2-runtime /app/pm2/auth.config.js
+    depends_on:
+      - mongo
 
   listing:
     build:
@@ -121,6 +117,8 @@ services:
       - ../package.json:/app/package.json
       - /app/node_modules
     command: pm2-runtime /app/pm2/listing.config.js
+    depends_on:
+      - mongo
 
   users:
     build:
@@ -138,7 +136,8 @@ services:
       - ../package.json:/app/package.json
       - /app/node_modules
     command: pm2-runtime /app/pm2/users.config.js
-
+    depends_on:
+      - mongo
 
   # nginx:
   #   build:

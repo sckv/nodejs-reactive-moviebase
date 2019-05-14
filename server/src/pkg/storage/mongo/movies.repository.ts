@@ -1,12 +1,12 @@
-import {ObjectID, ObjectId} from 'bson';
-import {Db} from 'mongodb';
-import {SearchMoviesObject, MovieCreateObject} from 'types/movies.repository';
-import {LanguageType} from 'types/User.model';
-import {Movie} from 'types/Movie.model';
-import {MovieInsertError} from '@src/errors/domain-errors/movie-insert';
-import {logger} from '@src/utils/logger';
+import { ObjectID, ObjectId } from 'bson';
+import { Db } from 'mongodb';
+import { SearchMoviesObject, MovieCreateObject } from 'types/movies.repository';
+import { LanguageType } from 'types/User.model';
+import { Movie } from 'types/Movie.model';
+import { MovieInsertError } from '@src/errors/domain-errors/movie-insert';
+import { logger } from '@src/utils/logger';
 // import {MovieNotFoundError} from '@src/errors/domain-errors/movie-not-found';
-import {MovieRequest, MovieRequestThin} from 'types/movies-requesting.services';
+import { MovieRequest, MovieRequestThin } from 'types/movies-requesting.services';
 
 const LIMIT_PAGINATION = 30;
 
@@ -15,20 +15,20 @@ export const MoviesRepository = (connection: Db) => {
     add: async (movieCreateObject: MovieCreateObject | MovieCreateObject[]): Promise<boolean> => {
       try {
         const insertable = Array.isArray(movieCreateObject) ? movieCreateObject : [movieCreateObject];
-        const {insertedIds} = await connection
+        const { insertedIds } = await connection
           .collection<Partial<Movie>>('movies')
-          .insertMany(insertable, {ordered: false});
+          .insertMany(insertable, { ordered: false });
 
         const insertedArray = Object.keys(insertedIds).map(k => insertedIds[k]);
 
         await connection.collection<Partial<Movie>>('movies').updateMany(
           {
-            _id: {$in: insertedArray},
+            _id: { $in: insertedArray },
           },
           {
             $currentDate: {
               lastModified: true,
-              createdAt: {$type: 'date'},
+              createdAt: { $type: 'date' },
             },
           },
         );
@@ -37,7 +37,7 @@ export const MoviesRepository = (connection: Db) => {
       } catch (error) {
         logger.error('Error inserting movies: ', error);
         // console.log('Error inserting movies', error);
-        throw new MovieInsertError({data: {error}});
+        throw new MovieInsertError({ data: { error } });
       }
     },
     search: async ({
@@ -47,7 +47,7 @@ export const MoviesRepository = (connection: Db) => {
       pageSize = LIMIT_PAGINATION,
       sort,
     }: SearchMoviesObject): Promise<MovieRequestThin[]> => {
-      const $sort: {[k: string]: any} = {};
+      const $sort: { [k: string]: any } = {};
       let aggregationPipeline: any[] = [];
 
       const $addFields: any = {
@@ -64,15 +64,15 @@ export const MoviesRepository = (connection: Db) => {
       } else if (sort === 'topRated' || sort === 'worstRated') {
         $sort.rate = sort === 'topRated' ? -1 : 1;
       } else if (criteria) {
-        $sort.score = {$meta: 'textScore'};
-        aggregationPipeline.push({$match: {$text: {$search: criteria}}});
-        $addFields.score = {$meta: 'textScore'};
+        $sort.score = { $meta: 'textScore' };
+        aggregationPipeline.push({ $match: { $text: { $search: criteria } } });
+        $addFields.score = { $meta: 'textScore' };
       }
       aggregationPipeline = aggregationPipeline.concat(
-        {$skip: page > 0 ? (page - 1) * pageSize : 0},
-        {$limit: pageSize},
-        {$addFields},
-        {$sort},
+        { $skip: page > 0 ? (page - 1) * pageSize : 0 },
+        { $limit: pageSize },
+        { $addFields },
+        { $sort },
         {
           $project: {
             _id: 1,
@@ -81,6 +81,7 @@ export const MoviesRepository = (connection: Db) => {
             year: 1,
             poster: 1,
             averageRate: 1,
+            plot: `$data.${language}.plot`,
           },
         },
       );
@@ -92,7 +93,7 @@ export const MoviesRepository = (connection: Db) => {
 
       return searchResult;
     },
-    watchSearch: ({language = 'es', criteria = ''}: {language?: LanguageType; criteria: string}) => {
+    watchSearch: ({ language = 'es', criteria = '' }: { language?: LanguageType; criteria: string }) => {
       // TODO: refine the object, value to combine/filter it upstairs
       return connection.collection<Movie>('movies').watch([
         {
@@ -122,15 +123,15 @@ export const MoviesRepository = (connection: Db) => {
       language?: LanguageType;
       selfId?: ObjectId;
     }): Promise<MovieRequest> => {
-      const aggregationPipeline: Array<{[k: string]: any}> = [
-        {$match: {_id: movieId}},
+      const aggregationPipeline: Array<{ [k: string]: any }> = [
+        { $match: { _id: movieId } },
         {
           $addFields: {
             rate: {
               $filter: {
                 input: '$ratedBy',
                 as: 'rate',
-                cond: {$eq: ['$$rate.userId', selfId]},
+                cond: { $eq: ['$$rate.userId', selfId] },
               },
             },
           },
@@ -149,7 +150,7 @@ export const MoviesRepository = (connection: Db) => {
               $filter: {
                 input: '$ratedBy',
                 as: 'rate',
-                cond: {$ne: ['$$rate.userId', selfId]},
+                cond: { $ne: ['$$rate.userId', selfId] },
               },
             },
             averageRate: {
@@ -183,14 +184,14 @@ export const MoviesRepository = (connection: Db) => {
       selfId?: ObjectId;
     }) => {
       return connection.collection('movies').watch([
-        {$match: {'fullDocument._id': movieId}},
+        { $match: { 'fullDocument._id': movieId } },
         {
           $addFields: {
             rate: {
               $filter: {
                 input: '$fullDocument.ratedBy',
                 as: 'rate',
-                cond: {$eq: ['$$rate.userId', selfId]},
+                cond: { $eq: ['$$rate.userId', selfId] },
               },
             },
           },
@@ -209,7 +210,7 @@ export const MoviesRepository = (connection: Db) => {
               $filter: {
                 input: '$fullDocument.ratedBy',
                 as: 'rate',
-                cond: {$ne: ['$$rate.userId', selfId]},
+                cond: { $ne: ['$$rate.userId', selfId] },
               },
             },
             averageRate: {
@@ -227,8 +228,8 @@ export const MoviesRepository = (connection: Db) => {
       ttid: string;
       fullMovie?: boolean;
       language?: LanguageType;
-    }): Promise<{movieId: ObjectID} | MovieRequest | null> => {
-      const aggregationPipeline: Array<{[k: string]: any}> = [{$match: {ttid}}];
+    }): Promise<{ movieId: ObjectID } | MovieRequest | null> => {
+      const aggregationPipeline: Array<{ [k: string]: any }> = [{ $match: { ttid } }];
 
       if (fullMovie)
         aggregationPipeline.push({
@@ -246,7 +247,7 @@ export const MoviesRepository = (connection: Db) => {
             },
           },
         });
-      else aggregationPipeline.push({$project: {_id: 1}});
+      else aggregationPipeline.push({ $project: { _id: 1 } });
 
       const movie = await connection
         .collection<MovieRequest>('movies')
@@ -256,7 +257,7 @@ export const MoviesRepository = (connection: Db) => {
       if (!movie) return null;
       //throw new MovieNotFoundError({data: {ttid}});
 
-      return fullMovie ? movie : {movieId: movie._id};
+      return fullMovie ? movie : { movieId: movie._id };
     },
   };
 };

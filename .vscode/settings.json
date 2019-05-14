@@ -1,4 +1,8 @@
 {
   "typescript.surveys.enabled": false,
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "workbench.colorCustomizations": {
+    "editorCursor.foreground": "#ffb765",
+    "tab.unfocusedActiveBorder": "#fff0"
+  }
 }
