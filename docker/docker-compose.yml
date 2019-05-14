@@ -90,7 +90,7 @@ services:
       - backendmesh
     tty: true
     env_file:
-      - ../.env
+      - ../.env.email
     volumes:
       - ../server/build:/app
       - ../pm2:/app/pm2
