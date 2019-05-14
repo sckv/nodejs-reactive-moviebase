@@ -25,7 +25,6 @@ const options = {
   // allowHTTP1: true,
   key: fs.readFileSync(path.join(backPath, 'cert/server.key')),
   cert: fs.readFileSync(path.join(backPath, 'cert/server.crt')),
-
   protocols: ['h2', 'http/1.1'],
 };
 
