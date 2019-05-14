@@ -1,13 +1,13 @@
 import React from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch } from 'react-router';
 import { ConnectedRouter } from 'connected-react-router';
 import { history } from '@src/store/create-store';
 import { HomePage } from '@src/modules/home-page/home-page';
 
-export const Router = () => {
+export const Router = () => (
   <ConnectedRouter history={history}>
     <Switch>
-      <Route exact={true} path="/home" component={HomePage} />
+      <Route exact={true} path="/" component={HomePage} />
     </Switch>
-  </ConnectedRouter>;
-};
+  </ConnectedRouter>
+);

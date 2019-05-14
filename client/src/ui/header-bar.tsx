@@ -106,7 +106,7 @@ export const HeaderBar = () => {
           <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="Open drawer">
             <MenuIcon />
           </IconButton>
-          <Typography className={classes.title} variant="h6" noWrap={true}>
+          <Typography className={classes.title} variant="h6" style={{ color: 'whitesmoke' }} noWrap={true}>
             Reactive Moviebase
           </Typography>
           <div className={classes.search}>
@@ -173,7 +173,7 @@ const MenuItemContaioner = styled.div`
     display: flex;
   }
   img {
-    height: 40px;
+    height: 50px;
   }
 `;
 

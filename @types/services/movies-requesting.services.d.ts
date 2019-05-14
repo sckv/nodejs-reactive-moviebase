@@ -1,7 +1,7 @@
 declare module 'types/movies-requesting.services' {
-  import {MongoObjectID} from 'types/utils';
-  import {MovieRating} from 'types/Movie.model';
-  import {ObjectId} from 'bson';
+  import { MongoObjectID } from 'types/utils';
+  import { MovieRating } from 'types/Movie.model';
+  import { ObjectId } from 'bson';
 
   interface MovieRequest {
     _id: ObjectId;
@@ -28,6 +28,7 @@ declare module 'types/movies-requesting.services' {
     title: string;
     year: number;
     poster: string;
+    plot: string;
     rate: number;
     score?: number;
     averageRate?: number;

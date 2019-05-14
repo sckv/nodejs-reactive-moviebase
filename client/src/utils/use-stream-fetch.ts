@@ -14,7 +14,7 @@ export const useStreamFetch = (
       if (response && response.ok && response.data) {
         const abort = () => {
           response.data!.cancel();
-          response.abortCall();
+          response.abortCall && response.abortCall();
           clearInterval(timer);
         };
         timer = setInterval(async () => {
@@ -25,11 +25,11 @@ export const useStreamFetch = (
             }
             if (value) {
               const decoded = JSON.parse(new TextDecoder('utf-8').decode(value));
-              setData((data: any) => data.concat(decoded));
+              setData((data: any) => (decoded.length ? data.concat(decoded) : [decoded].concat(data)));
             }
           } catch (error) {
             console.log('error reading stream>>', error);
-            return abort();
+            // return abort();
           }
         }, 500);
       }
