@@ -45,3 +45,17 @@ Whole application is dockerized and managed through `docker-compose`, node proce
 - `pkg` it is the main directory for the application services/repositories
 - `pkg/storage` different repositories for each different DB motor we implement
 - `pkg/{verbose}` self-explainable services
+
+## Installation
+
+### Requirements
+
+- `docker`
+- `Node LTS`
+
+### Launch
+
+- `yarn install`
+- cd `docker` && `docker-compose build`
+- cd `docker` && `docker-compose up`
+- if mongo did't start in replicaSet -> `docker-compose exec -T mongo mongo rs.initiate()`
