@@ -19,7 +19,9 @@ before_install:
 
 before_script:
   - sleep 5
-  - mongo mydb_test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
+  - echo "replSet = rs" | sudo tee -a /etc/mongodb.conf
+  - sudo service mongodb restart
+  - sleep 20
   - mongo --eval 'rs.initiate()'
   - sleep 15
 
