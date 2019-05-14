@@ -18,11 +18,6 @@ before_install:
   - export PATH="$HOME/.yarn/bin:$PATH"
 
 before_script:
-  - sleep 5
-  - echo "replSet = rs" | sudo tee -a /etc/mongodb.conf
-  - sudo service mongodb restart
-  - sleep 20
-  - mongo --eval 'rs.initiate()'
   - sleep 15
 
 cache: yarn

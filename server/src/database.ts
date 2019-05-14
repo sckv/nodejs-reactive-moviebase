@@ -1,14 +1,16 @@
-import {MongoClient, Db} from 'mongodb';
+import { MongoClient, Db } from 'mongodb';
 // import {logger} from '@src/utils/logger';
 // import {InitializeDatabase} from '@src/initialize-database';
 
 const mongoUrl = `mongodb://${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_DATABASE}`;
 
-export const connectToDatabase = async (): Promise<{db: Db; connection: MongoClient}> => {
+export const connectToDatabase = async (): Promise<{ db: Db; connection: MongoClient }> => {
   let connection: MongoClient = null;
+  const configOptions: any = { useNewUrlParser: true };
+  if (process.env.NODE_ENV === 'test') configOptions.replicaSet = 'rs';
   const tryConnect = async () => {
     try {
-      connection = await MongoClient.connect(mongoUrl, {useNewUrlParser: true, replicaSet: 'rs'});
+      connection = (await MongoClient.connect(mongoUrl, configOptions)) as any;
       console.log('CONNECTED TO DATABASE');
       // await InitializeDatabase(connection.db('moviebase'));
       // console.log('initialized DATABASE');
