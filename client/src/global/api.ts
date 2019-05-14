@@ -1,6 +1,6 @@
-import Axios from 'axios';
+// import Axios from 'axios';
 
-export const fetcher = Axios.create({
-  baseURL: 'http://localhost:9000',
-  withCredentials: false,
-});
+// export const fetcher = Axios.create({
+//   baseURL: 'http://localhost:9000',
+//   withCredentials: false,
+// });

@@ -21,7 +21,8 @@
     "importHelpers": false,
     "noUnusedLocals": true
   },
-  "include": ["./@types/**/*"],
+  "include": ["@types/**/*"],
+  // "typeRoots": ["@types/**/*"],
   "plugins": [
     {
       "name": "typescript-tslint-plugin",
