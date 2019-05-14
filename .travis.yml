@@ -18,8 +18,10 @@ before_install:
   - export PATH="$HOME/.yarn/bin:$PATH"
 
 before_script:
-  - sleep 15
+  - sleep 5
   - mongo mydb_test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
+  - mongo --eval 'rs.initiate()'
+  - sleep 15
 
 cache: yarn
 
