@@ -78,23 +78,29 @@ export const searchMovie: CustomRequestHandler = async (req, res) => {
       }
 
       if (imdbData.length > 20)
-        results = imdbData.slice(0, 20).map<MovieRequestThin>(mo => ({
-          ttid: mo.ttid,
-          poster: mo.image.url,
-          rate: 0,
-          _id: null,
-          title: mo.title,
-          year: mo.year,
-        }));
+        results = imdbData.slice(0, 20).map<MovieRequestThin>(
+          mo =>
+            ({
+              ttid: mo.ttid,
+              poster: mo.image.url,
+              rate: 0,
+              _id: null,
+              title: mo.title,
+              year: mo.year,
+            } as any),
+        );
       else
-        results = imdbData.map<MovieRequestThin>(mo => ({
-          ttid: mo.ttid,
-          poster: mo.image.url,
-          rate: 0,
-          _id: null,
-          title: mo.title,
-          year: mo.year,
-        }));
+        results = imdbData.map<MovieRequestThin>(
+          mo =>
+            ({
+              ttid: mo.ttid,
+              poster: mo.image.url,
+              rate: 0,
+              _id: null,
+              title: mo.title,
+              year: mo.year,
+            } as any),
+        );
 
       return res.status(200).send(results);
     }

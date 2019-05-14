@@ -82,6 +82,25 @@ services:
     depends_on:
       - redis
 
+  email:
+    build:
+      context: ./node
+    restart: on-failure
+    networks:
+      - backendmesh
+    tty: true
+    env_file:
+      - ../.env
+    volumes:
+      - ../server/build:/app
+      - ../pm2:/app/pm2
+      - ../server/cert:/app/cert
+      - ../package.json:/app/package.json
+      - /app/node_modules
+    command: pm2-runtime /app/pm2/email.config.js
+    depends_on:
+      - redis
+
   auth:
     build:
       context: ./node
