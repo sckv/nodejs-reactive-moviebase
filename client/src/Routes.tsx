@@ -8,6 +8,7 @@ import { AuthSelector } from '@src/store/reducers/auth.reducer';
 import { RouteProps } from 'react-router';
 import { history } from '@src/store/create-store';
 import { NotifyActions } from '@src/store/actions/notification.actions';
+import { PageNotFound } from '@src/ui/page-not-found';
 
 export const Router = () => (
   <ConnectedRouter history={history}>
@@ -25,6 +26,7 @@ export const Router = () => (
       <Route exact={true} path="/user/:username/followers" component={HomePage} />
       <Route exact={true} path="/user/:username/movies" component={HomePage} />
       <Route exact={true} path="/movie/:movieId" component={HomePage} />
+      <Route component={PageNotFound} />
     </Switch>
   </ConnectedRouter>
 );

@@ -6,6 +6,10 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircleTwoTone';
 import LockIcon from '@material-ui/icons/LockTwoTone';
 import RegIcon from '@material-ui/icons/HowToRegTwoTone';
 import EmailIcon from '@material-ui/icons/EmailTwoTone';
+import { useDispatch } from 'react-redux';
+import { LoginActionThunk } from '@src/store/actions/auth.actions';
+import { RegisterThunkAction } from '@src/store/actions/common.actions';
+import { NotifyActions } from '@src/store/actions/notification.actions';
 
 export const Login = () => {
   const loginUsernameRef = useRef<HTMLInputElement>();
@@ -16,6 +20,8 @@ export const Login = () => {
   const registerPasswordRef = useRef<HTMLInputElement>();
   const registerPasswordRepeatRef = useRef<HTMLInputElement>();
   const [passwordsMatch, setPasswordsMatch] = useState(true);
+
+  const dispatch = useDispatch();
 
   const checkPasswords = () => {
     if (!registerPasswordRepeatRef.current!.value) return;
@@ -56,7 +62,19 @@ export const Login = () => {
             />
           </CardContent>
           <CardActions>
-            <Button variant="contained">Login</Button>
+            <Button
+              variant="contained"
+              onClick={() =>
+                dispatch(
+                  LoginActionThunk({
+                    username: loginUsernameRef.current!.value,
+                    password: loginPasswordRef.current!.value,
+                  }),
+                )
+              }
+            >
+              Login
+            </Button>
           </CardActions>
         </Card>
       </Grid>
@@ -109,13 +127,31 @@ export const Login = () => {
               inputRef={registerPasswordRepeatRef}
               variant="standard"
               type="password"
-              error={!passwordsMatch}
-              onKeyPress={checkPasswords}
               placeholder="Repeat password"
+              error={!passwordsMatch}
+              label={!passwordsMatch ? 'Passwords do not match' : null}
+              onKeyPress={checkPasswords}
             />
           </CardContent>
           <CardActions>
-            <Button variant="contained">Register</Button>
+            <Button
+              variant="contained"
+              onClick={() => {
+                if (!passwordsMatch) return dispatch(NotifyActions.error('Passwords do not match.'));
+                if (!registerUsernameRef.current!.value) return dispatch(NotifyActions.error('Username is empty.'));
+                if (!registerEmailRef.current!.value) return dispatch(NotifyActions.error('Email is empty.'));
+
+                dispatch(
+                  RegisterThunkAction({
+                    email: registerEmailRef.current!.value,
+                    password: registerPasswordRef.current!.value,
+                    username: registerUsernameRef.current!.value,
+                  }),
+                );
+              }}
+            >
+              Register
+            </Button>
           </CardActions>
         </Card>
       </Grid>

@@ -9,7 +9,9 @@ const host = process.env.WEB_HOSTNAME || 'localhost';
 const moviesApiUrl = `https://${host}/api/movies/`;
 
 export const MoviesApi = {
-  searchCriteria: (criteria: string) => SecureFetcher(fetcher.get({ url: moviesApiUrl, params: { c: criteria } })),
+  searchCriteria: (criteria: string) =>
+    SecureFetcher(fetcher.get<MovieRequest[]>({ url: moviesApiUrl, params: { c: criteria } })),
+
   searchStream: ({
     criteria,
     language,
@@ -30,5 +32,6 @@ export const MoviesApi = {
       }),
     ),
   getByTtid: (ttid: string) => SecureFetcher(fetcher.get<MovieRequest>({ url: `${moviesApiUrl}${ttid}/by-ttid` })),
+
   getById: (_id: string) => SecureFetcher(fetcher.get<MovieRequest>({ url: `${moviesApiUrl}${_id}` })),
 };

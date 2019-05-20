@@ -25,11 +25,19 @@ export const useStreamFetch = (
             }
             if (value) {
               const decoded = JSON.parse(new TextDecoder('utf-8').decode(value));
-              setData((data: any) => (decoded.length ? data.concat(decoded) : [decoded].concat(data)));
+              setData((data: any) => {
+                if (decoded.length) return data.concat(decoded);
+
+                if (!data.find((d: any) => decoded._id === d.id)) return [decoded].concat(data);
+
+                return data.map((dt: any) => {
+                  if (dt._id === decoded._id) return decoded;
+                  else return dt;
+                });
+              });
             }
           } catch (error) {
             console.log('error reading stream>>', error);
-            // return abort();
           }
         }, 500);
       }

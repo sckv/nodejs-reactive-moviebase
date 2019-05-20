@@ -12,17 +12,16 @@ import CloseIcon from '@material-ui/icons/Close';
 import ErrorIcon from '@material-ui/icons/Error';
 import InfoIcon from '@material-ui/icons/Info';
 import WarningIcon from '@material-ui/icons/Warning';
-
-import { NotifyActionType } from './action-types';
+import { NotifyActionTypes } from '@src/store/actions/notification.actions';
 
 type variantType = {
   [name: string]: React.ComponentType<SvgIconProps>;
 };
 const variantIcon: variantType = {
-  [NotifyActionType.success]: CheckCircleIcon,
-  [NotifyActionType.warning]: WarningIcon,
-  [NotifyActionType.error]: ErrorIcon,
-  [NotifyActionType.notify]: InfoIcon,
+  [NotifyActionTypes.success]: CheckCircleIcon,
+  [NotifyActionTypes.warning]: WarningIcon,
+  [NotifyActionTypes.error]: ErrorIcon,
+  [NotifyActionTypes.notify]: InfoIcon,
 };
 
 type variantString = {
@@ -30,10 +29,10 @@ type variantString = {
 };
 
 const variantToString: variantString = {
-  [NotifyActionType.success]: 'success',
-  [NotifyActionType.error]: 'error',
-  [NotifyActionType.notify]: 'notify',
-  [NotifyActionType.warning]: 'warning',
+  [NotifyActionTypes.success]: 'success',
+  [NotifyActionTypes.error]: 'error',
+  [NotifyActionTypes.notify]: 'notify',
+  [NotifyActionTypes.warning]: 'warning',
 };
 
 //TODO refactor this to hookstyles
@@ -41,37 +40,36 @@ const styles = ({ palette, spacing }: Theme) =>
   createStyles({
     success: {
       backgroundColor: green[600],
-      margin: spacing.unit,
+      margin: spacing(1),
     },
     error: {
       backgroundColor: palette.error.dark,
-      margin: spacing.unit,
+      margin: spacing(1),
     },
     notify: {
       backgroundColor: blue[400],
       color: 'white',
-      margin: spacing.unit,
+      margin: spacing(1),
     },
     warning: {
       backgroundColor: amber[700],
-      margin: spacing.unit,
+      margin: spacing(1),
     },
     icon: {
       fontSize: 20,
     },
     iconVariant: {
       fontSize: 20,
-      marginRight: spacing.unit,
+      marginRight: spacing(1),
     },
     message: {
-      marginRight: spacing.unit,
+      marginRight: spacing(1),
       display: 'flex',
       alignItems: 'center',
     },
   });
 
-const MySnackbarContent = (props: any) => {
-  const { classes, className, message, onClose, variant, ...other } = props;
+const MySnackbarContent = ({ classes, className, message, onClose, variant, ...other }: any) => {
   const Icon = variantIcon[variant];
   const decode = (toDecode: string) => toDecode.replace(/(\r\n|\n|\r)/gm, '<br />');
 

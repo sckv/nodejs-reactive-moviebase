@@ -20,7 +20,8 @@
     "transpile:client": "cd client && tsc --noEmit",
     "transpile:server": "cd server && tsc --noEmit",
     "resolve": "cd client && babel build --out-dir build",
-    "run:test": "cross-env REDIS_PORT=6379 REDIS_HOST=localhost REDIS_DB=0 node server/build/services/cachingService.js"
+    "run:test": "cross-env REDIS_PORT=6379 REDIS_HOST=localhost REDIS_DB=0 node server/build/services/cachingService.js",
+    "postinstall": "gulp compile:server"
   },
   "engines": {
     "node": ">=10.0.0"
