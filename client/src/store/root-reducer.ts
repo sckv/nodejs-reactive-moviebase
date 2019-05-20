@@ -4,7 +4,7 @@ import { combineReducers, Reducer } from 'redux';
 import { AppStoreState } from '@src/store/store';
 import { AuthReducer } from '@src/store/reducers/auth.reducer';
 import { MovieReducer } from '@src/store/reducers/movie.reducer';
-
+import { NotificationReducer } from '@src/store/reducers/notification.reducer';
 
 export const reducers = (history: History): Reducer => {
   const appReducers: Reducer = (state, action) => {
@@ -13,6 +13,7 @@ export const reducers = (history: History): Reducer => {
       router: connectRouter(history),
       auth: AuthReducer,
       movie: MovieReducer,
+      notification: NotificationReducer,
     });
     return combi(state, action);
   };

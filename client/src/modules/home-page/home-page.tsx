@@ -12,6 +12,7 @@ type Props = {
   sort: SearchMoviesObject['sort'];
   children?: never;
 };
+
 export const HomePage = (props: Props) => {
   const [movies, setMovies] = useState<MovieRequestThin[]>([]);
   const [sort, setSort] = useState<SearchMoviesObject['sort']>('latest');
@@ -24,13 +25,10 @@ export const HomePage = (props: Props) => {
     <Container>
       <Grid container={true} spacing={3}>
         <Grid item={true} xs={9}>
-          <Typography>Browse movies stored in the database</Typography>
+          <Typography variant="h6">Browse movies stored in the database</Typography>
           {invoke(movies, 'map', (m: MovieRequestThin, idx: number) => {
             return <MovieCard {...m} key={(m._id as any) || idx} />;
           })}
-        </Grid>
-        <Grid item={true} xs={3}>
-          asd
         </Grid>
       </Grid>
     </Container>
