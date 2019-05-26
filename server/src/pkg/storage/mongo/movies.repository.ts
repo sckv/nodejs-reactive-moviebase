@@ -69,10 +69,10 @@ export const MoviesRepository = (connection: Db) => {
         $addFields.score = { $meta: 'textScore' };
       }
       aggregationPipeline = aggregationPipeline.concat(
+        { $sort },
         { $skip: page > 0 ? (page - 1) * pageSize : 0 },
         { $limit: pageSize },
         { $addFields },
-        { $sort },
         {
           $project: {
             _id: 1,
@@ -158,12 +158,6 @@ export const MoviesRepository = (connection: Db) => {
             },
           },
         },
-        // retrieve unlimited rates
-        // {
-        //   $addFields: {
-        //     ratedBy: {$slice: ['$ratedBy', 5]},
-        //   },
-        // },
       ];
       const movie = await connection
         .collection<MovieRequest>('movies')
@@ -172,6 +166,8 @@ export const MoviesRepository = (connection: Db) => {
 
       if (!movie) return null;
       //  throw new MovieNotFoundError({data: {movieId, language}});
+      connection.collection<Movie>('movies').updateOne({ _id: movie._id }, { $inc: { hits: 1 } });
+
       return movie;
     },
     getMovieWatch: ({
@@ -256,6 +252,7 @@ export const MoviesRepository = (connection: Db) => {
 
       if (!movie) return null;
       //throw new MovieNotFoundError({data: {ttid}});
+      connection.collection<Movie>('movies').updateOne({ _id: movie._id }, { $inc: { hits: 1 } });
 
       return fullMovie ? movie : { movieId: movie._id };
     },

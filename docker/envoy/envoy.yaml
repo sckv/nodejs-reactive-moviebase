@@ -30,25 +30,25 @@ static_resources:
               #   route:
               #     cluster: front_service
               - match:
-                  prefix: "/api/auth"
+                  prefix: "/api/auth/"
                 route:
                   cluster: auth_service
                   prefix_rewrite: "/"
                   timeout: 60s
               - match:
-                  prefix: "/api/movies"
+                  prefix: "/api/movies/"
                 route:
                   cluster: movies_service
                   prefix_rewrite: "/"
                   timeout: 9999s
               - match:
-                  prefix: "/api/lists"
+                  prefix: "/api/lists/"
                 route:
                   cluster: listing_service
                   timeout: 60s
                   prefix_rewrite: "/"
               - match:
-                  prefix: "/api/users"
+                  prefix: "/api/users/"
                 route:
                   cluster: users_service
                   timeout: 60s

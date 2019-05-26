@@ -9,13 +9,15 @@ import { createStyles, makeStyles, styled as muiStyled } from '@material-ui/styl
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import { Theme } from '@material-ui/core/styles';
-import { MovieRequestThin } from 'types/movies-requesting.services';
+import { MovieRequestThin, MovieRequest } from 'types/movies-requesting.services';
 import { MoviesApi } from '@src/api/movies.api';
 import { useDebounce } from 'use-debounce';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { MenuItem, Menu } from '@material-ui/core';
 import invoke from 'lodash/invoke';
 import styled from '@emotion/styled';
+import { useSelector, shallowEqual, connect } from 'react-redux';
+import { AuthSelector } from '@src/store/reducers/auth.reducer';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -69,22 +71,35 @@ const useStyles = makeStyles((theme: Theme) =>
         },
       },
     },
+    userData: {
+      width: 150,
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
   }),
 );
 
-export const HeaderBar = () => {
+export const HeaderBarBase = () => {
   const classes = useStyles();
-  const [list, setList] = useState<MovieRequestThin[]>([]);
+
+  const [list, setList] = useState<MovieRequest[]>([]);
   const [query, setQuery] = useState<string>('');
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isMenuOpen, setMenuOpen] = useState<boolean>(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [debouncedQuery] = useDebounce(query, 400);
 
-  const handleMenuClose = () => {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const [debouncedQuery] = useDebounce(query, 700);
+
+  const authData = useSelector(AuthSelector, shallowEqual);
+
+  const handleMenuClose = (ttid: string) => {
     setQuery('');
     setMenuOpen(false);
     inputRef.current!.blur();
+    MoviesApi.getByTtid(ttid).then(res => (res ? console.log('gotten by ttid', res.data) : null));
   };
 
   useEffect(() => {
@@ -99,6 +114,7 @@ export const HeaderBar = () => {
       });
     }
   }, [debouncedQuery]);
+
   return (
     <div className={classes.root}>
       <AppBar position="static">
@@ -109,6 +125,12 @@ export const HeaderBar = () => {
           <Typography className={classes.title} variant="h6" style={{ color: 'whitesmoke' }} noWrap={true}>
             Reactive Moviebase
           </Typography>
+          {authData && authData.username && (
+            <div className={classes.userData}>
+              <Typography>{authData.username}</Typography>
+              <Typography>Language: {authData.language.toUpperCase()}</Typography>
+            </div>
+          )}
           <div className={classes.search}>
             <div className={classes.searchIcon}>
               <SearchIcon />
@@ -123,7 +145,6 @@ export const HeaderBar = () => {
                 input: classes.inputInput,
               }}
               endAdornment={isSearching ? <ThemedCircularProgress size={25} color="secondary" /> : null}
-              // endAdornment={<ThemedCircularProgress size={25} color="secondary" />}
               onChange={e => setQuery(e.target.value)}
             />
             <Menu
@@ -141,7 +162,7 @@ export const HeaderBar = () => {
               onClose={handleMenuClose}
             >
               {invoke(list, 'map', (li: MovieRequestThin, idx: number) => (
-                <MenuItem onClick={handleMenuClose} key={(li._id as any) || idx}>
+                <MenuItem onClick={() => handleMenuClose(li.ttid)} key={(li._id as any) || idx}>
                   <MenuItemContaioner>
                     <div>
                       <img src={li.poster} />
@@ -159,6 +180,8 @@ export const HeaderBar = () => {
     </div>
   );
 };
+
+export const HeaderBar = connect()(HeaderBarBase);
 
 const MenuItemContaioner = styled.div`
   display: flex;
