@@ -13,7 +13,6 @@ import { convertToBuffer } from '@src/utils/convert-to-buffer';
 // we retrieve the movie and add it to db
 export const searchMovie: CustomRequestHandler = async (req, res) => {
   const { l, s, c, p, ps } = req.query;
-
   console.log('searching for a movie in imdb', c, s);
 
   const hashedUrl = hashUrl(req.originalUrl);

@@ -70,6 +70,7 @@ const styles = ({ palette, spacing }: Theme) =>
   });
 
 const MySnackbarContent = ({ classes, className, message, onClose, variant, ...other }: any) => {
+
   const Icon = variantIcon[variant];
   const decode = (toDecode: string) => toDecode.replace(/(\r\n|\n|\r)/gm, '<br />');
 

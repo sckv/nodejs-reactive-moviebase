@@ -7,6 +7,7 @@ import { NotifyActions } from '@src/store/actions/notification.actions';
 import { AuthSelector } from '@src/store/reducers/auth.reducer';
 import { push } from 'connected-react-router';
 
+
 export enum AuthActionTypes {
   addLoginData = '@@AUTH/ADD_LOGIN_DATA',
   clearLoginData = '@@AUTH/CLEAR_LOGIN_DATA',
@@ -57,3 +58,4 @@ export const LogoutActionThunk = (): ThunkAction<void, AppStoreState, null, AnyA
   } else dispatch(NotifyActions.error('Error logging out'));
   return;
 };
+

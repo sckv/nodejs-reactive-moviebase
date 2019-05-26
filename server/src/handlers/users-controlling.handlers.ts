@@ -72,6 +72,7 @@ export const getUserData: CustomRequestHandler = async (req, res) => {
       page,
     });
     await CacheServices.setToCache<typeof userData>({ urlHash, timeout: 10, data: { data: userData } });
+
   }
   return res.status(200).send(userData);
 };

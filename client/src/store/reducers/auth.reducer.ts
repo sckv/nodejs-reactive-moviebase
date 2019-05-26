@@ -4,6 +4,7 @@ import { AuthActionTypes, AuthActionsUnion } from '@src/store/actions/auth.actio
 import { Selector } from 'react-redux';
 import { AppStoreState } from '@src/store/store';
 
+
 export type AuthReducerState = {
   userId: string;
   language: LanguageType;
@@ -27,3 +28,4 @@ export const AuthReducer: Reducer<AuthReducerState, AuthActionsUnion> = (state =
 };
 
 export const AuthSelector: Selector<AppStoreState, AuthReducerState> = state => state.auth;
+
