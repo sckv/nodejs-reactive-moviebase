@@ -3,14 +3,11 @@ import { Theme } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
-import IconButton from '@material-ui/core/IconButton';
+
 import Typography from '@material-ui/core/Typography';
-import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import SkipNextIcon from '@material-ui/icons/SkipNext';
-import { createStyles, makeStyles, useTheme } from '@material-ui/styles';
+import { createStyles, makeStyles } from '@material-ui/styles';
 import { MovieRequestThin } from 'types/movies-requesting.services';
-import { prependOnceListener } from 'cluster';
+
 import styled from '@emotion/styled';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -44,21 +41,8 @@ const useStyles = makeStyles((theme: Theme) =>
 
 type Props = MovieRequestThin & { forwardedRef?: any } & { style?: any };
 
-export const MovieCard = ({
-  _id,
-  forwardedRef,
-  averageRate,
-  poster,
-  plot,
-  rate,
-  score,
-  title,
-  ttid,
-  year,
-  style,
-}: Props) => {
+export const MovieCard = ({ forwardedRef, averageRate, poster, plot, title, year, style }: Props) => {
   const classes = useStyles();
-  // const theme = useTheme<Theme>();
 
   return (
     <CardWrapper style={style} ref={forwardedRef}>
@@ -75,17 +59,6 @@ export const MovieCard = ({
               Average votings rate: {averageRate}
             </Typography>
           </CardContent>
-          {/* <div className={classes.controls}>
-          <IconButton aria-label="Previous">
-            prependOnceListener(event, listener){theme.direction === 'rtl' ? <SkipNextIcon /> : <SkipPreviousIcon />}
-          </IconButton>
-          <IconButton aria-label="Play/pause">
-            <PlayArrowIcon className={classes.playIcon} />
-          </IconButton>
-          <IconButton aria-label="Next">
-            {theme.direction === 'rtl' ? <SkipPreviousIcon /> : <SkipNextIcon />}
-          </IconButton>
-        </div> */}
         </div>
         <div style={{ flexGrow: 1 }} />
         <CardMedia className={classes.cover} image={poster} title={title} component="img" />

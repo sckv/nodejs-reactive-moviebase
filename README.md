@@ -60,3 +60,4 @@ Whole application is dockerized and managed through `docker-compose`, node proce
 - cd `docker` && `docker-compose up`
 - if mongo did't start in replicaSet -> `docker-compose exec -T mongo mongo rs.initiate()`
 - `yarn serve:dev:client`
+

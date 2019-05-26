@@ -6,7 +6,7 @@ import { enqueueEmail } from '@src/services/email/email-publisher';
 import { createObjectId } from '@src/utils/create-objectid';
 import { hashUrl } from '@src/utils';
 import { CacheServices } from '@src/pkg/cache/cache.services';
-import { UserFull } from 'types/user-controlling.services';
+import { UserFull, UserThin } from 'types/user-controlling.services';
 
 const WEB_HOSTNAME = process.env.WEB_HOSTNAME;
 
@@ -44,15 +44,22 @@ export const register: CustomRequestHandler = async (req, res) => {
 
 export const searchUsers: CustomRequestHandler = async (req, res) => {
   const { un, page } = req.query;
-  const usersList = await UserControllingServices().search({ username: un, page });
+  const urlHash = hashUrl(req.originalUrl);
+  const cachedUsers = await CacheServices.getFromCache<Partial<UserThin[]>>(urlHash);
+  let usersList: Partial<UserThin[]>;
+
+  if (!cachedUsers || !cachedUsers.data) {
+    usersList = await UserControllingServices().search({ username: un, page });
+    await CacheServices.setToCache<typeof usersList>({ urlHash, timeout: 10, data: { data: usersList } });
+  }
   return res.status(200).send(usersList);
 };
 
 export const getUserData: CustomRequestHandler = async (req, res) => {
   const { username, pd, ld, md, page, followers, follows } = req.query;
-  const hashedUrl = hashUrl(req.originalUrl);
+  const urlHash = hashUrl(req.originalUrl);
   let userData: Partial<UserFull>;
-  const cachedUser = await CacheServices.getFromCache<Partial<UserFull>>(hashedUrl);
+  const cachedUser = await CacheServices.getFromCache<Partial<UserFull>>(urlHash);
   if (!cachedUser || !cachedUser.data) {
     userData = await UserControllingServices().get({
       username,
@@ -64,7 +71,8 @@ export const getUserData: CustomRequestHandler = async (req, res) => {
       moviesData: md,
       page,
     });
-    await CacheServices.setToCache<typeof userData>({ urlHash: hashedUrl, timeout: 10, data: { data: userData } });
+    await CacheServices.setToCache<typeof userData>({ urlHash, timeout: 10, data: { data: userData } });
+
   }
   return res.status(200).send(userData);
 };
