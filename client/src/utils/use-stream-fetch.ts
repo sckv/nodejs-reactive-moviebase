@@ -12,7 +12,7 @@ export const useStreamFetch = (
 
   const movies = useSelector(MoviesSelector, shallowEqual);
   const dispatch = useDispatch();
-
+  
   React.useEffect(() => {
     const readStream = async () => {
       response = await fetchInstance();
@@ -30,7 +30,6 @@ export const useStreamFetch = (
             }
             if (value) {
               const decoded = JSON.parse(new TextDecoder('utf-8').decode(value));
-
               if (decoded.length) return movies.concat(decoded);
 
               if (!movies.find((d: any) => decoded._id === d.id)) return [decoded].concat(movies);
@@ -61,4 +60,5 @@ export const useStreamFetch = (
       }
     };
   }, [movies]);
+
 };

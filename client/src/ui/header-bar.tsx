@@ -125,7 +125,6 @@ export const HeaderBarBase = () => {
           <Typography className={classes.title} variant="h6" style={{ color: 'whitesmoke' }} noWrap={true}>
             Reactive Moviebase
           </Typography>
-
           {authData && authData.username && (
             <div className={classes.userData}>
               <Typography>{authData.username}</Typography>

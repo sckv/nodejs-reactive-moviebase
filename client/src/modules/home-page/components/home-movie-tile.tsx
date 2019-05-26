@@ -3,10 +3,10 @@ import { Theme } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
+
 import Typography from '@material-ui/core/Typography';
 import { createStyles, makeStyles } from '@material-ui/styles';
 import { MovieRequestThin } from 'types/movies-requesting.services';
-
 import styled from '@emotion/styled';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -42,7 +42,6 @@ type Props = MovieRequestThin & { forwardedRef?: any } & { style?: any };
 
 export const MovieCard = ({ forwardedRef, averageRate, poster, plot, title, year, style }: Props) => {
   const classes = useStyles();
-
   return (
     <CardWrapper style={style} ref={forwardedRef}>
       <Card className={classes.card}>
