@@ -1,21 +1,26 @@
 import * as React from 'react';
+import { useSelector, shallowEqual, useDispatch } from 'react-redux';
 import { FetcherResponse } from '@src/utils/fetcher';
+import { MoviesSelector } from '@src/store/reducers/movies.reducer';
+import { MoviesActions } from '@src/store/actions/movies.actions';
 
 export const useStreamFetch = (
   fetchInstance: () => FetcherResponse<ReadableStreamDefaultReader<Uint8Array> | null>,
-  setData: React.Dispatch<React.SetStateAction<any>>,
 ) => {
   let timer: any;
   let response: any;
+
+  const movies = useSelector(MoviesSelector, shallowEqual);
+  const dispatch = useDispatch();
 
   React.useEffect(() => {
     const readStream = async () => {
       response = await fetchInstance();
       if (response && response.ok && response.data) {
         const abort = () => {
-          response.data!.cancel();
-          response.abortCall && response.abortCall();
           clearInterval(timer);
+          response.data!.cancel();
+          response.ok && response.abortCall();
         };
         timer = setInterval(async () => {
           try {
@@ -25,16 +30,19 @@ export const useStreamFetch = (
             }
             if (value) {
               const decoded = JSON.parse(new TextDecoder('utf-8').decode(value));
-              setData((data: any) => {
-                if (decoded.length) return data.concat(decoded);
 
-                if (!data.find((d: any) => decoded._id === d.id)) return [decoded].concat(data);
+              if (decoded.length) return movies.concat(decoded);
 
-                return data.map((dt: any) => {
-                  if (dt._id === decoded._id) return decoded;
-                  else return dt;
-                });
-              });
+              if (!movies.find((d: any) => decoded._id === d.id)) return [decoded].concat(movies);
+
+              dispatch(
+                MoviesActions.addMoviesData(
+                  movies.map((dt: any) => {
+                    if (dt._id === decoded._id) return decoded;
+                    else return dt;
+                  }),
+                ),
+              );
             }
           } catch (error) {
             console.log('error reading stream>>', error);
@@ -49,8 +57,8 @@ export const useStreamFetch = (
       clearInterval(timer);
       if (response && response.data) {
         response.data.cancel();
-        response.abortCall();
+        response.ok && response.abortCall();
       }
     };
-  }, []);
+  }, [movies]);
 };

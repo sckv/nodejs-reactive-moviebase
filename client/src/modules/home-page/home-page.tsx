@@ -7,6 +7,8 @@ import React, { useState, useEffect } from 'react';
 import { MovieRequestThin } from 'types/movies-requesting.services';
 import { SearchMoviesObject } from 'types/movies.repository';
 import invoke from 'lodash/invoke';
+import { useSelector, shallowEqual } from 'react-redux';
+import { MoviesSelector } from '@src/store/reducers/movies.reducer';
 
 type Props = {
   sort: SearchMoviesObject['sort'];
@@ -14,9 +16,11 @@ type Props = {
 };
 
 export const HomePage = (props: Props) => {
-  const [movies, setMovies] = useState<MovieRequestThin[]>([]);
+  const movies = useSelector(MoviesSelector, shallowEqual);
   const [sort, setSort] = useState<SearchMoviesObject['sort']>('latest');
-  useStreamFetch(() => MoviesApi.searchStream({ sort }) as any, setMovies);
+
+  useStreamFetch(() => MoviesApi.searchStream({ sort }) as any);
+
   useEffect(() => {
     if (props.sort) setSort(props.sort);
   }, [props.sort]);
