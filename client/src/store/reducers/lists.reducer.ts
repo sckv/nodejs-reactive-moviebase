@@ -1,6 +1,7 @@
 import { Reducer } from 'redux';
 import { ListEntry } from 'types/listing.services';
 import { ListActionTypes } from '@src/store/actions/lists.actions';
+import { AppStoreState } from '@src/store/store';
 
 export type ListsReducerState = {
   lists: ListEntry[];
@@ -21,4 +22,9 @@ export const ListsReducer: Reducer<ListsReducerState, any> = (state = initialSta
     default:
       return state;
   }
+};
+
+export const ListsSelectors = {
+  lists: (state: AppStoreState) => state.lists.lists,
+  list: (state: AppStoreState) => state.lists.current,
 };

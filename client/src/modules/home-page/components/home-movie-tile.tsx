@@ -7,13 +7,15 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 import { createStyles, makeStyles } from '@material-ui/styles';
 import { MovieRequestThin } from 'types/movies-requesting.services';
-
 import styled from '@emotion/styled';
+import { useDispatch } from 'react-redux';
+import { push } from 'connected-react-router';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     card: {
       display: 'flex',
+      cursor: 'pointer',
     },
     details: {
       display: 'flex',
@@ -41,12 +43,12 @@ const useStyles = makeStyles((theme: Theme) =>
 
 type Props = MovieRequestThin & { forwardedRef?: any } & { style?: any };
 
-export const MovieCard = ({ forwardedRef, averageRate, poster, plot, title, year, style }: Props) => {
+export const MovieCard = ({ forwardedRef, averageRate, poster, plot, title, year, style, _id }: Props) => {
   const classes = useStyles();
-
+  const dispatch = useDispatch();
   return (
     <CardWrapper style={style} ref={forwardedRef}>
-      <Card className={classes.card}>
+      <Card className={classes.card} onClick={() => dispatch(push(`/movie/${_id}`))}>
         <div className={classes.details}>
           <CardContent className={classes.content}>
             <Typography component="h5" variant="h5">

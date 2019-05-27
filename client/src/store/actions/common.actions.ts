@@ -1,6 +1,6 @@
 import { ThunkAction } from 'redux-thunk';
 import { AppStoreState, ActionsUnion } from '@src/store/store';
-import { AuthSelector } from '@src/store/reducers/auth.reducer';
+import { AuthSelectors } from '@src/store/reducers/auth.reducer';
 import { NotifyActions } from '@src/store/actions/notification.actions';
 import { UsersApi } from '@src/api/users.api';
 import { push } from 'connected-react-router';
@@ -10,7 +10,7 @@ export const RegisterThunkAction = (registryData: {
   email: string;
   password: string;
 }): ThunkAction<void, AppStoreState, null, ActionsUnion> => async (dispatch, getState) => {
-  const authUsername = AuthSelector(getState()).username;
+  const authUsername = AuthSelectors.auth(getState()).username;
   if (authUsername) return dispatch(NotifyActions.error(`You cant register while logged in as ${authUsername}`));
 
   const register = await UsersApi.register(registryData);

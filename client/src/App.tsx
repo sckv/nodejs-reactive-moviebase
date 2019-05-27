@@ -15,6 +15,7 @@ import { Store } from 'redux';
 import { lightGreen } from '@material-ui/core/colors';
 import { ErrorHandler } from '@src/ui/error-handler';
 import { Router } from '@src/Routes';
+import { Notification } from '@src/ui/notification/notification';
 
 // const rendered = 0;
 export const App = () => {
@@ -44,6 +45,7 @@ export const App = () => {
         <Provider store={resolvedStore}>
           <ThemeProvider theme={theme}>
             <Global styles={globalStyles} />
+            <Notification />
             <HeaderBar />
             <Router />
           </ThemeProvider>

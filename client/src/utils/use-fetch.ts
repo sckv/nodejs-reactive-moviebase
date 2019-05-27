@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { FetcherResponse } from '@src/utils/fetcher';
 
-
 export const useFetch = <T>(fetchInstance: () => FetcherResponse<T | null>, startItem: any = null) => {
   const [data, setData] = React.useState<T | null>(startItem);
 

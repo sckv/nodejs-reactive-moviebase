@@ -22,14 +22,14 @@ export const fetcher = {
     params?: any;
     credentials?: RequestInit['credentials'];
   }) => {
-    const response = await fetch(url + '?' + qs.stringify(params, { skipNulls: true }), {
+    const response = await fetch(url + (params ? '?' + qs.stringify(params, { skipNulls: true }) : ''), {
       keepalive: true,
       method: 'GET',
       mode: 'cors',
       signal: abort.signal,
       credentials,
     });
-
+    console.log('data recieved>>');
     return {
       ok: response.ok,
       status: response.status,
@@ -52,17 +52,19 @@ export const fetcher = {
     body?: { [k: string]: any };
     credentials?: RequestInit['credentials'];
   }) => {
-    const response = await fetch(url + '?' + qs.stringify(params, { skipNulls: true }), {
+    console.log('fetching tto>>', url, params, body, credentials);
+    const response = await fetch(url + (params ? '?' + qs.stringify(params, { skipNulls: true }) : ''), {
       headers: {
         'Content-Type': 'application/json',
       },
-      keepalive: true,
       method: 'POST',
       mode: 'cors',
       body: body ? JSON.stringify(body) : undefined,
       signal: abort.signal,
       credentials,
     });
+
+    console.log('response>>', response);
 
     return {
       ok: response.ok,
@@ -86,11 +88,10 @@ export const fetcher = {
     body?: { [k: string]: any };
     credentials?: RequestInit['credentials'];
   }) => {
-    const response = await fetch(url + '?' + qs.stringify(params, { skipNulls: true }), {
+    const response = await fetch(url + (params ? '?' + qs.stringify(params, { skipNulls: true }) : ''), {
       headers: {
         'Content-Type': 'application/json',
       },
-      keepalive: true,
       method: 'PATCH',
       mode: 'cors',
       body: body ? JSON.stringify(body) : undefined,
@@ -118,8 +119,7 @@ export const fetcher = {
     params?: any;
     credentials?: RequestInit['credentials'];
   }) => {
-    const response = await fetch(url + '?' + qs.stringify(params, { skipNulls: true }), {
-      keepalive: true,
+    const response = await fetch(url + (params ? '?' + qs.stringify(params, { skipNulls: true }) : ''), {
       method: 'DELETE',
       mode: 'cors',
       signal: abort.signal,
@@ -148,11 +148,10 @@ export const fetcher = {
     body?: { [k: string]: any };
     credentials?: RequestInit['credentials'];
   }) => {
-    const response = await fetch(url + '?' + qs.stringify(params, { skipNulls: true }), {
+    const response = await fetch(url + (params ? '?' + qs.stringify(params, { skipNulls: true }) : ''), {
       headers: {
         'Content-Type': 'application/json',
       },
-      keepalive: true,
       method: 'PUT',
       mode: 'cors',
       body: body ? JSON.stringify(body) : undefined,
@@ -180,7 +179,7 @@ export const fetcher = {
     params?: any;
     credentials?: RequestInit['credentials'];
   }) => {
-    const response = await fetch(url + '?' + qs.stringify(params, { skipNulls: true }), {
+    const response = await fetch(url + (params ? '?' + qs.stringify(params, { skipNulls: true }) : ''), {
       keepalive: true,
       method: 'GET',
       mode: 'cors',

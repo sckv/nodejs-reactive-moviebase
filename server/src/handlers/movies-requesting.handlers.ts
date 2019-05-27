@@ -13,6 +13,7 @@ import { convertToBuffer } from '@src/utils/convert-to-buffer';
 // we retrieve the movie and add it to db
 export const searchMovie: CustomRequestHandler = async (req, res) => {
   const { l, s, c, p, ps } = req.query;
+
   console.log('searching for a movie in imdb', c, s);
 
   const hashedUrl = hashUrl(req.originalUrl);
@@ -109,49 +110,56 @@ export const searchMovie: CustomRequestHandler = async (req, res) => {
 
 export const getMovieById: CustomRequestHandler = async (req, res) => {
   const { movieId } = req.params;
-  const hashedUrl = hashUrl(req.originalUrl);
+
+  const urlHash = hashUrl(req.originalUrl);
+
+  const cached = await CacheServices.getFromCache(urlHash);
+  if (cached && cached.data) return res.status(200).send(cached.data);
 
   const movieData = await MoviesRequestingServices().getById({
     movieId,
     language: req.auth ? req.auth.language : undefined,
     selfId: req.auth ? req.auth.userId : undefined,
   });
-  res.write(convertToBuffer(movieData));
+  CacheServices.setToCache({ urlHash, data: { data: movieData }, timeout: 5 });
+  return res.status(200).send(movieData);
 
-  const isSubscribingFromBD = await CacheServices.existsSubscription(hashedUrl);
-  let announced;
+  // res.write(convertToBuffer(movieData));
 
-  if (!isSubscribingFromBD) announced = await CacheServices.announceSubscription(hashedUrl);
+  // const isSubscribingFromBD = await CacheServices.existsSubscription(hashedUrl);
+  // let announced;
 
-  if (announced) {
-    const streamingChange = MoviesRequestingServices().watchById({
-      movieId,
-      language: req.auth ? req.auth.language : undefined,
-      selfId: req.auth ? req.auth.userId : undefined,
-    });
+  // if (!isSubscribingFromBD) announced = await CacheServices.announceSubscription(hashedUrl);
 
-    streamingChange.on('data', async chunk => {
-      await CacheServices.publishToDigest({ url: req.originalUrl, data: chunk.fullDocument });
-      res.write(convertToBuffer(chunk.fullDocument));
-    });
+  // if (announced) {
+  //   const streamingChange = MoviesRequestingServices().watchById({
+  //     movieId,
+  //     language: req.auth ? req.auth.language : undefined,
+  //     selfId: req.auth ? req.auth.userId : undefined,
+  //   });
 
-    req.on('close', async () => {
-      await CacheServices.clearSubscription(hashedUrl);
-      streamingChange.close();
-    });
-  } else {
-    function listenerFn(data: any) {
-      res.write(convertToBuffer(data));
-    }
+  //   streamingChange.on('data', async chunk => {
+  //     await CacheServices.publishToDigest({ url: req.originalUrl, data: chunk.fullDocument });
+  //     res.write(convertToBuffer(chunk.fullDocument));
+  //   });
 
-    req.on('close', () => {
-      RedisStreamingService.unsubscribeFrom(hashedUrl, listenerFn);
-    });
+  //   req.on('close', async () => {
+  //     await CacheServices.clearSubscription(hashedUrl);
+  //     streamingChange.close();
+  //   });
+  // } else {
+  //   function listenerFn(data: any) {
+  //     res.write(convertToBuffer(data));
+  //   }
 
-    const redisSubscription = RedisStreamingService.subscribeTo(hashedUrl);
+  //   req.on('close', () => {
+  //     RedisStreamingService.unsubscribeFrom(hashedUrl, listenerFn);
+  //   });
 
-    redisSubscription.consume(hashedUrl, listenerFn);
-  }
+  //   const redisSubscription = RedisStreamingService.subscribeTo(hashedUrl);
+
+  //   redisSubscription.consume(hashedUrl, listenerFn);
+  // }
 };
 
 export const getMovieByTtid: CustomRequestHandler = async (req, res) => {
@@ -160,7 +168,8 @@ export const getMovieByTtid: CustomRequestHandler = async (req, res) => {
   const urlHash = hashUrl(req.originalUrl);
 
   const cached = await CacheServices.getFromCache(urlHash);
-  if (cached) return res.status(200).send(cached);
+
+  if (cached && cached.data) return res.status(200).send(cached.data);
 
   let movie = (await MoviesRequestingServices().getByTtid({ ttid, fullMovie: true })) as MovieRequest;
   if (!movie) {
@@ -169,7 +178,7 @@ export const getMovieByTtid: CustomRequestHandler = async (req, res) => {
     await translateAndAddNewMovie(imdbData);
     movie = (await MoviesRequestingServices().getByTtid({ ttid, fullMovie: true })) as MovieRequest;
   }
-  CacheServices.publishToDigest({ url: req.originalUrl, data: movie });
+  CacheServices.setToCache({ urlHash, data: { data: movie }, timeout: 5 });
   return res.status(200).send(movie);
 };
 

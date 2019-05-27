@@ -12,7 +12,7 @@ const moviesApiUrl = `https://${host}/api/movies/`;
 export const MoviesApi = {
   searchCriteria: (criteria: string) =>
     SecureFetcher(fetcher.get<MovieRequest[]>({ url: moviesApiUrl, params: { c: criteria } })),
-  
+
   searchStream: ({
     criteria,
     language,
