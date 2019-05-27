@@ -30,6 +30,23 @@ export const globalStyles = css`
     margin: 0;
     padding: 0;
     font: 15px Roboto, sans-serif;
+    background-image: linear-gradient(
+      to left top,
+      #ff6f91,
+      #ff7689,
+      #ff7d81,
+      #ff847b,
+      #ff8c76,
+      #ff9372,
+      #ff9a6e,
+      #ffa16b,
+      #ffaa67,
+      #ffb363,
+      #ffbd61,
+      #ffc75f
+    );
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
   }
   *::-webkit-scrollbar {
     width: 0.4em;

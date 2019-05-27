@@ -6,6 +6,7 @@ import { AuthReducer } from '@src/store/reducers/auth.reducer';
 import { MoviesReducer } from '@src/store/reducers/movies.reducer';
 import { NotificationReducer } from '@src/store/reducers/notification.reducer';
 import { ListsReducer } from '@src/store/reducers/lists.reducer';
+import { UserDataReducer } from '@src/store/reducers/user-data.reducer';
 
 export const reducers = (history: History): Reducer => {
   const appReducers: Reducer = (state, action) => {
@@ -16,6 +17,7 @@ export const reducers = (history: History): Reducer => {
       movies: MoviesReducer,
       notification: NotificationReducer,
       lists: ListsReducer,
+      users: UserDataReducer,
     });
     return combi(state, action);
   };

@@ -1,7 +1,6 @@
 import { LanguageType } from 'types/User.model';
 import { Reducer } from 'redux';
 import { AuthActionTypes, AuthActionsUnion } from '@src/store/actions/auth.actions';
-import { Selector } from 'react-redux';
 import { AppStoreState } from '@src/store/store';
 
 export type AuthReducerState = {
@@ -26,4 +25,4 @@ export const AuthReducer: Reducer<AuthReducerState, AuthActionsUnion> = (state =
   }
 };
 
-export const AuthSelector: Selector<AppStoreState, AuthReducerState> = state => state.auth;
+export const AuthSelectors = { auth: (state: AppStoreState) => state.auth };

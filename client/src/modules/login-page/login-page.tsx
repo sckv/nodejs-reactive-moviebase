@@ -1,17 +1,18 @@
 import React, { useRef, useState } from 'react';
 // import { useDispatch, useSelector, connect } from 'react-redux';
 import { Grid, Card, CardHeader, CardContent, TextField, InputAdornment, CardActions, Button } from '@material-ui/core';
-import LoginIcon from '@material-ui/icons/VpnKeyTwoTone';
-import AccountCircleIcon from '@material-ui/icons/AccountCircleTwoTone';
-import LockIcon from '@material-ui/icons/LockTwoTone';
-import RegIcon from '@material-ui/icons/HowToRegTwoTone';
-import EmailIcon from '@material-ui/icons/EmailTwoTone';
+import LoginIcon from '@material-ui/icons/VpnKey';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import LockIcon from '@material-ui/icons/Lock';
+import RegIcon from '@material-ui/icons/HowToReg';
+import EmailIcon from '@material-ui/icons/Email';
 import { useDispatch } from 'react-redux';
 import { LoginActionThunk } from '@src/store/actions/auth.actions';
 import { RegisterThunkAction } from '@src/store/actions/common.actions';
 import { NotifyActions } from '@src/store/actions/notification.actions';
+import { makeStyles } from '@material-ui/styles';
 
-export const Login = () => {
+export const LoginPage = () => {
   const loginUsernameRef = useRef<HTMLInputElement>();
   const loginPasswordRef = useRef<HTMLInputElement>();
 
@@ -23,18 +24,27 @@ export const Login = () => {
 
   const dispatch = useDispatch();
 
+  const classes = useStyles();
+
   const checkPasswords = () => {
     if (!registerPasswordRepeatRef.current!.value) return;
+    console.log(
+      'checkoing passwords',
+      registerPasswordRef.current!.value,
+      registerPasswordRepeatRef.current!.value,
+      registerPasswordRef.current!.value === registerPasswordRepeatRef.current!.value,
+    );
     setPasswordsMatch(registerPasswordRef.current!.value === registerPasswordRepeatRef.current!.value);
   };
 
   return (
-    <Grid container={true} spacing={10}>
-      <Grid item={true} xs={6}>
+    <Grid container={true} spacing={10} className={classes.container}>
+      <Grid item={true} xs={12} sm={6}>
         <Card>
           <CardHeader avatar={<LoginIcon />} title="Login" subheader="Username and password are needed" />
-          <CardContent>
+          <CardContent className={classes.formCard}>
             <TextField
+              className={classes.input}
               inputRef={loginUsernameRef}
               variant="standard"
               type="text"
@@ -48,6 +58,7 @@ export const Login = () => {
               }}
             />
             <TextField
+              className={classes.input}
               inputRef={loginPasswordRef}
               variant="standard"
               type="password"
@@ -78,11 +89,12 @@ export const Login = () => {
           </CardActions>
         </Card>
       </Grid>
-      <Grid item={true} xs={6}>
+      <Grid item={true} xs={12} sm={6}>
         <Card>
           <CardHeader avatar={<RegIcon />} title="Registration" subheader="Username, email and password are needed" />
-          <CardContent>
+          <CardContent className={classes.formCard}>
             <TextField
+              className={classes.input}
               inputRef={registerUsernameRef}
               variant="standard"
               type="text"
@@ -96,6 +108,7 @@ export const Login = () => {
               }}
             />
             <TextField
+              className={classes.input}
               inputRef={registerEmailRef}
               variant="standard"
               type="email"
@@ -109,12 +122,13 @@ export const Login = () => {
               }}
             />
             <TextField
+              className={classes.input}
               inputRef={registerPasswordRef}
               variant="standard"
               type="password"
               placeholder="Password"
               error={!passwordsMatch}
-              onKeyPress={checkPasswords}
+              onKeyUp={checkPasswords}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -124,13 +138,21 @@ export const Login = () => {
               }}
             />
             <TextField
+              className={classes.input}
               inputRef={registerPasswordRepeatRef}
               variant="standard"
               type="password"
               placeholder="Repeat password"
               error={!passwordsMatch}
               label={!passwordsMatch ? 'Passwords do not match' : null}
-              onKeyPress={checkPasswords}
+              onKeyUp={checkPasswords}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockIcon />
+                  </InputAdornment>
+                ),
+              }}
             />
           </CardContent>
           <CardActions>
@@ -158,3 +180,20 @@ export const Login = () => {
     </Grid>
   );
 };
+
+const useStyles = makeStyles({
+  formCard: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  input: {
+    width: '60%',
+    minWidth: 160,
+    margin: 25,
+  },
+  container: {
+    padding: 15,
+    width: '100%',
+    margin: 0,
+  },
+});

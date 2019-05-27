@@ -17,12 +17,12 @@ export const UsersApi = {
     pd: boolean;
     ld: boolean;
     md: boolean;
-    page: number;
+    page?: number;
     followers: boolean;
     follows: boolean;
   }) => SecureFetcher(fetcher.get<Partial<UserFull>>({ url: usersApiUrl + 'user', params })),
 
-  modify: (userId: string, body: { password: string; language: string }) =>
+  modify: (userId: string, body: { password?: string; language?: string }) =>
     SecureFetcher(fetcher.patch({ url: usersApiUrl + userId, body })),
 
   follow: (userId: string) => SecureFetcher(fetcher.post({ url: usersApiUrl + 'follow', body: { userId } })),

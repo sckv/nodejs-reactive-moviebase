@@ -50,8 +50,8 @@ export const searchUsers: CustomRequestHandler = async (req, res) => {
 
   if (!cachedUsers || !cachedUsers.data) {
     usersList = await UserControllingServices().search({ username: un, page });
-    await CacheServices.setToCache<typeof usersList>({ urlHash, timeout: 10, data: { data: usersList } });
-  }
+    await CacheServices.setToCache<typeof usersList>({ urlHash, timeout: 5, data: { data: usersList } });
+  } else usersList = cachedUsers.data;
   return res.status(200).send(usersList);
 };
 
@@ -71,8 +71,8 @@ export const getUserData: CustomRequestHandler = async (req, res) => {
       moviesData: md,
       page,
     });
-    await CacheServices.setToCache<typeof userData>({ urlHash, timeout: 10, data: { data: userData } });
-  }
+    await CacheServices.setToCache<typeof userData>({ urlHash, timeout: 5, data: { data: userData } });
+  } else userData = cachedUser.data;
   return res.status(200).send(userData);
 };
 

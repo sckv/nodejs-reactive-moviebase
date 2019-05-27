@@ -1,7 +1,6 @@
 import { Reducer } from 'redux';
 import { MovieRequest } from 'types/movies-requesting.services';
 import { MovieActionsUnion, MovieActionTypes } from '@src/store/actions/movies.actions';
-import { Selector } from 'react-redux';
 import { AppStoreState } from '@src/store/store';
 
 export type MoviesReducerState = { current: MovieRequest; movies: MovieRequest[] };
@@ -10,6 +9,7 @@ const initialState = { current: {} as any, movies: [] };
 
 export const MoviesReducer: Reducer<MoviesReducerState, MovieActionsUnion> = (state = initialState, action) => {
   if (!action) return state;
+  console.log('action payload>>>', (action as any).payload);
   switch (action.type) {
     case MovieActionTypes.addMoviesData:
       return { ...state, movies: action.payload };
@@ -22,6 +22,7 @@ export const MoviesReducer: Reducer<MoviesReducerState, MovieActionsUnion> = (st
   }
 };
 
-export const MoviesSelector: Selector<AppStoreState, MoviesReducerState['movies']> = state => state.movies.movies;
-
-export const MovieSelector: Selector<AppStoreState, MovieRequest> = state => state.movies.current;
+export const MoviesSelectors = {
+  movies: (state: AppStoreState) => state.movies.movies,
+  movie: (state: AppStoreState) => state.movies.current,
+};

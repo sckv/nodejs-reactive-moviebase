@@ -16,8 +16,9 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { MenuItem, Menu } from '@material-ui/core';
 import invoke from 'lodash/invoke';
 import styled from '@emotion/styled';
-import { useSelector, shallowEqual, connect } from 'react-redux';
-import { AuthSelector } from '@src/store/reducers/auth.reducer';
+import { useSelector, shallowEqual, connect, useDispatch } from 'react-redux';
+import { AuthSelectors } from '@src/store/reducers/auth.reducer';
+import { push } from 'connected-react-router';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -33,6 +34,7 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.up('sm')]: {
         display: 'block',
       },
+      cursor: 'pointer',
     },
     search: {
       position: 'relative',
@@ -84,6 +86,8 @@ const useStyles = makeStyles((theme: Theme) =>
 export const HeaderBarBase = () => {
   const classes = useStyles();
 
+  const dispatch = useDispatch();
+
   const [list, setList] = useState<MovieRequest[]>([]);
   const [query, setQuery] = useState<string>('');
   const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -93,13 +97,14 @@ export const HeaderBarBase = () => {
 
   const [debouncedQuery] = useDebounce(query, 700);
 
-  const authData = useSelector(AuthSelector, shallowEqual);
+  const authData = useSelector(AuthSelectors.auth, shallowEqual);
 
   const handleMenuClose = (ttid: string) => {
     setQuery('');
     setMenuOpen(false);
     inputRef.current!.blur();
-    MoviesApi.getByTtid(ttid).then(res => (res ? console.log('gotten by ttid', res.data) : null));
+    console.log('getting by ttid');
+    MoviesApi.getByTtid(ttid).then(res => (res ? dispatch(push(`/movie/${ttid}`)) : null));
   };
 
   useEffect(() => {
@@ -122,7 +127,16 @@ export const HeaderBarBase = () => {
           <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="Open drawer">
             <MenuIcon />
           </IconButton>
-          <Typography className={classes.title} variant="h6" style={{ color: 'whitesmoke' }} noWrap={true}>
+          <Typography
+            onClick={e => {
+              e.preventDefault();
+              dispatch(push('/'));
+            }}
+            className={classes.title}
+            variant="h6"
+            style={{ color: 'whitesmoke' }}
+            noWrap={true}
+          >
             Reactive Moviebase
           </Typography>
           {authData && authData.username && (

@@ -14,10 +14,10 @@ export const ListsApi = {
   create: (body: { title: string; description: string; isPrivate: boolean }) =>
     SecureFetcher(fetcher.post({ url: listsApiUrl, body })),
 
-  patchList: (listId: string, body: { title: string; description: string; isPrivate: boolean }) =>
+  modifyList: (listId: string, body: { title: string; description: string; isPrivate: boolean }) =>
     SecureFetcher(fetcher.patch({ url: listsApiUrl + listId, body })),
 
-  addToList: (listId: string, body: { movieId: string; commentary: string; rate: number }) =>
+  addToList: (listId: string, body: { movieId: string; commentary?: string; rate?: number }) =>
     SecureFetcher(fetcher.patch({ url: listsApiUrl + listId + 'add-to', body })),
 
   removeFromList: (listId: string, movieId: string) =>

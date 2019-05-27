@@ -4,7 +4,7 @@ import { ThunkAction } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { AuthApi } from '@src/api/auth.api';
 import { NotifyActions } from '@src/store/actions/notification.actions';
-import { AuthSelector } from '@src/store/reducers/auth.reducer';
+import { AuthSelectors } from '@src/store/reducers/auth.reducer';
 import { push } from 'connected-react-router';
 
 export enum AuthActionTypes {
@@ -31,8 +31,9 @@ export const LoginActionThunk = (loginData: {
   username: string;
   password: string;
 }): ThunkAction<void, AppStoreState, null, AnyAction> => async (dispatch, getState) => {
-  if (AuthSelector(getState()).username)
-    return dispatch(NotifyActions.error(`Can't login. Already logged as ${AuthSelector(getState()).username}`));
+  console.log('logging...', loginData);
+  if (AuthSelectors.auth(getState()).username)
+    return dispatch(NotifyActions.error(`Can't login. Already logged as ${AuthSelectors.auth(getState()).username}`));
 
   const authData = await AuthApi.login(loginData);
   if (authData && authData.ok) {
@@ -47,7 +48,8 @@ export const LogoutActionThunk = (): ThunkAction<void, AppStoreState, null, AnyA
   dispatch,
   getState,
 ) => {
-  if (!AuthSelector(getState()).username) return dispatch(NotifyActions.error(`Can't logout. Already logged out.`));
+  if (!AuthSelectors.auth(getState()).username)
+    return dispatch(NotifyActions.error(`Can't logout. Already logged out.`));
 
   const logoutData = await AuthApi.logout();
   if (logoutData && logoutData.ok) {
