@@ -27,7 +27,7 @@ export const AuthActions = {
   clearLoginData: (): AuthAction$Clear => ({ type: AuthActionTypes.clearLoginData }),
 };
 
-export const LoginActionThunk = (loginData: {
+export const loginAction = (loginData: {
   username: string;
   password: string;
 }): ThunkAction<void, AppStoreState, null, AnyAction> => async (dispatch, getState) => {
@@ -37,25 +37,23 @@ export const LoginActionThunk = (loginData: {
 
   const authData = await AuthApi.login(loginData);
   if (authData && authData.ok) {
+    dispatch(push('/'));
     dispatch(AuthActions.addLoginData({ ...(authData.data as any) }));
     dispatch(NotifyActions.success(`Successfully authoirized as ${authData.data.username}`));
-    dispatch(push('/'));
+    console.log('pushing to home>>');
   } else dispatch(NotifyActions.error(`Error authorizing as ${loginData.username}`));
   return;
 };
 
-export const LogoutActionThunk = (): ThunkAction<void, AppStoreState, null, AnyAction> => async (
-  dispatch,
-  getState,
-) => {
+export const logoutAction = (): ThunkAction<void, AppStoreState, null, AnyAction> => async (dispatch, getState) => {
   if (!AuthSelectors.auth(getState()).username)
     return dispatch(NotifyActions.error(`Can't logout. Already logged out.`));
 
   const logoutData = await AuthApi.logout();
   if (logoutData && logoutData.ok) {
+    dispatch(push('/'));
     dispatch(AuthActions.clearLoginData());
     dispatch(NotifyActions.success('Successfully logged out'));
-    dispatch(push('/'));
   } else dispatch(NotifyActions.error('Error logging out'));
   return;
 };

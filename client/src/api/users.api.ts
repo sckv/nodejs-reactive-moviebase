@@ -7,7 +7,7 @@ const host = process.env.WEB_HOSTNAME || 'localhost';
 const usersApiUrl = `https://${host}/api/users/`;
 
 export const UsersApi = {
-  activate: (token: string) => SecureFetcher(fetcher.post({ url: usersApiUrl + 'activate' + token })),
+  activate: (token: string) => SecureFetcher(fetcher.post({ url: usersApiUrl + 'activate/' + token })),
 
   register: (body: { username: string; email: string; password: string }) =>
     SecureFetcher(fetcher.post({ url: usersApiUrl + 'register', body })),

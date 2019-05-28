@@ -7,8 +7,8 @@ import LockIcon from '@material-ui/icons/Lock';
 import RegIcon from '@material-ui/icons/HowToReg';
 import EmailIcon from '@material-ui/icons/Email';
 import { useDispatch } from 'react-redux';
-import { LoginActionThunk } from '@src/store/actions/auth.actions';
-import { RegisterThunkAction } from '@src/store/actions/common.actions';
+import { loginAction } from '@src/store/actions/auth.actions';
+import { registerAction } from '@src/store/actions/common.actions';
 import { NotifyActions } from '@src/store/actions/notification.actions';
 import { makeStyles } from '@material-ui/styles';
 
@@ -77,7 +77,7 @@ export const LoginPage = () => {
               variant="contained"
               onClick={() =>
                 dispatch(
-                  LoginActionThunk({
+                  loginAction({
                     username: loginUsernameRef.current!.value,
                     password: loginPasswordRef.current!.value,
                   }),
@@ -164,7 +164,7 @@ export const LoginPage = () => {
                 if (!registerEmailRef.current!.value) return dispatch(NotifyActions.error('Email is empty.'));
 
                 dispatch(
-                  RegisterThunkAction({
+                  registerAction({
                     email: registerEmailRef.current!.value,
                     password: registerPasswordRef.current!.value,
                     username: registerUsernameRef.current!.value,

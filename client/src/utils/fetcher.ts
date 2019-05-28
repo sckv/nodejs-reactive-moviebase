@@ -29,14 +29,18 @@ export const fetcher = {
       signal: abort.signal,
       credentials,
     });
-    console.log('data recieved>>');
+
+    const contentType = response.headers.get('Content-Type');
+
     return {
       ok: response.ok,
       status: response.status,
       statusText: response.statusText,
       headers: response.headers,
       url: response.url,
-      data: (await response.json()) as T,
+      data: (contentType && contentType.includes('application/json')
+        ? await response.json()
+        : await response.text()) as T,
       abortCall: abort.abort,
     };
   },
@@ -63,8 +67,9 @@ export const fetcher = {
       signal: abort.signal,
       credentials,
     });
-
-    console.log('response>>', response);
+    const contentType = response.headers.get('Content-Type');
+    // console.log('RESPONSE', contentType!.includes('application/json'));
+    // if (!responseData) response.text().then(res => (responseData = res));
 
     return {
       ok: response.ok,
@@ -72,7 +77,9 @@ export const fetcher = {
       statusText: response.statusText,
       headers: response.headers,
       url: response.url,
-      data: (await response.json()) as T,
+      data: (contentType && contentType.includes('application/json')
+        ? await response.json()
+        : await response.text()) as T,
       abortCall: abort.abort,
     };
   },
@@ -98,6 +105,7 @@ export const fetcher = {
       signal: abort.signal,
       credentials,
     });
+    const contentType = response.headers.get('Content-Type');
 
     return {
       ok: response.ok,
@@ -105,7 +113,9 @@ export const fetcher = {
       statusText: response.statusText,
       headers: response.headers,
       url: response.url,
-      data: (await response.json()) as T,
+      data: (contentType && contentType.includes('application/json')
+        ? await response.json()
+        : await response.text()) as T,
       abortCall: abort.abort,
     };
   },
@@ -125,6 +135,7 @@ export const fetcher = {
       signal: abort.signal,
       credentials,
     });
+    const contentType = response.headers.get('Content-Type');
 
     return {
       ok: response.ok,
@@ -132,7 +143,9 @@ export const fetcher = {
       statusText: response.statusText,
       headers: response.headers,
       url: response.url,
-      data: (await response.json()) as T,
+      data: (contentType && contentType.includes('application/json')
+        ? await response.json()
+        : await response.text()) as T,
       abortCall: abort.abort,
     };
   },
@@ -158,6 +171,7 @@ export const fetcher = {
       signal: abort.signal,
       credentials,
     });
+    const contentType = response.headers.get('Content-Type');
 
     return {
       ok: response.ok,
@@ -165,7 +179,9 @@ export const fetcher = {
       statusText: response.statusText,
       headers: response.headers,
       url: response.url,
-      data: (await response.json()) as T,
+      data: (contentType && contentType.includes('application/json')
+        ? await response.json()
+        : await response.text()) as T,
       abortCall: abort.abort,
     };
   },
