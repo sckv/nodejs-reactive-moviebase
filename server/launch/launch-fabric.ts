@@ -1,8 +1,8 @@
 import path from 'path';
 import fs from 'fs';
 import spdy from 'spdy';
-import {api} from '@src/server';
-// import http2 from 'http2';
+import { api } from '@src/server';
+import { errorsHandler } from '@src/middlewares/error-handler';
 
 let backPath;
 let routesPath;
@@ -14,7 +14,7 @@ if (process.env.NODE_ENV !== 'production') {
   routesPath = path.join(backPath, 'src', 'routes');
 }
 
-type LaunchSettings = {port?: string | number; routesDir: string; serviceName: string};
+type LaunchSettings = { port?: string | number; routesDir: string; serviceName: string };
 
 const options = {
   // key: fs.readFileSync(path.join(backPath, 'cert/server-key.pem')),
@@ -28,7 +28,7 @@ const options = {
   protocols: ['h2', 'http/1.1'],
 };
 
-export const launchFabric = ({port = 443, routesDir, serviceName}: LaunchSettings) => {
+export const launchFabric = ({ port = 443, routesDir, serviceName }: LaunchSettings) => {
   try {
     fs.readdirSync(path.join(routesPath, routesDir)).map(file => {
       if (path.extname(file) === '.js') {
@@ -36,6 +36,7 @@ export const launchFabric = ({port = 443, routesDir, serviceName}: LaunchSetting
         require(filePath)(api);
       }
     });
+    api.use(errorsHandler);
   } catch (error) {
     console.error(`Error loading routes for ${serviceName}`, error);
     process.exit(1);

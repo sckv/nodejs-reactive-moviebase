@@ -27,7 +27,7 @@ const MoviePageBase = ({ match }: RouteComponentProps<{ movieId: string }>) => {
     else
       return (
         <Grid container={true} spacing={5} className={classes.grid}>
-          <Grid item={true} xs={7}>
+          <Grid item={true} xs={12} md={7}>
             <Card className={classes.mainCard}>
               <Paper>
                 <CardHeader title={movieData.title} subheader={movieData.year} />
@@ -59,7 +59,7 @@ const MoviePageBase = ({ match }: RouteComponentProps<{ movieId: string }>) => {
               </CardContent>
             </Card>
           </Grid>
-          <Grid item={true} xs={5}>
+          <Grid item={true} xs={12} md={5}>
             <Card draggable={false} className={classes.imageCard}>
               <CardMedia image={movieData.poster} style={{ height: '85vh' }} />
             </Card>
@@ -88,7 +88,7 @@ const useStyles = makeStyles({
     marginBottom: 20,
   },
   imageCard: {
-    maxWidth: 493,
+    maxWidth: 510,
     margin: 'auto',
   },
 });

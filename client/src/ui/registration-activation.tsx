@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { UsersApi } from '@src/api/users.api';
 import { createStyles, makeStyles } from '@material-ui/styles';
@@ -19,26 +19,32 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const RegistrationActivationBase = ({ match }: RouteComponentProps<{ token: string }>) => {
   const classes = useStyles();
+  const [activated, setActivated] = useState<'yes' | 'no' | null>(null);
+  useEffect(() => {
+    if (match) ActivationComponent();
+  }, [match]);
 
   const ActivationComponent = async () => {
     const activationResponse = await UsersApi.activate(match.params.token);
-    if (activationResponse && activationResponse.ok)
-      return (
-        <Typography>
-          Your account have been activated! <CheckIcon style={{ color: 'green' }} />
-        </Typography>
-      );
-    return (
-      <Typography>
-        Error ocurred during your activation! <FailIcon style={{ color: 'red' }} />
-      </Typography>
-    );
+    if (activationResponse && activationResponse.ok) setActivated('yes');
+    else setActivated('no');
   };
   return (
     <Container>
-      <Suspense fallback={<CircularProgress className={classes.progress} color="secondary" />}>
-        {ActivationComponent()}
-      </Suspense>
+      <Typography component="div" variant="h4">
+        {typeof activated === null && <CircularProgress className={classes.progress} color="secondary" />}
+        {activated === 'yes' && (
+          <>
+            Your account have been activated! <CheckIcon style={{ color: 'green' }} />
+          </>
+        )}
+
+        {activated === 'no' && (
+          <>
+            An error ocurred during your activation! <FailIcon style={{ color: 'red' }} />
+          </>
+        )}
+      </Typography>
     </Container>
   );
 };
@@ -46,8 +52,8 @@ const RegistrationActivationBase = ({ match }: RouteComponentProps<{ token: stri
 export const RegistrationActivation = withRouter(RegistrationActivationBase);
 
 const Container = styled.div`
-  height: 95vh;
-  width: 100vw;
+  height: calc(100vh - 50px);
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;

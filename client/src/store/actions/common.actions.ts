@@ -5,7 +5,7 @@ import { NotifyActions } from '@src/store/actions/notification.actions';
 import { UsersApi } from '@src/api/users.api';
 import { push } from 'connected-react-router';
 
-export const RegisterThunkAction = (registryData: {
+export const registerAction = (registryData: {
   username: string;
   email: string;
   password: string;

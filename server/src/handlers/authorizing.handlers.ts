@@ -9,14 +9,28 @@ export const login: CustomRequestHandler = async (req, res, next) => {
   const loginObject = await AuthServices().login({ username, password });
   res
     .status(200)
-    .cookie('__session', loginObject.token, { maxAge: 9000000, httpOnly: true, path: '/', sameSite: 'Strict' })
+    .cookie('__session', loginObject.token, {
+      maxAge: 9000000,
+      httpOnly: true,
+      path: '/',
+      sameSite: 'Lax',
+      domain: WEB_HOSTNAME || 'localhost',
+    })
     .send(loginObject);
 };
 
 export const logout: CustomRequestHandler = async (req, res) => {
   const sessionToken = req.cookies['__session'];
   await AuthServices().logout(sessionToken);
-  res.status(200).cookie('__session', undefined, { maxAge: 1, httpOnly: true, path: '/', sameSite: 'Strict' });
+  res
+    .status(200)
+    .cookie('__session', undefined, {
+      maxAge: 1,
+      httpOnly: true,
+      path: '/',
+      sameSite: 'Lax',
+      domain: WEB_HOSTNAME || 'localhost',
+    });
 };
 
 export const forgot: CustomRequestHandler = async (req, res) => {

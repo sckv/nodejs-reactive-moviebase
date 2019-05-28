@@ -2,7 +2,8 @@ import { MongoClient, Db } from 'mongodb';
 // import {logger} from '@src/utils/logger';
 // import {InitializeDatabase} from '@src/initialize-database';
 
-const mongoUrl = `mongodb://${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_DATABASE}`;
+const mongoUrl = `mongodb://${process.env.MONGO_HOST || 'localhost'}:${process.env.MONGO_PORT || 27017}/${process.env
+  .MONGO_DATABASE || 'moviebase'}`;
 
 export const connectToDatabase = async (): Promise<{ db: Db; connection: MongoClient }> => {
   let connection: MongoClient = null;

@@ -13,6 +13,7 @@ import { UserPage } from '@src/modules/user-page/user-page';
 import { LoginPage } from '@src/modules/login-page/login-page';
 import { MoviePage } from '@src/modules/movie-page/movie-page';
 import { AuthSelectors } from '@src/store/reducers/auth.reducer';
+import { RegistrationActivation } from '@src/ui/registration-activation';
 
 export const Router = () => (
   <ConnectedRouter history={history}>
@@ -20,7 +21,7 @@ export const Router = () => (
       <Route exact={true} path="/" component={HomePage} />
       <GuardUnAuthRoute exact={true} path="/login" component={LoginPage} />
       <GuardAuthRoute exact={true} path="/panel" component={HomePage} />
-      <GuardUnAuthRoute exact={true} path="/activate/:token" component={HomePage} />
+      <GuardUnAuthRoute exact={true} path="/activate/:token" component={RegistrationActivation} />
       <GuardUnAuthRoute exact={true} path="/restore/:token" component={HomePage} />
       <Route exact={true} path="/user/:username" component={UserPage} />
       <Route exact={true} path="/user/:username/lists" component={HomePage} />
