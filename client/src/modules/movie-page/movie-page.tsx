@@ -30,10 +30,9 @@ const MoviePageBase = ({ match }: RouteComponentProps<{ movieId: string }>) => {
           <Grid item={true} xs={12} md={7}>
             <Card className={classes.mainCard}>
               <Paper>
-                <CardHeader title={movieData.title} subheader={movieData.year} />
+                <CardHeader title={movieData.title} subheader={movieData.year + ' - ' + movieData.description} />
                 <CardContent>
                   <Typography>{movieData.plot}</Typography>
-                  <Typography>{movieData.description}</Typography>
                   <Typography>Average rating: {movieData.averageRate}</Typography>
                 </CardContent>
               </Paper>

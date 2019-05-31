@@ -1,24 +1,26 @@
-import React, { useState, useEffect, useRef } from 'react';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
-import InputBase from '@material-ui/core/InputBase';
-import { fade } from '@material-ui/core/styles/colorManipulator';
-import { createStyles, makeStyles, styled as muiStyled } from '@material-ui/styles';
-import MenuIcon from '@material-ui/icons/Menu';
-import SearchIcon from '@material-ui/icons/Search';
-import { Theme } from '@material-ui/core/styles';
-import { MovieRequestThin, MovieRequest } from 'types/movies-requesting.services';
-import { MoviesApi } from '@src/api/movies.api';
-import { useDebounce } from 'use-debounce';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { MenuItem, Menu } from '@material-ui/core';
-import invoke from 'lodash/invoke';
 import styled from '@emotion/styled';
-import { useSelector, shallowEqual, connect, useDispatch } from 'react-redux';
+import { Button, Menu, MenuItem, Tooltip } from '@material-ui/core';
+import AppBar from '@material-ui/core/AppBar';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import IconButton from '@material-ui/core/IconButton';
+import InputBase from '@material-ui/core/InputBase';
+import { Theme } from '@material-ui/core/styles';
+import { fade } from '@material-ui/core/styles/colorManipulator';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import MenuIcon from '@material-ui/icons/Menu';
+import PersonIcon from '@material-ui/icons/Person';
+import SearchIcon from '@material-ui/icons/Search';
+import { createStyles, makeStyles, styled as muiStyled } from '@material-ui/styles';
+import { MoviesApi } from '@src/api/movies.api';
 import { AuthSelectors } from '@src/store/reducers/auth.reducer';
 import { push } from 'connected-react-router';
+import invoke from 'lodash/invoke';
+import React, { useEffect, useRef, useState } from 'react';
+import { connect, shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { MovieRequest, MovieRequestThin } from 'types/movies-requesting.services';
+import { useDebounce } from 'use-debounce';
+import { fetchUserData } from '@src/store/actions/user-data.actions';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -74,11 +76,22 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     userData: {
-      width: 150,
+      width: 200,
       display: 'flex',
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
+    },
+    userDataTitle: {
+      display: 'flex',
+      alignItems: 'center',
+      cursor: 'pointer',
+    },
+    userDataTitleUsername: {
+      cursor: 'pointer',
+      marginLeft: 10,
+      color: 'whitesmoke',
+      fontSize: theme.typography.h6.fontSize,
     },
   }),
 );
@@ -141,10 +154,33 @@ export const HeaderBarBase = () => {
           </Typography>
           {authData && authData.username && (
             <div className={classes.userData}>
-              <Typography>{authData.username}</Typography>
+              <Typography className={classes.userDataTitle} component="div">
+                <Tooltip title="User Profile" placement="bottom">
+                  <IconButton
+                    onClick={() => dispatch(fetchUserData(authData.username, true))}
+                    color="default"
+                    size="medium"
+                  >
+                    <PersonIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="User Panel" placement="bottom">
+                  <span onClick={() => dispatch(push('/panel'))} className={classes.userDataTitleUsername}>
+                    {authData.username}
+                  </span>
+                </Tooltip>
+              </Typography>
               <Typography>Language: {authData.language.toUpperCase()}</Typography>
             </div>
           )}
+          {!authData ||
+            (!authData.username && (
+              <div className={classes.userData}>
+                <Typography>
+                  <Button onClick={() => dispatch(push('/login'))}>Login or Register</Button>
+                </Typography>
+              </div>
+            ))}
           <div className={classes.search}>
             <div className={classes.searchIcon}>
               <SearchIcon />

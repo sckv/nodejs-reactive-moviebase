@@ -15,7 +15,7 @@ export const UserDataReducer: Reducer<UserDataReducerState, UserDataActionsUnion
   if (!action) return state;
   switch (action.type) {
     case UserDataActionTypes.addUserData:
-      return { ...state, users: action.payload };
+      return { ...state, current: action.payload };
     case UserDataActionTypes.addUserSearchListData:
       return { ...state, searchList: action.payload };
     case UserDataActionTypes.clearUserData:
@@ -27,7 +27,7 @@ export const UserDataReducer: Reducer<UserDataReducerState, UserDataActionsUnion
   }
 };
 
-export const UserDataSelectors: { [k: string]: Selector<AppStoreState, any> } = {
-  searchList: state => state.users.searchList,
-  userData: state => state.users.current,
+export const UserDataSelectors = {
+  searchList: (state: AppStoreState) => state.users.searchList,
+  userData: (state: AppStoreState) => state.users.current,
 };

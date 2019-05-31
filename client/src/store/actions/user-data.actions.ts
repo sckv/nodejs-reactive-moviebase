@@ -5,6 +5,7 @@ import { UserFull, UserThin } from 'types/user-controlling.services';
 import { UsersApi } from '@src/api/users.api';
 import { LanguageType } from 'types/User.model';
 import { AuthSelectors } from '@src/store/reducers/auth.reducer';
+import { push } from 'connected-react-router';
 
 export enum UserDataActionTypes {
   addUserData = '@@USER/ADD_USER_DATA',
@@ -44,6 +45,7 @@ export const UserDataActions = {
 
 export const fetchUserData = (
   username: string,
+  goTo: boolean = false,
 ): ThunkAction<void, AppStoreState, void, ActionsUnion> => async dispatch => {
   dispatch(UserDataActions.clearUserData());
   let userData: Partial<UserFull> = {} as any;
@@ -51,9 +53,14 @@ export const fetchUserData = (
   if (username)
     request = await UsersApi.getUserData({ username, pd: true, ld: true, md: true, followers: true, follows: true });
 
-  if (request && request.data) userData = request.data;
+  if (request && request.data && request.status === 200) {
+    userData = request.data;
+    dispatch(UserDataActions.addUserData(userData));
 
-  dispatch(UserDataActions.addUserData(userData));
+    if (goTo) dispatch(push(`/user/${username}`));
+    return;
+  } else if (request) return dispatch(NotifyActions.error((request.data as any).message));
+  return;
 };
 
 export const searchUsers = (

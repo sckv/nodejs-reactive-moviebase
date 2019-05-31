@@ -1,55 +1,55 @@
-import {Db, ObjectId} from 'mongodb';
-import {RegisterUserObject, SearchUsersObject, GetUserObject, ModifyUserObject} from 'types/users.repository';
-import {UserRegisterError} from '@src/errors/domain-errors/user-register';
-import {User} from 'types/User.model';
-import {UserFull} from 'types/user-controlling.services';
-import {UserNotFoundError} from '@src/errors/domain-errors/user-not-found';
-import {FollowingOperationError} from '@src/errors/domain-errors/following';
-import {UserModifyingError} from '@src/errors/domain-errors/user-modify';
-import {logger} from '@src/utils/logger';
+import { Db, ObjectId } from 'mongodb';
+import { RegisterUserObject, SearchUsersObject, GetUserObject, ModifyUserObject } from 'types/users.repository';
+import { UserRegisterError } from '@src/errors/domain-errors/user-register';
+import { User } from 'types/User.model';
+import { UserFull } from 'types/user-controlling.services';
+import { UserNotFoundError } from '@src/errors/domain-errors/user-not-found';
+import { FollowingOperationError } from '@src/errors/domain-errors/following';
+import { UserModifyingError } from '@src/errors/domain-errors/user-modify';
+import { logger } from '@src/utils/logger';
 
 const USERS_PER_PAGE = 30;
 const LIMIT_PAGINATION = 30;
 
 export const UsersRepository = (connection: Db) => {
   return {
-    register: async (registerData: RegisterUserObject): Promise<{userId: ObjectId}> => {
+    register: async (registerData: RegisterUserObject): Promise<{ userId: ObjectId }> => {
       try {
         const registration = await connection
           .collection<Partial<User>>('users')
-          .insertOne({...registerData, language: 'en'});
+          .insertOne({ ...registerData, language: 'en' });
 
-        if (!registration.insertedCount) throw new UserRegisterError({data: {registerData}});
+        if (!registration.insertedCount) throw new UserRegisterError({ data: { registerData } });
 
         const updating = await connection.collection<User>('users').updateOne(
-          {_id: registration.insertedId},
+          { _id: registration.insertedId },
           {
             $set: {
               language: 'en',
               active: false,
             },
             $currentDate: {
-              createdAt: {$type: 'date'},
+              createdAt: { $type: 'date' },
               lastModified: true,
             },
           },
         );
 
-        if (!updating.modifiedCount) throw new UserModifyingError({data: {registerData}});
+        if (!updating.modifiedCount) throw new UserModifyingError({ data: { registerData } });
         const account = await connection
           .collection<User>('users')
-          .findOne({username: registerData.username}, {projection: {_id: 1}});
-        return {userId: account._id};
+          .findOne({ username: registerData.username }, { projection: { _id: 1 } });
+        return { userId: account._id };
       } catch (e) {
         logger.error(e);
-        throw new UserRegisterError({data: {registerData}});
+        throw new UserRegisterError({ data: { registerData } });
       }
     },
-    search: async <T>({username, page = 0}: SearchUsersObject): Promise<T[]> => {
+    search: async <T>({ username, page = 0 }: SearchUsersObject): Promise<T[]> => {
       const users = await connection
         .collection<User>('users')
         .find<T>(
-          {username: new RegExp(username, 'gi')},
+          { username: new RegExp(username, 'gi') },
           {
             projection: {
               _id: 1,
@@ -75,7 +75,7 @@ export const UsersRepository = (connection: Db) => {
       page = 0,
     }: GetUserObject): Promise<Partial<UserFull>> => {
       const user = await connection.collection<User>('users').findOne<User>(
-        {$and: [{$or: [{_id: userId}, {username}]}]},
+        { $and: [{ $or: [{ _id: userId }, { username }] }] },
         {
           projection: {
             _id: 1,
@@ -91,10 +91,10 @@ export const UsersRepository = (connection: Db) => {
           },
         });
 
-      const {_id} = user;
+      const { _id } = user;
 
       // monkey-check the input query additional parameters, do not count on personalData
-      const exclusionProject: {$project: {[k: string]: number}} = {$project: {}};
+      const exclusionProject: { $project: { [k: string]: number } } = { $project: {} };
       if (!followers) exclusionProject.$project.followers = 0;
       if (!follows) exclusionProject.$project.follows = 0;
       if (!listsData) exclusionProject.$project.lists = 0;
@@ -102,11 +102,11 @@ export const UsersRepository = (connection: Db) => {
       const exclusions = Object.keys(exclusionProject.$project);
 
       // query initial array and helper object
-      const queryArray: Array<{[k: string]: any}> = [];
-      const addFieldsObject: {$addFields: {[k: string]: any}} = {$addFields: {}};
+      const queryArray: Array<{ [k: string]: any }> = [];
+      const addFieldsObject: { $addFields: { [k: string]: any } } = { $addFields: {} };
 
       // match the required user
-      queryArray.push({$match: {_id}});
+      queryArray.push({ $match: { _id } });
 
       // make invisible irrelevant data by default
       queryArray.push({
@@ -115,6 +115,8 @@ export const UsersRepository = (connection: Db) => {
           active: 0,
           createdAt: 0,
           lastModified: 0,
+          activationToken: 0,
+          recoveryToken: 0,
         },
       });
 
@@ -122,10 +124,10 @@ export const UsersRepository = (connection: Db) => {
       if (exclusions.length > 1)
         queryArray.push({
           $addFields: {
-            follows: {$slice: ['$follows', LIMIT_PAGINATION]},
-            followers: {$slice: ['$followers', LIMIT_PAGINATION]},
-            ratedMovies: {$slice: ['$ratedMovies', LIMIT_PAGINATION]},
-            lists: {$slice: ['$lists', LIMIT_PAGINATION]},
+            follows: { $slice: ['$follows', LIMIT_PAGINATION] },
+            followers: { $slice: ['$followers', LIMIT_PAGINATION] },
+            ratedMovies: { $slice: ['$ratedMovies', LIMIT_PAGINATION] },
+            lists: { $slice: ['$lists', LIMIT_PAGINATION] },
           },
         });
 
@@ -137,7 +139,7 @@ export const UsersRepository = (connection: Db) => {
         const lowerLimit = LIMIT_PAGINATION * page;
         queryArray.push({
           $addFields: {
-            [uniqueKey]: {$slice: [`$${uniqueKey}`, lowerLimit, LIMIT_PAGINATION]},
+            [uniqueKey]: { $slice: [`$${uniqueKey}`, lowerLimit, LIMIT_PAGINATION] },
           },
         });
       }
@@ -224,9 +226,9 @@ export const UsersRepository = (connection: Db) => {
             as: 'ratedMovies',
             pipeline: [
               {
-                $match: {'ratedBy.userId': _id},
+                $match: { 'ratedBy.userId': _id },
               },
-              {$unwind: '$ratedBy'},
+              { $unwind: '$ratedBy' },
               {
                 $project: {
                   _id: '$_id',
@@ -238,9 +240,9 @@ export const UsersRepository = (connection: Db) => {
               {
                 $group: {
                   _id: '$_id',
-                  title: {$first: '$title'},
-                  poster: {$first: '$poster'},
-                  rate: {$first: '$rate'},
+                  title: { $first: '$title' },
+                  poster: { $first: '$poster' },
+                  rate: { $first: '$rate' },
                 },
               },
             ],
@@ -270,9 +272,9 @@ export const UsersRepository = (connection: Db) => {
       return queriedUserData;
     },
 
-    modify: async ({userId, ...userData}: ModifyUserObject): Promise<boolean> => {
+    modify: async ({ userId, ...userData }: ModifyUserObject): Promise<boolean> => {
       const updatedUser = await connection.collection<User>('users').updateOne(
-        {_id: userId},
+        { _id: userId },
         {
           $set: {
             ...userData,
@@ -282,12 +284,12 @@ export const UsersRepository = (connection: Db) => {
           },
         },
       );
-      if (!updatedUser.matchedCount) throw new UserNotFoundError({data: {userId, ...userData}});
-      if (!updatedUser.modifiedCount) throw new UserModifyingError({data: {userId, ...userData}});
+      if (!updatedUser.matchedCount) throw new UserNotFoundError({ data: { userId, ...userData } });
+      if (!updatedUser.modifiedCount) throw new UserModifyingError({ data: { userId, ...userData } });
 
       return;
     },
-    follow: async ({userId, followId}: {userId: ObjectId; followId: ObjectId}) => {
+    follow: async ({ userId, followId }: { userId: ObjectId; followId: ObjectId }) => {
       const followed = await connection.collection<User>('users').bulkWrite([
         {
           updateOne: {
@@ -314,10 +316,10 @@ export const UsersRepository = (connection: Db) => {
           },
         },
       ]);
-      if (followed.matchedCount !== 2) throw new FollowingOperationError({data: {userId, followId}});
+      if (followed.matchedCount !== 2) throw new FollowingOperationError({ data: { userId, followId } });
       return true;
     },
-    unfollow: async ({userId, followId}: {userId: ObjectId; followId: ObjectId}) => {
+    unfollow: async ({ userId, followId }: { userId: ObjectId; followId: ObjectId }) => {
       const followed = await connection.collection<User>('users').bulkWrite([
         {
           updateOne: {
@@ -344,7 +346,7 @@ export const UsersRepository = (connection: Db) => {
           },
         },
       ]);
-      if (followed.matchedCount !== 2) throw new FollowingOperationError({data: {userId, followId}});
+      if (followed.matchedCount !== 2) throw new FollowingOperationError({ data: { userId, followId } });
       return true;
     },
   };

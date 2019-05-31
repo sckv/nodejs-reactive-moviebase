@@ -30,7 +30,7 @@ export const HomePage = (props: Props) => {
   return (
     <Container>
       <Grid container={true} spacing={3}>
-        <Grid item={true} xs={9}>
+        <Grid item={true} xs={12} sm={12}>
           <Card className={classes.title}>
             <CardHeader title="Browse movies stored in the database" />
           </Card>

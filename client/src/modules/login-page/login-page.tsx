@@ -75,14 +75,19 @@ export const LoginPage = () => {
           <CardActions>
             <Button
               variant="contained"
-              onClick={() =>
+              onClick={() => {
+                if (!loginUsernameRef.current!.value && !loginPasswordRef.current!.value)
+                  return dispatch(NotifyActions.error("Login fields can't be empty."));
+                if (!loginUsernameRef.current!.value) return dispatch(NotifyActions.error('Login username is empty.'));
+                if (!loginPasswordRef.current!.value) return dispatch(NotifyActions.error('Login assword is empty.'));
+
                 dispatch(
                   loginAction({
                     username: loginUsernameRef.current!.value,
                     password: loginPasswordRef.current!.value,
                   }),
-                )
-              }
+                );
+              }}
             >
               Login
             </Button>
@@ -159,9 +164,17 @@ export const LoginPage = () => {
             <Button
               variant="contained"
               onClick={() => {
-                if (!passwordsMatch) return dispatch(NotifyActions.error('Passwords do not match.'));
-                if (!registerUsernameRef.current!.value) return dispatch(NotifyActions.error('Username is empty.'));
-                if (!registerEmailRef.current!.value) return dispatch(NotifyActions.error('Email is empty.'));
+                if (
+                  !registerEmailRef.current!.value &&
+                  !registerPasswordRef.current!.value &&
+                  !registerUsernameRef.current!.value
+                )
+                  return dispatch(NotifyActions.error("Regitration fields can't be empty."));
+                if (!passwordsMatch) return dispatch(NotifyActions.error('Regitration passwords do not match.'));
+                if (!registerUsernameRef.current!.value)
+                  return dispatch(NotifyActions.error('Regitration username is empty.'));
+                if (!registerEmailRef.current!.value)
+                  return dispatch(NotifyActions.error('Regitration email is empty.'));
 
                 dispatch(
                   registerAction({
