@@ -28,11 +28,11 @@ export const Router = () => (
       <GuardUnAuthRoute exact={true} path="/restore/:token" component={HomePage} />
       <Route exact={true} path="/user/:username" component={UserPage} />
       <Route exact={true} path="/user/:username/lists" component={HomePage} />
-      <Route exact={true} path="/user/:username/list/:listId" component={ListPage} />
       <Route exact={true} path="/user/:username/follows" component={HomePage} />
       <Route exact={true} path="/user/:username/followers" component={HomePage} />
       <Route exact={true} path="/user/:username/followers" component={HomePage} />
       <Route exact={true} path="/user/:username/movies" component={HomePage} />
+      <Route exact={true} path="/list/:listId" component={ListPage} />
       <Route exact={true} path="/movie/:movieId" component={MoviePage} />
       <Route component={PageNotFound} />
     </Switch>

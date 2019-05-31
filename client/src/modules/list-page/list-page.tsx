@@ -11,10 +11,11 @@ const ListPageBase = ({ match }: RouteComponentProps<{ listId: string }>) => {
   const { listId } = match.params;
 
   const dispatch = useDispatch();
-  const listData = useSelector(ListsSelectors.list, shallowEqual);
+  const listData = useSelector(ListsSelectors.current, shallowEqual);
 
   useEffect(() => {
-    dispatch(fetchListData(listId));
+    !listData && dispatch(fetchListData({ listId }));
+    listData && listData!._id !== match.params.listId && dispatch(fetchListData({ listId }));
   }, [listId]);
 
   const ListData = () => {
@@ -22,7 +23,8 @@ const ListPageBase = ({ match }: RouteComponentProps<{ listId: string }>) => {
     else
       return (
         <Grid container={true} spacing={8}>
-          <Grid item={true} xs={7}>
+          <Typography variant="h3">{listData.username}'s list</Typography>
+          <Grid item={true} xs={12}>
             <Card>
               <CardHeader title={listData.title} subheader={listData.description} />
               <CardContent>

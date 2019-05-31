@@ -3,6 +3,7 @@ import { ThunkAction } from 'redux-thunk';
 import { ListEntry } from 'types/listing.services';
 import { ListsApi } from '@src/api/lists.api';
 import { NotifyActions } from '@src/store/actions/notification.actions';
+import { push } from 'connected-react-router';
 
 export enum ListActionTypes {
   addListData = '@@LIST/ADD_LIST_DATA',
@@ -31,16 +32,23 @@ export const ListsActions = {
   clearListData: (): ListAction$Clear => ({ type: ListActionTypes.clearListData }),
 };
 
-export const fetchListData = (
-  listId: string,
-): ThunkAction<void, AppStoreState, void, ActionsUnion> => async dispatch => {
+export const fetchListData = ({
+  listId,
+  goTo = false,
+}: {
+  listId: string;
+  goTo?: boolean;
+}): ThunkAction<void, AppStoreState, void, ActionsUnion> => async dispatch => {
   let listData: ListEntry = {} as any;
   let request;
   if (listId) request = await ListsApi.getList(listId);
 
-  if (request && request.data) listData = request.data;
+  if (request && request.data && request.status === 200) {
+    listData = request.data;
+    dispatch(ListsActions.addListData(listData));
 
-  dispatch(ListsActions.addListData(listData));
+    goTo && dispatch(push(`/list/${listId}`));
+  }
 };
 
 export const fetchUserListsData = (

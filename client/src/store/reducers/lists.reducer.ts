@@ -26,5 +26,5 @@ export const ListsReducer: Reducer<ListsReducerState, any> = (state = initialSta
 
 export const ListsSelectors = {
   lists: (state: AppStoreState) => state.lists.lists,
-  list: (state: AppStoreState) => state.lists.current,
+  current: (state: AppStoreState) => state.lists.current,
 };

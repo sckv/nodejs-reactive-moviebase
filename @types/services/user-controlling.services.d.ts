@@ -1,8 +1,8 @@
 declare module 'types/user-controlling.services' {
-  import {MovieRequestThin} from 'types/movies-requesting.services';
-  import {ListEntryThin} from 'types/listing.services';
-  import {LanguageType} from 'types/User.model';
-  import {MongoObjectID} from 'types/utils';
+  import { MovieRequestThin } from 'types/movies-requesting.services';
+  import { ListEntryThin } from 'types/listing.services';
+  import { LanguageType } from 'types/User.model';
+  import { MongoObjectID } from 'types/utils';
 
   interface UserThin {
     _id: string;
@@ -20,7 +20,7 @@ declare module 'types/user-controlling.services' {
   };
 
   interface UserMovies {
-    movies: Array<{
+    ratedMovies: Array<{
       movie: MovieRequestThin;
       rating: 1 | 2 | 3 | 4 | 5;
       comment: string;

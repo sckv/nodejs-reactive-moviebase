@@ -16,7 +16,7 @@ import { Notification } from '@src/ui/notification/notification';
 import throttle from 'lodash/throttle';
 import { saveState } from '@src/utils/persist-state';
 
-const throttled = throttle(fn => fn(), 5000);
+const throttled = throttle(fn => fn(), 1000);
 export const App = () => {
   const [resolvedStore, setStore] = useState<Store>(null as any);
 

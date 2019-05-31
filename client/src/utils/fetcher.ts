@@ -13,21 +13,14 @@ export type FetcherResponse<T = any> = Promise<{
 }>;
 
 export const fetcher = {
-  get: async <T = any>({
-    url,
-    params,
-    credentials,
-  }: {
-    url: string;
-    params?: any;
-    credentials?: RequestInit['credentials'];
-  }) => {
+  get: async <T = any>({ url, params }: { url: string; params?: any }) => {
     const response = await fetch(url + (params ? '?' + qs.stringify(params, { skipNulls: true }) : ''), {
       keepalive: true,
       method: 'GET',
       mode: 'cors',
       signal: abort.signal,
-      credentials: 'same-origin',
+      credentials: 'include',
+      redirect: 'follow',
     });
 
     const contentType = response.headers.get('Content-Type');
@@ -49,14 +42,12 @@ export const fetcher = {
     url,
     params,
     body,
-    credentials,
   }: {
     url: string;
     params?: { [k: string]: any };
     body?: { [k: string]: any };
-    credentials?: RequestInit['credentials'];
   }) => {
-    console.log('fetching tto>>', url, params, body, credentials);
+    console.log('fetching tto>>', url, params, body);
     const response = await fetch(url + (params ? '?' + qs.stringify(params, { skipNulls: true }) : ''), {
       headers: {
         'Content-Type': 'application/json',
@@ -65,7 +56,8 @@ export const fetcher = {
       mode: 'cors',
       body: body ? JSON.stringify(body) : undefined,
       signal: abort.signal,
-      credentials: 'same-origin',
+      credentials: 'include',
+      redirect: 'follow',
     });
     const contentType = response.headers.get('Content-Type');
     // console.log('RESPONSE', contentType!.includes('application/json'));
@@ -88,12 +80,10 @@ export const fetcher = {
     url,
     params,
     body,
-    credentials,
   }: {
     url: string;
     params?: { [k: string]: any };
     body?: { [k: string]: any };
-    credentials?: RequestInit['credentials'];
   }) => {
     const response = await fetch(url + (params ? '?' + qs.stringify(params, { skipNulls: true }) : ''), {
       headers: {
@@ -103,7 +93,8 @@ export const fetcher = {
       mode: 'cors',
       body: body ? JSON.stringify(body) : undefined,
       signal: abort.signal,
-      credentials,
+      credentials: 'include',
+      redirect: 'follow',
     });
     const contentType = response.headers.get('Content-Type');
 
@@ -120,20 +111,13 @@ export const fetcher = {
     };
   },
 
-  delete: async <T = any>({
-    url,
-    params,
-    credentials,
-  }: {
-    url: string;
-    params?: any;
-    credentials?: RequestInit['credentials'];
-  }) => {
+  delete: async <T = any>({ url, params }: { url: string; params?: any }) => {
     const response = await fetch(url + (params ? '?' + qs.stringify(params, { skipNulls: true }) : ''), {
       method: 'DELETE',
       mode: 'cors',
       signal: abort.signal,
-      credentials,
+      credentials: 'include',
+      redirect: 'follow',
     });
     const contentType = response.headers.get('Content-Type');
 
@@ -150,17 +134,7 @@ export const fetcher = {
     };
   },
 
-  put: async <T = any>({
-    url,
-    params,
-    body,
-    credentials,
-  }: {
-    url: string;
-    params?: any;
-    body?: { [k: string]: any };
-    credentials?: RequestInit['credentials'];
-  }) => {
+  put: async <T = any>({ url, params, body }: { url: string; params?: any; body?: { [k: string]: any } }) => {
     const response = await fetch(url + (params ? '?' + qs.stringify(params, { skipNulls: true }) : ''), {
       headers: {
         'Content-Type': 'application/json',
@@ -169,7 +143,8 @@ export const fetcher = {
       mode: 'cors',
       body: body ? JSON.stringify(body) : undefined,
       signal: abort.signal,
-      credentials,
+      credentials: 'include',
+      redirect: 'follow',
     });
     const contentType = response.headers.get('Content-Type');
 
@@ -186,21 +161,14 @@ export const fetcher = {
     };
   },
 
-  getStream: async ({
-    url,
-    params,
-    credentials,
-  }: {
-    url: string;
-    params?: any;
-    credentials?: RequestInit['credentials'];
-  }) => {
+  getStream: async ({ url, params }: { url: string; params?: any }) => {
     const response = await fetch(url + (params ? '?' + qs.stringify(params, { skipNulls: true }) : ''), {
       keepalive: true,
       method: 'GET',
       mode: 'cors',
       signal: abort.signal,
-      credentials,
+      credentials: 'include',
+      redirect: 'follow',
     });
     const body = await response.body;
     const stream = body ? body.getReader() : null;

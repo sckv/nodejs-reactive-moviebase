@@ -10,7 +10,15 @@ import { session } from '@src/middlewares/session';
 
 const api = express();
 
-api.use(cors({ maxAge: 1728000, credentials: true, exposedHeaders: ['set-cookie'] }));
+api.use(
+  cors({
+    maxAge: 1728000,
+    credentials: true,
+    exposedHeaders: ['x-request-id'],
+    origin: 'http://localhost:4200',
+    optionsSuccessStatus: 200,
+  }),
+);
 
 api.use(cookieParser());
 api.use(uniqueRequestId);

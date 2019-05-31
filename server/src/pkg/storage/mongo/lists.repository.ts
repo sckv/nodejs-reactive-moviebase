@@ -188,6 +188,7 @@ export const ListsRepository = (db: Db) => {
           $project: {
             _id: '$list._id',
             title: '$list.title',
+            username: 1,
             description: '$list.description',
             private: '$list.private',
             movies: '$list.movies',
