@@ -28,7 +28,7 @@ export const HomePage = (props: Props) => {
   }, [props.sort]);
 
   return (
-    <Container>
+    <Container className="container">
       <Grid container={true} spacing={3}>
         <Grid item={true} xs={12} sm={12}>
           <Card className={classes.title}>

@@ -1,6 +1,16 @@
 import React, { useRef, useState } from 'react';
 // import { useDispatch, useSelector, connect } from 'react-redux';
-import { Grid, Card, CardHeader, CardContent, TextField, InputAdornment, CardActions, Button } from '@material-ui/core';
+import {
+  Grid,
+  Card,
+  CardHeader,
+  CardContent,
+  TextField,
+  InputAdornment,
+  CardActions,
+  Button,
+  Container,
+} from '@material-ui/core';
 import LoginIcon from '@material-ui/icons/VpnKey';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import LockIcon from '@material-ui/icons/Lock';
@@ -38,159 +48,162 @@ export const LoginPage = () => {
   };
 
   return (
-    <Grid container={true} spacing={10} className={classes.container}>
-      <Grid item={true} xs={12} sm={6}>
-        <Card>
-          <CardHeader avatar={<LoginIcon />} title="Login" subheader="Username and password are needed" />
-          <CardContent className={classes.formCard}>
-            <TextField
-              className={classes.input}
-              inputRef={loginUsernameRef}
-              variant="standard"
-              type="text"
-              placeholder="Username"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <AccountCircleIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <TextField
-              className={classes.input}
-              inputRef={loginPasswordRef}
-              variant="standard"
-              type="password"
-              placeholder="Password"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LockIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </CardContent>
-          <CardActions>
-            <Button
-              variant="contained"
-              onClick={() => {
-                if (!loginUsernameRef.current!.value && !loginPasswordRef.current!.value)
-                  return dispatch(NotifyActions.error("Login fields can't be empty."));
-                if (!loginUsernameRef.current!.value) return dispatch(NotifyActions.error('Login username is empty.'));
-                if (!loginPasswordRef.current!.value) return dispatch(NotifyActions.error('Login assword is empty.'));
+    <Container className="container">
+      <Grid container={true} spacing={10} className={classes.container}>
+        <Grid item={true} xs={12} sm={6}>
+          <Card>
+            <CardHeader avatar={<LoginIcon />} title="Login" subheader="Username and password are needed" />
+            <CardContent className={classes.formCard}>
+              <TextField
+                className={classes.input}
+                inputRef={loginUsernameRef}
+                variant="standard"
+                type="text"
+                placeholder="Username"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <AccountCircleIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <TextField
+                className={classes.input}
+                inputRef={loginPasswordRef}
+                variant="standard"
+                type="password"
+                placeholder="Password"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </CardContent>
+            <CardActions>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  if (!loginUsernameRef.current!.value && !loginPasswordRef.current!.value)
+                    return dispatch(NotifyActions.error("Login fields can't be empty."));
+                  if (!loginUsernameRef.current!.value)
+                    return dispatch(NotifyActions.error('Login username is empty.'));
+                  if (!loginPasswordRef.current!.value) return dispatch(NotifyActions.error('Login assword is empty.'));
 
-                dispatch(
-                  loginAction({
-                    username: loginUsernameRef.current!.value,
-                    password: loginPasswordRef.current!.value,
-                  }),
-                );
-              }}
-            >
-              Login
-            </Button>
-          </CardActions>
-        </Card>
-      </Grid>
-      <Grid item={true} xs={12} sm={6}>
-        <Card>
-          <CardHeader avatar={<RegIcon />} title="Registration" subheader="Username, email and password are needed" />
-          <CardContent className={classes.formCard}>
-            <TextField
-              className={classes.input}
-              inputRef={registerUsernameRef}
-              variant="standard"
-              type="text"
-              placeholder="Username"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <AccountCircleIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <TextField
-              className={classes.input}
-              inputRef={registerEmailRef}
-              variant="standard"
-              type="email"
-              placeholder="Email"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <EmailIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <TextField
-              className={classes.input}
-              inputRef={registerPasswordRef}
-              variant="standard"
-              type="password"
-              placeholder="Password"
-              error={!passwordsMatch}
-              onKeyUp={checkPasswords}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LockIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <TextField
-              className={classes.input}
-              inputRef={registerPasswordRepeatRef}
-              variant="standard"
-              type="password"
-              placeholder="Repeat password"
-              error={!passwordsMatch}
-              label={!passwordsMatch ? 'Passwords do not match' : null}
-              onKeyUp={checkPasswords}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LockIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </CardContent>
-          <CardActions>
-            <Button
-              variant="contained"
-              onClick={() => {
-                if (
-                  !registerEmailRef.current!.value &&
-                  !registerPasswordRef.current!.value &&
-                  !registerUsernameRef.current!.value
-                )
-                  return dispatch(NotifyActions.error("Regitration fields can't be empty."));
-                if (!passwordsMatch) return dispatch(NotifyActions.error('Regitration passwords do not match.'));
-                if (!registerUsernameRef.current!.value)
-                  return dispatch(NotifyActions.error('Regitration username is empty.'));
-                if (!registerEmailRef.current!.value)
-                  return dispatch(NotifyActions.error('Regitration email is empty.'));
+                  dispatch(
+                    loginAction({
+                      username: loginUsernameRef.current!.value,
+                      password: loginPasswordRef.current!.value,
+                    }),
+                  );
+                }}
+              >
+                Login
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid>
+        <Grid item={true} xs={12} sm={6}>
+          <Card>
+            <CardHeader avatar={<RegIcon />} title="Registration" subheader="Username, email and password are needed" />
+            <CardContent className={classes.formCard}>
+              <TextField
+                className={classes.input}
+                inputRef={registerUsernameRef}
+                variant="standard"
+                type="text"
+                placeholder="Username"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <AccountCircleIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <TextField
+                className={classes.input}
+                inputRef={registerEmailRef}
+                variant="standard"
+                type="email"
+                placeholder="Email"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <EmailIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <TextField
+                className={classes.input}
+                inputRef={registerPasswordRef}
+                variant="standard"
+                type="password"
+                placeholder="Password"
+                error={!passwordsMatch}
+                onKeyUp={checkPasswords}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <TextField
+                className={classes.input}
+                inputRef={registerPasswordRepeatRef}
+                variant="standard"
+                type="password"
+                placeholder="Repeat password"
+                error={!passwordsMatch}
+                label={!passwordsMatch ? 'Passwords do not match' : null}
+                onKeyUp={checkPasswords}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </CardContent>
+            <CardActions>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  if (
+                    !registerEmailRef.current!.value &&
+                    !registerPasswordRef.current!.value &&
+                    !registerUsernameRef.current!.value
+                  )
+                    return dispatch(NotifyActions.error("Regitration fields can't be empty."));
+                  if (!passwordsMatch) return dispatch(NotifyActions.error('Regitration passwords do not match.'));
+                  if (!registerUsernameRef.current!.value)
+                    return dispatch(NotifyActions.error('Regitration username is empty.'));
+                  if (!registerEmailRef.current!.value)
+                    return dispatch(NotifyActions.error('Regitration email is empty.'));
 
-                dispatch(
-                  registerAction({
-                    email: registerEmailRef.current!.value,
-                    password: registerPasswordRef.current!.value,
-                    username: registerUsernameRef.current!.value,
-                  }),
-                );
-              }}
-            >
-              Register
-            </Button>
-          </CardActions>
-        </Card>
+                  dispatch(
+                    registerAction({
+                      email: registerEmailRef.current!.value,
+                      password: registerPasswordRef.current!.value,
+                      username: registerUsernameRef.current!.value,
+                    }),
+                  );
+                }}
+              >
+                Register
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid>
       </Grid>
-    </Grid>
+    </Container>
   );
 };
 
@@ -205,7 +218,7 @@ const useStyles = makeStyles({
     margin: 25,
   },
   container: {
-    padding: 15,
+    padding: 0,
     width: '100%',
     margin: 0,
   },

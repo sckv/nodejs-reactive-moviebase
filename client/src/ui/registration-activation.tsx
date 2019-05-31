@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const RegistrationActivationBase = ({ match }: RouteComponentProps<{ token: string }>) => {
-  const classes = useStyles();
+  const classes = useStyles({});
   const [activated, setActivated] = useState<'yes' | 'no' | null>(null);
   useEffect(() => {
     if (match) ActivationComponent();

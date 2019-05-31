@@ -1,8 +1,8 @@
 import React from 'react';
-import { connect, useDispatch } from 'react-redux';
+import { connect } from 'react-redux';
 
 const UserPanelBase = () => {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   return <div>User Panel</div>;
 };
 

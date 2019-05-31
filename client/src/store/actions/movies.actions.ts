@@ -3,18 +3,21 @@ import { MovieRequest } from 'types/movies-requesting.services';
 import { ThunkAction } from 'redux-thunk';
 import { MoviesApi } from '@src/api/movies.api';
 import { NotifyActions } from '@src/store/actions/notification.actions';
+import { push } from 'connected-react-router';
 
 export enum MovieActionTypes {
   addMovieData = '@@MOVIE/ADD_MOVIE_DATA',
   addMoviesData = '@@MOVIE/ADD_MOVIES_DATA',
+  removeSingleMovie = '@@MOVIE/REMOVE_SINGLE',
   clearMovieData = '@@MOVIE/CLEAR_MOVIE_DATA',
 }
 
 export type MovieAction$Add = ActionRich<typeof MovieActionTypes.addMovieData, MovieRequest>;
 export type MovieAction$AddMovies = ActionRich<typeof MovieActionTypes.addMoviesData, MovieRequest[]>;
+export type MovieAction$RemoveSingle = ActionRich<typeof MovieActionTypes.removeSingleMovie, string>;
 export type MovieAction$Clear = Action<typeof MovieActionTypes.clearMovieData>;
 
-export type MovieActionsUnion = MovieAction$Clear | MovieAction$Add | MovieAction$AddMovies;
+export type MovieActionsUnion = MovieAction$Clear | MovieAction$Add | MovieAction$AddMovies | MovieAction$RemoveSingle;
 
 export const MoviesActions = {
   addMovieData: (payload: MovieRequest): MovieAction$Add => ({
@@ -25,17 +28,22 @@ export const MoviesActions = {
     type: MovieActionTypes.addMoviesData,
     payload,
   }),
+  removeSingle: (payload: string): MovieAction$RemoveSingle => ({
+    type: MovieActionTypes.removeSingleMovie,
+    payload,
+  }),
   clearMovieData: (): MovieAction$Clear => ({ type: MovieActionTypes.clearMovieData }),
 };
 
 export const fetchMovieData = ({
   movieId,
   ttid,
+  goTo = false,
 }: {
   movieId?: string;
   ttid?: string;
+  goTo?: boolean;
 }): ThunkAction<void, AppStoreState, void, ActionsUnion> => async dispatch => {
-  let movieData: MovieRequest = {} as any;
   let request;
   if (movieId) {
     request = await MoviesApi.getById(movieId);
@@ -44,9 +52,10 @@ export const fetchMovieData = ({
   }
 
   console.log('request done>>>', request);
-  if (request && request.data) movieData = request.data;
-
-  dispatch(MoviesActions.addMovieData(movieData));
+  if (request && request.data) {
+    dispatch(MoviesActions.addMovieData(request.data));
+    goTo && dispatch(push(`/movie/${movieId}`));
+  }
 };
 
 export const searchMovies = (

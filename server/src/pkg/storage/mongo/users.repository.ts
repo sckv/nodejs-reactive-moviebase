@@ -209,6 +209,7 @@ export const UsersRepository = (connection: Db) => {
             as: 'list',
             in: {
               _id: '$$list._id',
+              title: '$$list.title',
               description: '$$list.description',
             },
           },
@@ -235,6 +236,7 @@ export const UsersRepository = (connection: Db) => {
                   title: '$title',
                   poster: '$poster',
                   rate: '$ratedBy.rate',
+                  comment: '$ratedBy.comment',
                 },
               },
               {
@@ -243,6 +245,7 @@ export const UsersRepository = (connection: Db) => {
                   title: { $first: '$title' },
                   poster: { $first: '$poster' },
                   rate: { $first: '$rate' },
+                  comment: { $first: '$comment' },
                 },
               },
             ],

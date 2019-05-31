@@ -48,12 +48,13 @@ export const loginAction = (loginData: {
 export const logoutAction = (): ThunkAction<void, AppStoreState, null, AnyAction> => async (dispatch, getState) => {
   if (!AuthSelectors.auth(getState()).username)
     return dispatch(NotifyActions.error(`Can't logout. Already logged out.`));
+  dispatch(NotifyActions.success('Successfully logged out'));
 
-  const logoutData = await AuthApi.logout();
-  if (logoutData && logoutData.ok) {
-    dispatch(push('/'));
-    dispatch(AuthActions.clearLoginData());
-    dispatch(NotifyActions.success('Successfully logged out'));
-  } else dispatch(NotifyActions.error('Error logging out'));
+  dispatch(push('/'));
+  dispatch(AuthActions.clearLoginData());
+  await AuthApi.logout();
+  // if (logoutData && logoutData.ok) {
+
+  // } else dispatch(NotifyActions.error('Error logging out'));
   return;
 };

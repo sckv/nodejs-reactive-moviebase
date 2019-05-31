@@ -10,6 +10,7 @@ declare module 'types/utils' {
     auth: {
       userId: ObjectId;
       language: LanguageType;
+      sessionToken: string;
     };
     initTime: number;
     log: any;

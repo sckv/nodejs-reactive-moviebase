@@ -11,10 +11,10 @@ const sessionMiddleware: CustomRequestHandler = async (request, _, next) => {
   if (__session) {
     try {
       let auth = await CacheServices.getSession(__session);
-      if (auth) request.auth = auth;
+      if (auth) request.auth = { ...auth, sessionToken: __session };
       else {
         auth = await AuthServices().getSession({ sessionToken: __session });
-        request.auth = auth;
+        request.auth = { ...auth, sessionToken: __session };
         await CacheServices.setSession({ sessionToken: __session, ...auth });
       }
       next();

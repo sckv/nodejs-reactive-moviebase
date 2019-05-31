@@ -18,10 +18,10 @@ export const ListsApi = {
     SecureFetcher(fetcher.patch({ url: listsApiUrl + listId, body })),
 
   addToList: (listId: string, body: { movieId: string; commentary?: string; rate?: number }) =>
-    SecureFetcher(fetcher.patch({ url: listsApiUrl + listId + 'add-to', body })),
+    SecureFetcher(fetcher.patch({ url: listsApiUrl + listId + '/add-to', body })),
 
   removeFromList: (listId: string, movieId: string) =>
-    SecureFetcher(fetcher.patch({ url: listsApiUrl + listId, body: { movieId } })),
+    SecureFetcher(fetcher.patch({ url: listsApiUrl + listId + '/remove-from', body: { movieId } })),
 
   deleteList: (listId: string) => SecureFetcher(fetcher.delete({ url: listsApiUrl + listId })),
 };

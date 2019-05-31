@@ -102,8 +102,6 @@ export const ListsRepository = (db: Db) => {
       return lists.lists;
     },
     get: async <T>(listId: ObjectId, selfId?: ObjectId): Promise<T> => {
-      // if (selfId) initialMatcher._id = selfId;
-
       const userOfList = await db
         .collection('users')
         .findOne<{ _id: ObjectId }>({ 'lists._id': listId }, { projection: { _id: 1 } });
@@ -119,6 +117,7 @@ export const ListsRepository = (db: Db) => {
             title: 1,
             description: 1,
             private: 1,
+            username: 1,
             list: {
               $filter: {
                 input: '$lists',
@@ -188,6 +187,7 @@ export const ListsRepository = (db: Db) => {
           $project: {
             _id: '$list._id',
             title: '$list.title',
+            username: '$username',
             description: '$list.description',
             private: '$list.private',
             movies: '$list.movies',
@@ -263,7 +263,7 @@ export const ListsRepository = (db: Db) => {
           });
         return true;
       } catch (error) {
-        logger.error('Error creating list', error);
+        logger.error('Error modifying list', error);
         throw new ListModifyingError({ data: { description, isPrivate, title, selfId } });
       }
     },
@@ -289,7 +289,7 @@ export const ListsRepository = (db: Db) => {
           });
         return true;
       } catch (error) {
-        logger.error('Error creating list', error);
+        logger.error('Error deleting list', error);
         throw new ListModifyingError({
           data: {
             listId,

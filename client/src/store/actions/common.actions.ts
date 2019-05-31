@@ -19,7 +19,7 @@ export const registerAction = (registryData: {
     dispatch(
       NotifyActions.success(
         `Successfully registered with email ${registryData.email}.
-   Await for an emails with instructions to activate your account`,
+   Await for an email with instructions to activate your account`,
         15000,
       ),
     );

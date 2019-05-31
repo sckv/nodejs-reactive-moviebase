@@ -10,6 +10,7 @@ import { push } from 'connected-react-router';
 export enum UserDataActionTypes {
   addUserData = '@@USER/ADD_USER_DATA',
   addUserSearchListData = '@@USER/ADD_USER_SEARCH_LIST_DATA',
+  removeListFromCurrent = '@@USER/REMOVE_LIST_FROM_CURRENT',
   clearUserData = '@@USER/CLEAR_USER_DATA',
   clearUserSearchListData = '@@USER/CLEAR_USER_SEARCH_LIST_DATA',
 }
@@ -19,6 +20,8 @@ export type UserDataAction$AddListData = ActionRich<
   typeof UserDataActionTypes.addUserSearchListData,
   Partial<UserThin[]>
 >;
+
+export type UserDataAction$RemoveListFromCurrent = ActionRich<typeof UserDataActionTypes.removeListFromCurrent, string>;
 export type UserDataAction$Clear = Action<typeof UserDataActionTypes.clearUserData>;
 export type UserDataAction$ClearListData = Action<typeof UserDataActionTypes.clearUserSearchListData>;
 
@@ -26,7 +29,8 @@ export type UserDataActionsUnion =
   | UserDataAction$Clear
   | UserDataAction$Add
   | UserDataAction$AddListData
-  | UserDataAction$ClearListData;
+  | UserDataAction$ClearListData
+  | UserDataAction$RemoveListFromCurrent;
 
 export const UserDataActions = {
   addUserData: (payload: Partial<UserFull>): UserDataAction$Add => ({
@@ -35,6 +39,10 @@ export const UserDataActions = {
   }),
   addSearchListData: (payload: Partial<UserThin[]>): UserDataAction$AddListData => ({
     type: UserDataActionTypes.addUserSearchListData,
+    payload,
+  }),
+  removeListFromCurrent: (payload: string): UserDataAction$RemoveListFromCurrent => ({
+    type: UserDataActionTypes.removeListFromCurrent,
     payload,
   }),
   clearUserData: (): UserDataAction$Clear => ({ type: UserDataActionTypes.clearUserData }),
@@ -47,20 +55,40 @@ export const fetchUserData = (
   username: string,
   goTo: boolean = false,
 ): ThunkAction<void, AppStoreState, void, ActionsUnion> => async dispatch => {
-  dispatch(UserDataActions.clearUserData());
-  let userData: Partial<UserFull> = {} as any;
   let request;
   if (username)
     request = await UsersApi.getUserData({ username, pd: true, ld: true, md: true, followers: true, follows: true });
 
   if (request && request.data && request.status === 200) {
-    userData = request.data;
-    dispatch(UserDataActions.addUserData(userData));
-
+    dispatch(UserDataActions.addUserData(request.data));
     if (goTo) dispatch(push(`/user/${username}`));
-    return;
-  } else if (request) return dispatch(NotifyActions.error((request.data as any).message));
-  return;
+  } else if (request) dispatch(NotifyActions.error((request.data as any).message));
+};
+
+export const fetchUserDataCustom = ({
+  username,
+  pd = false,
+  ld = false,
+  md = false,
+  followers = false,
+  follows = false,
+  goTo = false,
+}: {
+  username: string;
+  pd?: boolean;
+  ld?: boolean;
+  md?: boolean;
+  followers?: boolean;
+  follows?: boolean;
+  goTo?: boolean;
+}): ThunkAction<void, AppStoreState, void, ActionsUnion> => async dispatch => {
+  let request;
+  if (username) request = await UsersApi.getUserData({ username, pd, ld, md, followers, follows });
+
+  if (request && request.data && request.status === 200) {
+    dispatch(UserDataActions.addUserData(request.data));
+    if (goTo) dispatch(push(`/user/${username}`));
+  } else if (request) dispatch(NotifyActions.error((request.data as any).message));
 };
 
 export const searchUsers = (

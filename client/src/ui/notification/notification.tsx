@@ -17,10 +17,8 @@ export const Notification = () => {
       setOpen(true);
     } else {
       setOpen(false);
-      // setLocal(null);
     }
   }, [notificationState]);
-  // if (local)
   return (
     <Snackbar
       anchorOrigin={{ vertical: 'top', horizontal: 'right' }}

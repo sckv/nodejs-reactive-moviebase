@@ -67,8 +67,7 @@ export const AuthRepository = (connection: Db) => {
         {
           $currentDate: {
             lastModified: true,
-            createdAt: { $type: 'date' },
-            sessionClosed: { $type: 'timestamp' },
+            sessionClosed: { $type: 'date' },
           },
         },
       );

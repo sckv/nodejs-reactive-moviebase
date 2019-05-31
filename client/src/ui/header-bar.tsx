@@ -10,6 +10,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import MenuIcon from '@material-ui/icons/Menu';
 import PersonIcon from '@material-ui/icons/Person';
+import ExitIcon from '@material-ui/icons/ExitToApp';
 import SearchIcon from '@material-ui/icons/Search';
 import { createStyles, makeStyles, styled as muiStyled } from '@material-ui/styles';
 import { MoviesApi } from '@src/api/movies.api';
@@ -21,6 +22,7 @@ import { connect, shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { MovieRequest, MovieRequestThin } from 'types/movies-requesting.services';
 import { useDebounce } from 'use-debounce';
 import { fetchUserData } from '@src/store/actions/user-data.actions';
+import { logoutAction } from '@src/store/actions/auth.actions';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -76,7 +78,7 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     userData: {
-      width: 200,
+      width: 230,
       display: 'flex',
       flexDirection: 'row',
       justifyContent: 'space-between',
@@ -97,7 +99,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export const HeaderBarBase = () => {
-  const classes = useStyles();
+  const classes = useStyles({});
 
   const dispatch = useDispatch();
 
@@ -117,7 +119,8 @@ export const HeaderBarBase = () => {
     setMenuOpen(false);
     inputRef.current!.blur();
     console.log('getting by ttid');
-    MoviesApi.getByTtid(ttid).then(res => (res ? dispatch(push(`/movie/${ttid}`)) : null));
+
+    typeof ttid === 'string' && MoviesApi.getByTtid(ttid).then(res => (res ? dispatch(push(`/movie/${ttid}`)) : null));
   };
 
   useEffect(() => {
@@ -135,7 +138,7 @@ export const HeaderBarBase = () => {
 
   return (
     <div className={classes.root}>
-      <AppBar position="static">
+      <AppBar position="fixed">
         <Toolbar variant="dense">
           <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="Open drawer">
             <MenuIcon />
@@ -170,7 +173,9 @@ export const HeaderBarBase = () => {
                   </span>
                 </Tooltip>
               </Typography>
-              <Typography>Language: {authData.language.toUpperCase()}</Typography>
+              <LanguageTypography component="div">
+                <span style={{ color: 'whitesmoke' }}>language</span> <span>{authData.language}</span>
+              </LanguageTypography>
             </div>
           )}
           {!authData ||
@@ -225,6 +230,13 @@ export const HeaderBarBase = () => {
               ))}
             </Menu>
           </div>
+          {authData && authData.username && (
+            <Tooltip title="Logout" placement="bottom">
+              <IconButton onClick={() => dispatch(logoutAction())} style={{ marginLeft: 10 }}>
+                <ExitIcon />
+              </IconButton>
+            </Tooltip>
+          )}
         </Toolbar>
       </AppBar>
     </div>
@@ -253,4 +265,16 @@ const MenuItemContaioner = styled.div`
 const ThemedCircularProgress = muiStyled(CircularProgress)({
   position: 'absolute',
   right: 5,
+});
+
+const LanguageTypography = muiStyled(Typography)({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginLeft: 20,
+  marginRight: 10,
+  '& span': {
+    textTransform: 'uppercase',
+  },
 });

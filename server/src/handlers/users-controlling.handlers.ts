@@ -96,7 +96,7 @@ export const followUser: CustomRequestHandler = async (req, res) => {
     userId,
     followId,
   });
-  return res.status(200);
+  return res.sendStatus(200);
 };
 
 export const unfollowUser: CustomRequestHandler = async (req, res) => {
@@ -107,5 +107,5 @@ export const unfollowUser: CustomRequestHandler = async (req, res) => {
     userId,
     followId,
   });
-  return res.status(200);
+  return res.sendStatus(200);
 };

@@ -1,5 +1,4 @@
 import { Reducer } from 'redux';
-import { Selector } from 'react-redux';
 import { AppStoreState } from '@src/store/store';
 import { UserFull, UserThin } from 'types/user-controlling.services';
 import { UserDataActionTypes, UserDataActionsUnion } from '@src/store/actions/user-data.actions';
@@ -18,6 +17,11 @@ export const UserDataReducer: Reducer<UserDataReducerState, UserDataActionsUnion
       return { ...state, current: action.payload };
     case UserDataActionTypes.addUserSearchListData:
       return { ...state, searchList: action.payload };
+    case UserDataActionTypes.removeListFromCurrent:
+      return {
+        ...state,
+        current: { ...state.current, lists: state.current.lists!.filter(list => list._id !== action.payload) },
+      };
     case UserDataActionTypes.clearUserData:
       return { ...state, current: {} } as typeof state;
     case UserDataActionTypes.clearUserSearchListData:
@@ -30,4 +34,5 @@ export const UserDataReducer: Reducer<UserDataReducerState, UserDataActionsUnion
 export const UserDataSelectors = {
   searchList: (state: AppStoreState) => state.users.searchList,
   userData: (state: AppStoreState) => state.users.current,
+  userCurrentLists: (state: AppStoreState) => state.users.current.lists,
 };

@@ -15,6 +15,8 @@ export const MoviesReducer: Reducer<MoviesReducerState, MovieActionsUnion> = (st
       return { ...state, movies: action.payload };
     case MovieActionTypes.addMovieData:
       return { ...state, current: action.payload };
+    case MovieActionTypes.removeSingleMovie:
+      return { ...state, movies: state.movies.filter(mv => (mv._id as any) !== action.payload) };
     case MovieActionTypes.clearMovieData:
       return { ...state, current: {} } as typeof state;
     default:
