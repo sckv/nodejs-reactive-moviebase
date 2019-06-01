@@ -6,6 +6,9 @@ import { AuthActionsUnion } from '@src/store/actions/auth.actions';
 import { MovieActionsUnion } from '@src/store/actions/movies.actions';
 import { NotifyActionsUnion } from '@src/store/actions/notification.actions';
 import { ListsReducerState } from '@src/store/reducers/lists.reducer';
+import { UserDataActionsUnion } from '@src/store/actions/user-data.actions';
+import { UserDataReducerState } from '@src/store/reducers/user-data.reducer';
+import { ListActionsUnion } from '@src/store/actions/lists.actions';
 
 export interface AppStoreState {
   router: RouterState;
@@ -13,6 +16,7 @@ export interface AppStoreState {
   movies: MoviesReducerState;
   notification: NotificationReducerState;
   lists: ListsReducerState;
+  users: UserDataReducerState;
 }
 
 export type ActionsUnion =
@@ -20,6 +24,7 @@ export type ActionsUnion =
   | MovieActionsUnion
   | NotifyActionsUnion
   | ListActionsUnion
+  | UserDataActionsUnion
   | CallHistoryMethodAction<[string, any?]>;
 
 export type Action<T> = {

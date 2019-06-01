@@ -12,7 +12,6 @@ const WEB_HOSTNAME = process.env.WEB_HOSTNAME;
 
 export const activate: CustomRequestHandler = async (req, res) => {
   const { token } = req.params;
-  console.log('toker recived', token);
   const { username, email } = await AuthServices().activate(token);
   enqueueEmail({
     to: email,
@@ -50,30 +49,29 @@ export const searchUsers: CustomRequestHandler = async (req, res) => {
 
   if (!cachedUsers || !cachedUsers.data) {
     usersList = await UserControllingServices().search({ username: un, page });
-    await CacheServices.setToCache<typeof usersList>({ urlHash, timeout: 10, data: { data: usersList } });
-  }
+    await CacheServices.setToCache<typeof usersList>({ urlHash, timeout: 5, data: { data: usersList } });
+  } else usersList = cachedUsers.data;
   return res.status(200).send(usersList);
 };
 
 export const getUserData: CustomRequestHandler = async (req, res) => {
   const { username, pd, ld, md, page, followers, follows } = req.query;
-  const urlHash = hashUrl(req.originalUrl);
+  // const urlHash = hashUrl(req.originalUrl);
   let userData: Partial<UserFull>;
-  const cachedUser = await CacheServices.getFromCache<Partial<UserFull>>(urlHash);
-  if (!cachedUser || !cachedUser.data) {
-    userData = await UserControllingServices().get({
-      username,
-      selfId: req.auth ? req.auth.userId : undefined,
-      personalData: pd,
-      followers,
-      follows,
-      listsData: ld,
-      moviesData: md,
-      page,
-    });
-    await CacheServices.setToCache<typeof userData>({ urlHash, timeout: 10, data: { data: userData } });
-
-  }
+  // const cachedUser = await CacheServices.getFromCache<Partial<UserFull>>(urlHash);
+  // if (!cachedUser || !cachedUser.data) {
+  userData = await UserControllingServices().get({
+    username,
+    selfId: req.auth ? req.auth.userId : undefined,
+    personalData: pd,
+    followers,
+    follows,
+    listsData: ld,
+    moviesData: md,
+    page,
+  });
+  // await CacheServices.setToCache<typeof userData>({ urlHash, timeout: 5, data: { data: userData } });
+  // } else userData = cachedUser.data;
   return res.status(200).send(userData);
 };
 
@@ -97,7 +95,7 @@ export const followUser: CustomRequestHandler = async (req, res) => {
     userId,
     followId,
   });
-  return res.status(200);
+  return res.sendStatus(200);
 };
 
 export const unfollowUser: CustomRequestHandler = async (req, res) => {
@@ -108,5 +106,5 @@ export const unfollowUser: CustomRequestHandler = async (req, res) => {
     userId,
     followId,
   });
-  return res.status(200);
+  return res.sendStatus(200);
 };
