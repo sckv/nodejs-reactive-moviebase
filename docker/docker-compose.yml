@@ -3,9 +3,6 @@ services:
   mongo:
     image: mongo:4.0.6-xenial
     restart: on-failure
-    # environment:
-    #   MONGO_INITDB_ROOT_USERNAME: root
-    #   MONGO_INITDB_ROOT_PASSWORD: exampl
     networks:
       - backendmesh
     tty: true
@@ -13,8 +10,8 @@ services:
     volumes:
       - mongo-data:/etc/mongo
     command: ["--replSet", "rs", "--bind_ip_all"]
-    ports:
-      - 27017:27017
+    # ports:
+    #   - 27017:27017
 
   redis:
     image: redis:4.0.5-alpine
@@ -26,8 +23,8 @@ services:
     tty: true
     volumes:
       - redis-data:/data
-    ports:
-      - 6379:6379
+    # ports:
+    #   - 6379:6379
 
   envoy:
     build:
@@ -159,19 +156,19 @@ services:
     depends_on:
       - mongo
 
-  # nginx:
-  #   build:
-  #     context: ./nginx
-  #   restart: on-failure
-  #   networks:
-  #     - backendmesh
-  #   volumes:
-  #     # - ~/nginx_certs:/etc/nginx/certs
-  #     # - ~/letsencrypt_www:/var/www/letsencrypt
-  #     - ~/app:/var/www
-  #     - ~/app-logs/nginx:/var/log/nginx
-  #     - ./nginx/sites:/etc/nginx/sites-available
-  #   tty: true
+  nginx:
+    build:
+      context: ./nginx
+    restart: on-failure
+    networks:
+      - backendmesh
+    volumes:
+      # - ~/nginx_certs:/etc/nginx/certs
+      # - ~/letsencrypt_www:/var/www/letsencrypt
+      - ~/app:/var/www
+      - ~/app-logs/nginx:/var/log/nginx
+      - ./nginx/sites:/etc/nginx/sites-available
+    tty: true
 
 volumes:
   data:

@@ -8,24 +8,24 @@
   "dependencies": {
     "@sendgrid/mail": "^6.4.0",
     "bcrypt": "^3.0.6",
-    "bull": "^3.9.1",
+    "bull": "^3.10.0",
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
-    "express": "^4.16.4",
+    "express": "^4.17.1",
     "express-pino-logger": "^4.0.0",
     "fast-deep-equal": "^2.0.1",
     "helmet": "^3.18.0",
-    "ioredis": "^4.9.0",
+    "ioredis": "^4.9.5",
     "lodash": "^4.17.11",
-    "mongodb": "3.2.4",
-    "pino": "^5.12.3",
-    "pino-pretty": "^3.0.0",
-    "pm2": "^3.5.0",
+    "mongodb": "3.2.6",
+    "pino": "^5.12.6",
+    "pino-pretty": "^3.1.0",
+    "pm2": "^3.5.1",
     "qs": "^6.7.0",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
     "spdy": "^4.0.0",
     "uuid": "^3.3.2",
-    "validator": "^10.11.0"
+    "validator": "^11.0.0"
   }
 }
