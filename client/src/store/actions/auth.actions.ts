@@ -31,7 +31,6 @@ export const loginAction = (loginData: {
   username: string;
   password: string;
 }): ThunkAction<void, AppStoreState, null, AnyAction> => async (dispatch, getState) => {
-  console.log('logging...', loginData);
   if (AuthSelectors.auth(getState()).username)
     return dispatch(NotifyActions.error(`Can't login. Already logged as ${AuthSelectors.auth(getState()).username}`));
 
@@ -40,7 +39,6 @@ export const loginAction = (loginData: {
     dispatch(push('/'));
     dispatch(AuthActions.addLoginData({ ...(authData.data as any) }));
     dispatch(NotifyActions.success(`Successfully authoirized as ${authData.data.username}`));
-    console.log('pushing to home>>');
   } else dispatch(NotifyActions.error(`Error authorizing as ${loginData.username}`));
   return;
 };

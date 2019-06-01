@@ -47,7 +47,6 @@ export const fetcher = {
     params?: { [k: string]: any };
     body?: { [k: string]: any };
   }) => {
-    console.log('fetching tto>>', url, params, body);
     const response = await fetch(url + (params ? '?' + qs.stringify(params, { skipNulls: true }) : ''), {
       headers: {
         'Content-Type': 'application/json',
@@ -60,9 +59,6 @@ export const fetcher = {
       redirect: 'follow',
     });
     const contentType = response.headers.get('Content-Type');
-    // console.log('RESPONSE', contentType!.includes('application/json'));
-    // if (!responseData) response.text().then(res => (responseData = res));
-
     return {
       ok: response.ok,
       status: response.status,

@@ -14,8 +14,6 @@ import { convertToBuffer } from '@src/utils/convert-to-buffer';
 export const searchMovie: CustomRequestHandler = async (req, res) => {
   const { l, s, c, p, ps } = req.query;
 
-  console.log('searching for a movie in imdb', c, s);
-
   const hashedUrl = hashUrl(req.originalUrl);
 
   res.setHeader('Content-Type', 'application/json');

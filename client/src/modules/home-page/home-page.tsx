@@ -10,6 +10,7 @@ import invoke from 'lodash/invoke';
 import { useSelector, shallowEqual } from 'react-redux';
 import { MoviesSelectors } from '@src/store/reducers/movies.reducer';
 import { makeStyles } from '@material-ui/styles';
+import { AuthSelectors } from '@src/store/reducers/auth.reducer';
 
 type Props = {
   sort: SearchMoviesObject['sort'];
@@ -20,8 +21,9 @@ export const HomePage = (props: Props) => {
   const movies = useSelector(MoviesSelectors.movies, shallowEqual);
   const [sort, setSort] = useState<SearchMoviesObject['sort']>('latest');
   const classes = useStyles();
+  const authData = useSelector(AuthSelectors.auth, shallowEqual);
 
-  useStreamFetch(() => MoviesApi.searchStream({ sort }) as any);
+  useStreamFetch(() => MoviesApi.searchStream({ sort, language: authData ? authData.language : undefined }) as any);
 
   useEffect(() => {
     if (props.sort) setSort(props.sort);

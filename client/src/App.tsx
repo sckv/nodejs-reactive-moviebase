@@ -27,18 +27,10 @@ export const App = () => {
         const { router, ...other } = resolved.getState();
         throttled(() => saveState({ ...other }));
       });
-      console.log('resolved store>> ', resolved);
       setStore(resolved);
     };
     awaitForStore();
   }, []);
-
-  // useStreamFetch(() => MoviesApi.searchStream({ sort: 'latest' }) as any, setMoviesData);
-
-  // TODO: fix typings
-
-  // console.log('data is>>>', moviesData);
-  // console.log('rendered>> ', rendered);
 
   if (resolvedStore) {
     return (

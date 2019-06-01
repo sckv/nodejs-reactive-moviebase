@@ -12,7 +12,6 @@ const WEB_HOSTNAME = process.env.WEB_HOSTNAME;
 
 export const activate: CustomRequestHandler = async (req, res) => {
   const { token } = req.params;
-  console.log('toker recived', token);
   const { username, email } = await AuthServices().activate(token);
   enqueueEmail({
     to: email,

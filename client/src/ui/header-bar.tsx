@@ -8,7 +8,7 @@ import { Theme } from '@material-ui/core/styles';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import MenuIcon from '@material-ui/icons/Menu';
+import MovieIcon from '@material-ui/icons/MovieFilter';
 import PersonIcon from '@material-ui/icons/Person';
 import ExitIcon from '@material-ui/icons/ExitToApp';
 import SearchIcon from '@material-ui/icons/Search';
@@ -118,8 +118,6 @@ export const HeaderBarBase = () => {
     setQuery('');
     setMenuOpen(false);
     inputRef.current!.blur();
-    console.log('getting by ttid');
-
     typeof ttid === 'string' && MoviesApi.getByTtid(ttid).then(res => (res ? dispatch(push(`/movie/${ttid}`)) : null));
   };
 
@@ -140,9 +138,7 @@ export const HeaderBarBase = () => {
     <div className={classes.root}>
       <AppBar position="fixed">
         <Toolbar variant="dense">
-          <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="Open drawer">
-            <MenuIcon />
-          </IconButton>
+          <MovieIcon style={{ marginRight: 15, height: 35, width: 35 }} />
           <Typography
             onClick={e => {
               e.preventDefault();
@@ -174,7 +170,8 @@ export const HeaderBarBase = () => {
                 </Tooltip>
               </Typography>
               <LanguageTypography component="div">
-                <span style={{ color: 'whitesmoke' }}>language</span> <span>{authData.language}</span>
+                <span style={{ color: 'whitesmoke', textTransform: 'lowercase' }}>language</span>{' '}
+                <span>{authData.language}</span>
               </LanguageTypography>
             </div>
           )}
@@ -245,7 +242,7 @@ export const HeaderBarBase = () => {
 
 export const HeaderBar = connect()(HeaderBarBase);
 
-const MenuItemContainer = styled.div`
+export const MenuItemContainer = styled.div`
   display: flex;
   flex-direction: row;
   span {
@@ -262,7 +259,7 @@ const MenuItemContainer = styled.div`
   }
 `;
 
-const ThemedCircularProgress = muiStyled(CircularProgress)({
+export const ThemedCircularProgress = muiStyled(CircularProgress)({
   position: 'absolute',
   right: 5,
 });

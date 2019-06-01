@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react';
-// import { useDispatch, useSelector, connect } from 'react-redux';
 import {
   Grid,
   Card,
@@ -38,12 +37,6 @@ export const LoginPage = () => {
 
   const checkPasswords = () => {
     if (!registerPasswordRepeatRef.current!.value) return;
-    console.log(
-      'checkoing passwords',
-      registerPasswordRef.current!.value,
-      registerPasswordRepeatRef.current!.value,
-      registerPasswordRef.current!.value === registerPasswordRepeatRef.current!.value,
-    );
     setPasswordsMatch(registerPasswordRef.current!.value === registerPasswordRepeatRef.current!.value);
   };
 

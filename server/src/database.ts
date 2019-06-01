@@ -13,8 +13,7 @@ export const connectToDatabase = async (): Promise<{ db: Db; connection: MongoCl
     try {
       connection = (await MongoClient.connect(mongoUrl, configOptions)) as any;
       console.log('CONNECTED TO DATABASE');
-      // await InitializeDatabase(connection.db('moviebase'));
-      // console.log('initialized DATABASE');
+
       return true;
     } catch (error) {
       console.error('Error with database connection', error);

@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { connect, useDispatch, useSelector, shallowEqual } from 'react-redux';
 import { withRouter, RouteComponentProps } from 'react-router';
 import {
@@ -37,7 +37,7 @@ const MoviePageBase = ({ match }: RouteComponentProps<{ movieId: string }>) => {
   return (
     <Container className="container">
       <Grid container={true} spacing={5} className={classes.grid}>
-        <Grid item={true} xs={12} md={7}>
+        <Grid item={true} xs={12} md={6}>
           <Card className={classes.mainCard}>
             <Paper>
               <CardHeader
@@ -77,15 +77,13 @@ const MoviePageBase = ({ match }: RouteComponentProps<{ movieId: string }>) => {
                 ? invoke(movieData.ratedBy, 'map', (item: MovieRequest['ratedBy'][0]) => (
                     <ListItem>
                       <ListItemText primary={item.comment} secondary={`Rating: ${item.rate}`} />
-                      {/* <Typography>{item.comment}</Typography>
-                      <Typography>{item.rate}</Typography> */}
                     </ListItem>
                   ))
                 : 'No ratings'}
             </CardContent>
           </Card>
         </Grid>
-        <Grid item={true} xs={12} md={5}>
+        <Grid item={true} xs={12} md={6}>
           <Card draggable={false} className={classes.imageCard}>
             <CardMedia image={movieData.poster} style={{ height: '85vh' }} />
           </Card>
@@ -99,15 +97,13 @@ export const MoviePage = connect()(withRouter(MoviePageBase));
 
 const useStyles = makeStyles({
   grid: {
-    padding: 0,
-    width: '100%',
-    margin: 0,
+    marginTop: 15,
   },
   mainCard: {
     marginBottom: 20,
   },
   imageCard: {
-    maxWidth: 510,
+    maxWidth: 525,
     margin: 'auto',
   },
   cardTitleWButton: {

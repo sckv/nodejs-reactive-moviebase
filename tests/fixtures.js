@@ -1,4 +1,4 @@
-const {ObjectId} = require('bson');
+const { ObjectId } = require('bson');
 
 const UserIDS = {
   user0: new ObjectId('5cc85a65cbe99c36e2bec3fa'),
@@ -351,4 +351,4 @@ const usersFixture = [
   },
 ];
 
-module.exports = {usersFixture, moviesFixture, UserIDS, ListIDS, MovieIDS};
+module.exports = { usersFixture, moviesFixture, UserIDS, ListIDS, MovieIDS };

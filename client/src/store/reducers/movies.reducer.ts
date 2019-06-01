@@ -9,7 +9,6 @@ const initialState = { current: {} as any, movies: [] };
 
 export const MoviesReducer: Reducer<MoviesReducerState, MovieActionsUnion> = (state = initialState, action) => {
   if (!action) return state;
-  console.log('action payload>>>', (action as any).payload);
   switch (action.type) {
     case MovieActionTypes.addMoviesData:
       return { ...state, movies: action.payload };

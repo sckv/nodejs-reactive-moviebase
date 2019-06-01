@@ -51,7 +51,6 @@ export const fetchMovieData = ({
     request = await MoviesApi.getByTtid(ttid);
   }
 
-  console.log('request done>>>', request);
   if (request && request.data) {
     dispatch(MoviesActions.addMovieData(request.data));
     goTo && dispatch(push(`/movie/${movieId}`));

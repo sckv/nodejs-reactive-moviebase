@@ -14,7 +14,6 @@ const ListEntryBase = ({ title, poster, rate, _id, editable }: Props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const currentList = useSelector(ListsSelectors.current, shallowEqual);
-  console.log('props...', title, poster, rate, _id, editable);
   return (
     <Card className={classes.mainCard}>
       <CardHeader
