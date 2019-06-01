@@ -46,7 +46,7 @@ export const UserDataActions = {
     payload,
   }),
   clearUserData: (): UserDataAction$Clear => ({ type: UserDataActionTypes.clearUserData }),
-  clearListData: (): UserDataAction$ClearListData => ({ type: UserDataActionTypes.clearUserSearchListData }),
+  clearSearchListData: (): UserDataAction$ClearListData => ({ type: UserDataActionTypes.clearUserSearchListData }),
 };
 
 // THUNKS
@@ -94,7 +94,7 @@ export const fetchUserDataCustom = ({
 export const searchUsers = (
   username: string,
 ): ThunkAction<void, AppStoreState, void, ActionsUnion> => async dispatch => {
-  dispatch(UserDataActions.clearListData());
+  dispatch(UserDataActions.clearSearchListData());
 
   const response = await UsersApi.search(username);
 
@@ -116,18 +116,26 @@ export const modifyUser = ({
   else dispatch(NotifyActions.error('Error retrieving users from database.'));
 };
 
-export const followUser = (userId: string): ThunkAction<void, AppStoreState, void, ActionsUnion> => async dispatch => {
+export const followUser = (
+  userId: string,
+  username: string,
+): ThunkAction<void, AppStoreState, void, ActionsUnion> => async dispatch => {
   const response = await UsersApi.follow(userId);
 
-  if (response && response.ok) dispatch(NotifyActions.success('User followed.'));
-  else dispatch(NotifyActions.error('Error following user.'));
+  if (response && response.ok) {
+    dispatch(NotifyActions.success('User followed.'));
+    username && dispatch(fetchUserData(username));
+  } else dispatch(NotifyActions.error('Error following user.'));
 };
 
 export const unfollowUser = (
   userId: string,
+  username: string,
 ): ThunkAction<void, AppStoreState, void, ActionsUnion> => async dispatch => {
   const response = await UsersApi.unfollow(userId);
 
-  if (response && response.ok) dispatch(NotifyActions.success('User unfollowed.'));
-  else dispatch(NotifyActions.error('Error unfollowing user.'));
+  if (response && response.ok) {
+    dispatch(NotifyActions.success('User unfollowed.'));
+    username && dispatch(fetchUserData(username));
+  } else dispatch(NotifyActions.error('Error unfollowing user.'));
 };

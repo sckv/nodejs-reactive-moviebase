@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector, shallowEqual } from 'react-redux';
 import { withRouter, RouteComponentProps } from 'react-router';
 import {
   Grid,
@@ -18,9 +18,20 @@ import {
   Avatar,
   ListItemAvatar,
   Divider,
+  InputBase,
+  MenuItem,
+  ListItemIcon,
 } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
-import { fetchUserData, unfollowUser, followUser } from '@src/store/actions/user-data.actions';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
+import { makeStyles, createStyles, styled as muiStyled } from '@material-ui/styles';
+import {
+  fetchUserData,
+  unfollowUser,
+  followUser,
+  searchUsers,
+  UserDataActions,
+} from '@src/store/actions/user-data.actions';
 import { UserDataSelectors } from '@src/store/reducers/user-data.reducer';
 import invoke from 'lodash/invoke';
 import { UserFull, UserFollower } from 'types/user-controlling.services';
@@ -28,16 +39,22 @@ import { fetchListData, createList } from '@src/store/actions/lists.actions';
 import { AuthSelectors } from '@src/store/reducers/auth.reducer';
 import { NotifyActions } from '@src/store/actions/notification.actions';
 import { fetchMovieData } from '@src/store/actions/movies.actions';
+import PersonIcon from '@material-ui/icons/Person';
+import { fade, Theme } from '@material-ui/core/styles';
+import { useDebounce } from 'use-debounce';
+import styled from '@emotion/styled';
 
 const UserPageBase = ({ match }: RouteComponentProps<{ username: string }>) => {
   const { username } = match.params;
-  const classes = useStyles();
+  const classes = useStyles({});
   const dispatch = useDispatch();
 
   const titleRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLInputElement>(null);
-  const userData = useSelector(UserDataSelectors.userData);
-  const authData = useSelector(AuthSelectors.auth);
+
+  const userData = useSelector(UserDataSelectors.userData, shallowEqual);
+  const authData = useSelector(AuthSelectors.auth, shallowEqual);
+  const usersList = useSelector(UserDataSelectors.searchList, shallowEqual);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [switchCheck, setSwitch] = useState<boolean>(false);
@@ -47,6 +64,38 @@ const UserPageBase = ({ match }: RouteComponentProps<{ username: string }>) => {
     userData && userData.username !== username && dispatch(fetchUserData(username));
   }, [match]);
 
+  // const [list, setList] = useState<MovieRequest[]>([]);
+  const [query, setQuery] = useState<string>('');
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [isMenuOpen, setMenuOpen] = useState<boolean>(false);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const [debouncedQuery] = useDebounce(query, 700);
+
+  const handleMenuClose = (usrnm: string) => {
+    setQuery('');
+    setMenuOpen(false);
+    inputRef.current!.blur();
+    console.log('getting by username', usrnm);
+    dispatch(UserDataActions.clearSearchListData());
+    typeof usrnm === 'string' && dispatch(fetchUserData(usrnm, true));
+  };
+
+  useEffect(() => {
+    console.log('enter for seearching>>>', debouncedQuery, usersList);
+
+    if (debouncedQuery && !usersList) {
+      dispatch(searchUsers(debouncedQuery));
+      setIsSearching(true);
+    }
+    if (debouncedQuery && usersList) {
+      usersList.length && setMenuOpen(true);
+      setIsSearching(false);
+      !usersList.length && dispatch(UserDataActions.clearSearchListData());
+    }
+  }, [debouncedQuery, usersList]);
+
   const isSelf = () => authData.username === userData.username;
 
   const isFollowable = () => {
@@ -54,12 +103,12 @@ const UserPageBase = ({ match }: RouteComponentProps<{ username: string }>) => {
     if (isSelf()) return null;
     if (userData.followers && userData.followers.some(el => el.username === authData.username))
       return (
-        <Button color="primary" onClick={() => dispatch(unfollowUser(userData._id!))}>
+        <Button color="primary" onClick={() => dispatch(unfollowUser(userData._id!, username))}>
           Unfollow
         </Button>
       );
     return (
-      <Button color="primary" onClick={() => dispatch(followUser(userData._id!))}>
+      <Button color="primary" onClick={() => dispatch(followUser(userData._id!, username))}>
         Follow
       </Button>
     );
@@ -88,7 +137,62 @@ const UserPageBase = ({ match }: RouteComponentProps<{ username: string }>) => {
 
   return (
     <Container className="container">
-      <Grid container={true} spacing={7} className={classes.grid}>
+      <Grid container={true} spacing={3} className={classes.grid}>
+        <Grid item={true} xs={12} sm={12} md={12}>
+          <Card>
+            <CardHeader
+              title={
+                <div className={classes.searchFieldContainer}>
+                  <span>Find new users: </span>
+                  <div className={classes.search}>
+                    <div className={classes.searchIcon}>
+                      <PersonIcon />
+                    </div>
+                    <InputBase
+                      ref={inputRef}
+                      value={query}
+                      aria-owns={isMenuOpen ? 'movies-list' : undefined}
+                      placeholder="Search for a user"
+                      classes={{
+                        root: classes.inputRoot,
+                        input: classes.inputInput,
+                      }}
+                      endAdornment={isSearching ? <ThemedCircularProgress size={25} color="secondary" /> : null}
+                      onChange={e => setQuery(e.target.value)}
+                    />
+                    <Menu
+                      id="movies-list"
+                      anchorEl={inputRef.current}
+                      anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                      }}
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                      }}
+                      open={isMenuOpen}
+                      onClose={handleMenuClose}
+                    >
+                      {invoke(usersList, 'map', (usr: any, idx: number) => (
+                        <MenuItem onClick={() => handleMenuClose(usr.username)} key={(usr.username as any) + idx}>
+                          <MenuItemContainer>
+                            <span>{usr.username}</span>
+                          </MenuItemContainer>
+                        </MenuItem>
+                      ))}
+                    </Menu>
+                  </div>
+                  {/* <TextField
+                    style={{ marginLeft: 20, minWidth: 250 }}
+                    InputProps={{ style: { height: 40 } }}
+                    variant="outlined"
+                  /> */}
+                </div>
+              }
+            />
+          </Card>
+        </Grid>
         <Grid item={true} xs={12} sm={12} md={7}>
           <Card className={classes.card}>
             <CardHeader
@@ -153,7 +257,6 @@ const UserPageBase = ({ match }: RouteComponentProps<{ username: string }>) => {
               }
             />
             <CardContent>
-              {console.log(userData.lists)}
               {userData.lists && userData.lists.length ? (
                 <List component="div">
                   {invoke(userData.lists, 'map', (list: UserFull['lists'][0], idx: number) => (
@@ -162,20 +265,14 @@ const UserPageBase = ({ match }: RouteComponentProps<{ username: string }>) => {
                       onClick={() => dispatch(fetchListData({ listId: list._id, goTo: true }))}
                       key={`mov+${idx}`}
                     >
-                      {console.log('list item>>', list)}
                       <ListItemText primary={list.title} secondary={list.description} />
-                      {list.movies && list.movies.length ? (
-                        invoke(list.movies, 'map', (mov: typeof list.movies[0], idx2: number) => (
-                          <img key={`poster-${idx2}`} src={mov.poster} />
-                        ))
-                      ) : (
-                        <Typography>No movies in the list</Typography>
-                      )}
                     </ListItem>
                   ))}
                 </List>
               ) : (
-                <Typography color="secondary">No lists</Typography>
+                <Typography component="span" color="secondary">
+                  No lists
+                </Typography>
               )}
             </CardContent>
           </Card>
@@ -197,8 +294,8 @@ const UserPageBase = ({ match }: RouteComponentProps<{ username: string }>) => {
                         primary={movie.title}
                         secondary={
                           <div>
-                            <Typography>Comment: {movie.comment}</Typography>
-                            <Typography>Rated: {movie.rate}</Typography>
+                            <Typography component="span">Comment: {movie.comment}</Typography>
+                            <Typography component="span">Rated: {movie.rate}</Typography>
                           </div>
                         }
                       />
@@ -206,7 +303,9 @@ const UserPageBase = ({ match }: RouteComponentProps<{ username: string }>) => {
                   ))}
                 </List>
               ) : (
-                <Typography color="secondary">No rated movies</Typography>
+                <Typography color="secondary" component="span">
+                  No rated movies
+                </Typography>
               )}
             </CardContent>
           </Card>
@@ -223,6 +322,9 @@ const UserPageBase = ({ match }: RouteComponentProps<{ username: string }>) => {
                       button={true}
                       onClick={() => dispatch(fetchUserData(follower.username, true))}
                     >
+                      <ListItemIcon>
+                        <PersonIcon />
+                      </ListItemIcon>
                       <ListItemText
                         primary={
                           <Typography component="span" variant="h6">
@@ -249,6 +351,9 @@ const UserPageBase = ({ match }: RouteComponentProps<{ username: string }>) => {
                       button={true}
                       onClick={() => dispatch(fetchUserData(follow.username, true))}
                     >
+                      <ListItemIcon>
+                        <PersonIcon />
+                      </ListItemIcon>
                       <ListItemText
                         primary={
                           <Typography component="span" variant="h6">
@@ -288,48 +393,114 @@ const UserPageBase = ({ match }: RouteComponentProps<{ username: string }>) => {
 
 export const UserPage = connect()(withRouter(UserPageBase));
 
-const useStyles = makeStyles({
-  grid: {
-    padding: 0,
-    width: '100%',
-    margin: 0,
-  },
-  card: {
-    marginBottom: 15,
-  },
-  cardTitleWButton: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  userDataEntry: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  listCreateDialog: {
-    height: 250,
-    width: 200,
-    padding: 10,
-    display: 'flex',
-    flexDirection: 'column',
-    '& span:nth-child(1)': {
-      textAlign: 'center',
-      textTransform: 'uppercase',
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    grid: {
+      padding: 0,
+      width: '100%',
+      margin: 0,
     },
-  },
-  listCreateField: {
-    margin: '7px 0px',
-  },
-  listCreateSwitchContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-evenly',
-    textTransform: 'initial',
-  },
-  listCreateButton: {
-    margin: '7px 0px',
-  },
+    card: {
+      marginBottom: 15,
+    },
+    cardTitleWButton: {
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    userDataEntry: {
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    listCreateDialog: {
+      height: 250,
+      width: 200,
+      padding: 10,
+      display: 'flex',
+      flexDirection: 'column',
+      '& span:nth-child(1)': {
+        textAlign: 'center',
+        textTransform: 'uppercase',
+      },
+    },
+    listCreateField: {
+      margin: '7px 0px',
+    },
+    listCreateSwitchContainer: {
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-evenly',
+      textTransform: 'initial',
+    },
+    listCreateButton: {
+      margin: '7px 0px',
+    },
+    searchFieldContainer: {
+      height: 40,
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    search: {
+      position: 'relative',
+      borderRadius: theme.shape.borderRadius,
+      backgroundColor: fade(theme.palette.common.black, 0.15),
+      '&:hover': {
+        backgroundColor: fade(theme.palette.common.black, 0.25),
+      },
+      marginLeft: 0,
+      width: '100%',
+      [theme.breakpoints.up('sm')]: {
+        marginLeft: theme.spacing(1),
+        width: 'auto',
+      },
+    },
+    searchIcon: {
+      width: theme.spacing(7),
+      height: '100%',
+      position: 'absolute',
+      pointerEvents: 'none',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    inputRoot: {
+      color: 'inherit',
+    },
+    inputInput: {
+      padding: theme.spacing(1, 1, 1, 7),
+      transition: theme.transitions.create('width'),
+      width: '100%',
+      [theme.breakpoints.up('sm')]: {
+        width: 150,
+        '&:focus': {
+          width: 250,
+        },
+      },
+    },
+  }),
+);
+const ThemedCircularProgress = muiStyled(CircularProgress)({
+  position: 'absolute',
+  right: 5,
 });
+
+const MenuItemContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  span {
+    justify-self: center;
+    align-self: center;
+  }
+  div {
+    width: 50px;
+    margin-right: 8px;
+    display: flex;
+  }
+  img {
+    height: 50px;
+  }
+`;

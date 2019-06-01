@@ -57,22 +57,22 @@ export const searchUsers: CustomRequestHandler = async (req, res) => {
 
 export const getUserData: CustomRequestHandler = async (req, res) => {
   const { username, pd, ld, md, page, followers, follows } = req.query;
-  const urlHash = hashUrl(req.originalUrl);
+  // const urlHash = hashUrl(req.originalUrl);
   let userData: Partial<UserFull>;
-  const cachedUser = await CacheServices.getFromCache<Partial<UserFull>>(urlHash);
-  if (!cachedUser || !cachedUser.data) {
-    userData = await UserControllingServices().get({
-      username,
-      selfId: req.auth ? req.auth.userId : undefined,
-      personalData: pd,
-      followers,
-      follows,
-      listsData: ld,
-      moviesData: md,
-      page,
-    });
-    await CacheServices.setToCache<typeof userData>({ urlHash, timeout: 5, data: { data: userData } });
-  } else userData = cachedUser.data;
+  // const cachedUser = await CacheServices.getFromCache<Partial<UserFull>>(urlHash);
+  // if (!cachedUser || !cachedUser.data) {
+  userData = await UserControllingServices().get({
+    username,
+    selfId: req.auth ? req.auth.userId : undefined,
+    personalData: pd,
+    followers,
+    follows,
+    listsData: ld,
+    moviesData: md,
+    page,
+  });
+  // await CacheServices.setToCache<typeof userData>({ urlHash, timeout: 5, data: { data: userData } });
+  // } else userData = cachedUser.data;
   return res.status(200).send(userData);
 };
 

@@ -218,14 +218,14 @@ export const HeaderBarBase = () => {
             >
               {invoke(list, 'map', (li: MovieRequestThin, idx: number) => (
                 <MenuItem onClick={() => handleMenuClose(li.ttid)} key={(li._id as any) || idx}>
-                  <MenuItemContaioner>
+                  <MenuItemContainer>
                     <div>
                       <img src={li.poster} />
                     </div>
                     <span>
                       {li.title} - {li.year}
                     </span>
-                  </MenuItemContaioner>
+                  </MenuItemContainer>
                 </MenuItem>
               ))}
             </Menu>
@@ -245,7 +245,7 @@ export const HeaderBarBase = () => {
 
 export const HeaderBar = connect()(HeaderBarBase);
 
-const MenuItemContaioner = styled.div`
+const MenuItemContainer = styled.div`
   display: flex;
   flex-direction: row;
   span {

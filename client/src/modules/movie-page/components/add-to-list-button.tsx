@@ -26,7 +26,7 @@ const AddToListMenuBase = ({ isRated }: Props) => {
   const [listId, setListId] = useState<string | null>(null);
   const classes = useStyles();
 
-  const lists = useSelector(UserDataSelectors.userCurrentLists);
+  const lists = useSelector(UserDataSelectors.userCurrentMovieLists);
   const { username } = useSelector(AuthSelectors.auth, shallowEqual);
   const { _id } = useSelector(MoviesSelectors.movie, shallowEqual);
 

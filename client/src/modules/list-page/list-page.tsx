@@ -45,8 +45,6 @@ const ListPageBase = ({ match }: RouteComponentProps<{ listId: string }>) => {
   const saveEditing = () => {
     if (!titleRef.current) dispatch(NotifyActions.error("Title can't be empty"));
     else {
-      console.log('CHECKED IS>>??', checkerRef.current!.checked);
-
       dispatch(
         modifyList({
           listId,
