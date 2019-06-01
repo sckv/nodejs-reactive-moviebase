@@ -1,7 +1,7 @@
 # Reactive Nodejs-MongoDB Movies
 
 [![Build Status](https://travis-ci.org/sckv/nodejs-reactive-moviebase.svg?branch=master)](https://travis-ci.org/sckv/nodejs-reactive-moviebase)
-[![codebeat badge](https://codebeat.co/badges/3684d439-e8c5-41ef-8d08-36afe1303a1f)](https://codebeat.co/projects/github-com-sckv-nodejs-reactive-moviebase-master)
+[![codebeat badge](https://codebeat.co/badges/4ab7fc93-50c6-4de2-9d7b-703962c4eea0)](https://codebeat.co/projects/github-com-sckv-actionhero-todo-example-master)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat)](https://github.com/prettier/prettier)
 
 
