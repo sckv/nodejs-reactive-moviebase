@@ -14,8 +14,6 @@ import { convertToBuffer } from '@src/utils/convert-to-buffer';
 export const searchMovie: CustomRequestHandler = async (req, res) => {
   const { l, s, c, p, ps } = req.query;
 
-  console.log('searching for a movie in imdb', c, s);
-
   const hashedUrl = hashUrl(req.originalUrl);
 
   res.setHeader('Content-Type', 'application/json');
@@ -168,7 +166,6 @@ export const getMovieByTtid: CustomRequestHandler = async (req, res) => {
   const urlHash = hashUrl(req.originalUrl);
 
   const cached = await CacheServices.getFromCache(urlHash);
-
   if (cached && cached.data) return res.status(200).send(cached.data);
 
   let movie = (await MoviesRequestingServices().getByTtid({ ttid, fullMovie: true })) as MovieRequest;

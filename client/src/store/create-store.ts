@@ -5,6 +5,7 @@ import { routerMiddleware } from 'connected-react-router';
 import { createBrowserHistory } from 'history';
 import { applyMiddleware, compose, createStore, DeepPartial } from 'redux';
 import thunk from 'redux-thunk';
+import { AppStoreState, ActionsUnion } from '@src/store/store';
 
 declare global {
   interface Window {
@@ -35,7 +36,7 @@ export const store = async () => {
     logger = createLogger({ collapsed: true });
   }
   if (logger) middlewares.push(logger);
-  const newStore = createStore(
+  const newStore = createStore<AppStoreState, ActionsUnion, {}, {}>(
     reducers(history) as any,
     persistentStore !== null ? persistentStore : {},
     composeEnhancers(applyMiddleware(...middlewares)),

@@ -18,7 +18,13 @@ export const NotificationReducer: Reducer<NotificationReducerState, NotifyAction
 ) => {
   if (!action) return state;
   switch (action.type) {
-    case NotifyActionTypes.error || NotifyActionTypes.notify || NotifyActionTypes.warning || NotifyActionTypes.success:
+    case NotifyActionTypes.error:
+      return { ...action.payload };
+    case NotifyActionTypes.notify:
+      return { ...action.payload };
+    case NotifyActionTypes.warning:
+      return { ...action.payload };
+    case NotifyActionTypes.success:
       return { ...action.payload };
     case NotifyActionTypes.close:
       return {} as typeof state;

@@ -2,7 +2,6 @@ import * as React from 'react';
 import { useDispatch } from 'react-redux';
 import { FetcherResponse } from '@src/utils/fetcher';
 import { MoviesActions } from '@src/store/actions/movies.actions';
-// import isEqual from 'react-fast-compare';
 
 export const useStreamFetch = (
   fetchInstance: () => FetcherResponse<ReadableStreamDefaultReader<Uint8Array> | null>,
@@ -14,7 +13,6 @@ export const useStreamFetch = (
 
   React.useEffect(() => {
     let movies: any = [];
-    console.log('NEW MOVIES >>', movies);
     const readStream = async () => {
       response = await fetchInstance();
       if (response && response.ok && response.data) {
@@ -30,16 +28,10 @@ export const useStreamFetch = (
             }
             if (value) {
               const decoded = JSON.parse(new TextDecoder('utf-8').decode(value));
-              if (decoded.length) {
-                console.log('decoded length yes');
-                movies = [...movies].concat(decoded);
-              }
-              if (!decoded.length && !movies.find((d: any) => decoded._id === d.id)) {
-                console.log('decoded single movie');
-                movies = [decoded].concat(movies);
-              }
+              if (decoded.length) movies = [...movies].concat(decoded);
 
-              console.log('reading new value>>>', decoded, movies);
+              if (!decoded.length && !movies.find((d: any) => decoded._id === d.id)) movies = [decoded].concat(movies);
+
               if (decoded)
                 dispatch(
                   MoviesActions.addMoviesData(
@@ -63,8 +55,8 @@ export const useStreamFetch = (
       clearInterval(timer);
       if (response && response.data) {
         response.data.cancel();
-        // response.ok && response.abortCall();
       }
     };
   }, []);
+
 };

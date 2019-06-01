@@ -13,22 +13,26 @@ import { UserPage } from '@src/modules/user-page/user-page';
 import { LoginPage } from '@src/modules/login-page/login-page';
 import { MoviePage } from '@src/modules/movie-page/movie-page';
 import { AuthSelectors } from '@src/store/reducers/auth.reducer';
+import { RegistrationActivation } from '@src/ui/registration-activation';
+import { RegistrationDone } from '@src/ui/registration-done';
+import { UserPanel } from '@src/modules/user-panel/user-panel';
 
 export const Router = () => (
   <ConnectedRouter history={history}>
     <Switch>
       <Route exact={true} path="/" component={HomePage} />
       <GuardUnAuthRoute exact={true} path="/login" component={LoginPage} />
-      <GuardAuthRoute exact={true} path="/panel" component={HomePage} />
-      <GuardUnAuthRoute exact={true} path="/activate/:token" component={HomePage} />
+      <GuardUnAuthRoute exact={true} path="/registration-ok" component={RegistrationDone} />
+      <GuardAuthRoute exact={true} path="/panel" component={UserPanel} />
+      <GuardUnAuthRoute exact={true} path="/activate/:token" component={RegistrationActivation} />
       <GuardUnAuthRoute exact={true} path="/restore/:token" component={HomePage} />
       <Route exact={true} path="/user/:username" component={UserPage} />
       <Route exact={true} path="/user/:username/lists" component={HomePage} />
-      <Route exact={true} path="/user/:username/list/:listId" component={ListPage} />
       <Route exact={true} path="/user/:username/follows" component={HomePage} />
       <Route exact={true} path="/user/:username/followers" component={HomePage} />
       <Route exact={true} path="/user/:username/followers" component={HomePage} />
       <Route exact={true} path="/user/:username/movies" component={HomePage} />
+      <Route exact={true} path="/list/:listId" component={ListPage} />
       <Route exact={true} path="/movie/:movieId" component={MoviePage} />
       <Route component={PageNotFound} />
     </Switch>
@@ -40,7 +44,7 @@ const GuardAuthRouteBase = ({ location, match, staticContext, ...props }: RouteC
   const dispatch = useDispatch();
   if (!auth.userId) {
     dispatch(NotifyActions.error('No access.'));
-    return <Redirect to={location} />;
+    return <Redirect to="/" />;
   }
   return <Route {...props} />;
 };
@@ -52,7 +56,7 @@ const GuardUnAuthRouteBase = ({ location, match, staticContext, ...props }: Rout
   const dispatch = useDispatch();
   if (auth.userId) {
     dispatch(NotifyActions.error('No access.'));
-    return <Redirect to={location} />;
+    return <Redirect to="/" />;
   }
   return <Route {...props} />;
 };

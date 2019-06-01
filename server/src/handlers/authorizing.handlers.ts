@@ -1,6 +1,7 @@
 import { CustomRequestHandler } from 'types/utils';
 import { AuthServices } from '@src/pkg/authorizing/authorizing.services';
 import { enqueueEmail } from '@src/services/email/email-publisher';
+import { CacheServices } from '@src/pkg/cache/cache.services';
 
 const WEB_HOSTNAME = process.env.WEB_HOSTNAME;
 
@@ -9,14 +10,29 @@ export const login: CustomRequestHandler = async (req, res, next) => {
   const loginObject = await AuthServices().login({ username, password });
   res
     .status(200)
-    .cookie('__session', loginObject.token, { maxAge: 9000000, httpOnly: true, path: '/', sameSite: 'Strict' })
+    .cookie('__session', loginObject.token, {
+      maxAge: 9000000,
+      httpOnly: true,
+      path: '/',
+      sameSite: 'Lax',
+      domain: WEB_HOSTNAME || 'localhost',
+    })
     .send(loginObject);
 };
 
 export const logout: CustomRequestHandler = async (req, res) => {
-  const sessionToken = req.cookies['__session'];
-  await AuthServices().logout(sessionToken);
-  res.status(200).cookie('__session', undefined, { maxAge: 1, httpOnly: true, path: '/', sameSite: 'Strict' });
+  const { sessionToken } = req.auth;
+  await AuthServices().logout({ sessionToken });
+  await CacheServices.clearSession(sessionToken);
+  res
+    .cookie('__session', undefined, {
+      maxAge: 1,
+      httpOnly: true,
+      path: '/',
+      sameSite: 'Lax',
+      domain: WEB_HOSTNAME || 'localhost',
+    })
+    .sendStatus(200);
 };
 
 export const forgot: CustomRequestHandler = async (req, res) => {

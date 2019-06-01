@@ -36,7 +36,6 @@ export const MoviesRepository = (connection: Db) => {
         return true;
       } catch (error) {
         logger.error('Error inserting movies: ', error);
-        // console.log('Error inserting movies', error);
         throw new MovieInsertError({ data: { error } });
       }
     },
@@ -138,7 +137,7 @@ export const MoviesRepository = (connection: Db) => {
         },
         {
           $project: {
-            plot: '$data.en.plot',
+            plot: `$data.${language}.plot`,
             description: `$data.${language}.description`,
             poster: '$poster',
             ttid: '$ttid',
@@ -194,7 +193,7 @@ export const MoviesRepository = (connection: Db) => {
         },
         {
           $project: {
-            plot: '$fullDocument.data.en.plot',
+            plot: `$fullDocument.data.${language}.plot`,
             description: `$fullDocument.data.${language}.description`,
             poster: '$fullDocument.poster',
             ttid: '$fullDocument.ttid',

@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme: Theme) =>
 type Props = MovieRequestThin & { forwardedRef?: any } & { style?: any };
 
 export const MovieCard = ({ forwardedRef, averageRate, poster, plot, title, year, style, _id }: Props) => {
-  const classes = useStyles();
+  const classes = useStyles({});
   const dispatch = useDispatch();
   return (
     <CardWrapper style={style} ref={forwardedRef}>

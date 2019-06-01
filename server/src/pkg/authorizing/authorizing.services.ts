@@ -20,7 +20,7 @@ export const AuthServices = (mc?: Db) => {
     login: async ({ username, password }: LoginObject): Promise<LoginResponseObject> => {
       const userPassword = await AuthRepo.getPasswordByUsername(username);
 
-      if (await bcrypt.compare(password, userPassword.password)) {
+      if (userPassword && (await bcrypt.compare(password, userPassword.password))) {
         const sessionToken = await generateToken(SESSION_TOKEN_LENGTH);
         const { userId, language } = await AuthRepo.setSession({ username, sessionToken });
         await CacheServices.setSession({ userId, sessionToken, language });

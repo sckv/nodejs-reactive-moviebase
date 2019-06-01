@@ -1,13 +1,13 @@
-import {Db, MongoClient, ObjectId} from 'mongodb';
+import { Db, MongoClient, ObjectId } from 'mongodb';
 
-import {connectToDatabase} from '../../src/database';
-import {usersFixture} from '../fixtures/users.fixture';
-import {moviesFixture} from '../fixtures/movies.fixture';
-import {MovieInsertError} from '../../src/errors/domain-errors/movie-insert';
+import { connectToDatabase } from '../../src/database';
+import { usersFixture } from '../fixtures/users.fixture';
+import { moviesFixture } from '../fixtures/movies.fixture';
+import { MovieInsertError } from '../../src/errors/domain-errors/movie-insert';
 // Service & Repo
-import {MoviesRequestingServices} from '../../src/pkg/movies-requesting/movies-requesting.services';
-import {MoviesRepository} from '../../src/pkg/storage/mongo/movies.repository';
-import {UserIDS} from '../fixtures/IDs';
+import { MoviesRequestingServices } from '../../src/pkg/movies-requesting/movies-requesting.services';
+import { MoviesRepository } from '../../src/pkg/storage/mongo/movies.repository';
+import { UserIDS } from '../fixtures/IDs';
 
 type ThenArg<T> = T extends Promise<infer U> ? U : T;
 
@@ -25,12 +25,12 @@ export default describe('<-- Movies control service / repository -->', () => {
     connection = connect.connection;
 
     await database.collection('users').insertMany(usersFixture);
-    await database.collection('users').createIndex({email: 1}, {unique: true});
-    await database.collection('users').createIndex({username: 1}, {unique: true});
+    await database.collection('users').createIndex({ email: 1 }, { unique: true });
+    await database.collection('users').createIndex({ username: 1 }, { unique: true });
 
     await database.collection('movies').insertMany(moviesFixture);
-    await database.collection('movies').createIndex({ttid: 1});
-    await database.collection('movies').createIndex({year: 'text', title: 'text', data: 'text'}, {
+    await database.collection('movies').createIndex({ ttid: 1 });
+    await database.collection('movies').createIndex({ year: 'text', title: 'text', data: 'text' }, {
       weights: {
         title: 10,
         data: 5,
@@ -51,7 +51,7 @@ export default describe('<-- Movies control service / repository -->', () => {
 
   it('gets a movieById', async () => {
     const movieExample = moviesFixture[0];
-    const movie = await repository.get({movieId: movieExample._id});
+    const movie = await repository.get({ movieId: movieExample._id });
 
     expect(movie._id).toEqual(movieExample._id);
     expect(movie.ttid).toBe(movieExample.ttid);
@@ -59,14 +59,14 @@ export default describe('<-- Movies control service / repository -->', () => {
 
   it('gets a movieByTtid', async () => {
     const movieExample = moviesFixture[0];
-    const movie = await repository.getByTtid({ttid: movieExample.ttid});
+    const movie = await repository.getByTtid({ ttid: movieExample.ttid });
 
     expect(movie.movieId).toEqual(movieExample._id);
   });
 
   it('adds a movie to the database', async () => {
     const added = await repository.add(additionalMovies[0]);
-    const movieByTtid = await repository.getByTtid({ttid: additionalMovies[0].ttid, fullMovie: true});
+    const movieByTtid = await repository.getByTtid({ ttid: additionalMovies[0].ttid, fullMovie: true });
 
     expect(added).toBeTruthy();
     expect(movieByTtid.title).toBe(additionalMovies[0].title);
@@ -75,8 +75,8 @@ export default describe('<-- Movies control service / repository -->', () => {
 
   it('adds array of movies to the database', async () => {
     const added = await repository.add([additionalMovies[1], additionalMovies[2]]);
-    const movie1ByTtid = await repository.getByTtid({ttid: additionalMovies[1].ttid, fullMovie: true});
-    const movie2ByTtid = await repository.getByTtid({ttid: additionalMovies[2].ttid, fullMovie: true});
+    const movie1ByTtid = await repository.getByTtid({ ttid: additionalMovies[1].ttid, fullMovie: true });
+    const movie2ByTtid = await repository.getByTtid({ ttid: additionalMovies[2].ttid, fullMovie: true });
 
     expect(added).toBeTruthy();
     expect(movie1ByTtid.title).toBe(additionalMovies[1].title);
@@ -105,23 +105,9 @@ export default describe('<-- Movies control service / repository -->', () => {
 
   it('search for a movie', async () => {
     const movie = additionalMovies[1];
-    const searchResult = await repository.search({criteria: movie.title});
-    // console.log('search resul>>> ', searchResult);
+    const searchResult = await repository.search({ criteria: movie.title });
     expect(searchResult[0].ttid).toBe(movie.ttid);
   });
-
-  // TODO: implement change stream tests
-  // it('subscribes to the change for an array of movies', async () => {
-  // const movie = additionalMovies[4];
-  // const stream = repository.watchSearch({criteria: movie.title});
-  // console.log('stream>>>', stream);
-  // stream.on('data', chunk => {
-  //   console.log('CHUNK', chunk, done());
-  // });
-  // await repository.add(additionalMovies[4]);
-  // });
-
-  // it('subscribes for a movieById', async () => {});
 });
 
 export const additionalMovies = [

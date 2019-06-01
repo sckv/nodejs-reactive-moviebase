@@ -5,7 +5,7 @@ import { NotifyActions } from '@src/store/actions/notification.actions';
 import { UsersApi } from '@src/api/users.api';
 import { push } from 'connected-react-router';
 
-export const RegisterThunkAction = (registryData: {
+export const registerAction = (registryData: {
   username: string;
   email: string;
   password: string;
@@ -19,7 +19,7 @@ export const RegisterThunkAction = (registryData: {
     dispatch(
       NotifyActions.success(
         `Successfully registered with email ${registryData.email}.
-   Await for an emails with instructions to activate your account`,
+   Await for an email with instructions to activate your account`,
         15000,
       ),
     );

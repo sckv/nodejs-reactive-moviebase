@@ -7,7 +7,7 @@ const host = process.env.WEB_HOSTNAME || 'localhost';
 const usersApiUrl = `https://${host}/api/users/`;
 
 export const UsersApi = {
-  activate: (token: string) => SecureFetcher(fetcher.post({ url: usersApiUrl + 'activate' + token })),
+  activate: (token: string) => SecureFetcher(fetcher.post({ url: usersApiUrl + 'activate/' + token })),
 
   register: (body: { username: string; email: string; password: string }) =>
     SecureFetcher(fetcher.post({ url: usersApiUrl + 'register', body })),
@@ -25,8 +25,9 @@ export const UsersApi = {
   modify: (userId: string, body: { password?: string; language?: string }) =>
     SecureFetcher(fetcher.patch({ url: usersApiUrl + userId, body })),
 
-  follow: (userId: string) => SecureFetcher(fetcher.post({ url: usersApiUrl + 'follow', body: { userId } })),
-  unfollow: (userId: string) => SecureFetcher(fetcher.post({ url: usersApiUrl + 'unfollow', body: { userId } })),
+  follow: (userId: string) => SecureFetcher(fetcher.post({ url: usersApiUrl + 'follow', body: { followId: userId } })),
+  unfollow: (userId: string) =>
+    SecureFetcher(fetcher.post({ url: usersApiUrl + 'unfollow', body: { followId: userId } })),
 
   search: (username: string, page?: number) =>
     SecureFetcher(fetcher.get<UserThin[]>({ url: usersApiUrl, params: { un: username, page } })),

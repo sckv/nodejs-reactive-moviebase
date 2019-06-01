@@ -1,15 +1,15 @@
-import {Db, MongoClient, ObjectId} from 'mongodb';
+import { Db, MongoClient, ObjectId } from 'mongodb';
 
-import {connectToDatabase} from '../../src/database';
-import {usersFixture} from '../fixtures/users.fixture';
-import {moviesFixture} from '../fixtures/movies.fixture';
-import {UserNotFoundError} from '../../src/errors/domain-errors/user-not-found';
-import {InvalidEmailError} from '../../src/errors/application-errors/invalid-email';
-import {UserRegisterError} from '../../src/errors/domain-errors/user-register';
+import { connectToDatabase } from '../../src/database';
+import { usersFixture } from '../fixtures/users.fixture';
+import { moviesFixture } from '../fixtures/movies.fixture';
+import { UserNotFoundError } from '../../src/errors/domain-errors/user-not-found';
+import { InvalidEmailError } from '../../src/errors/application-errors/invalid-email';
+import { UserRegisterError } from '../../src/errors/domain-errors/user-register';
 // Service & Repo
-import {ListingServices} from '../../src/pkg/listing/listing.services';
-import {ListsRepository} from '../../src/pkg/storage/mongo/lists.repository';
-import {UserIDS, ListIDS, MovieIDS} from '../fixtures/IDs';
+import { ListingServices } from '../../src/pkg/listing/listing.services';
+import { ListsRepository } from '../../src/pkg/storage/mongo/lists.repository';
+import { UserIDS, ListIDS, MovieIDS } from '../fixtures/IDs';
 
 type ThenArg<T> = T extends Promise<infer U> ? U : T;
 
@@ -27,8 +27,8 @@ export default describe('<-- Listing control service / repository -->', () => {
     connection = connect.connection;
 
     await database.collection('users').insertMany(usersFixture);
-    await database.collection('users').createIndex({email: 1}, {unique: true});
-    await database.collection('users').createIndex({username: 1}, {unique: true});
+    await database.collection('users').createIndex({ email: 1 }, { unique: true });
+    await database.collection('users').createIndex({ username: 1 }, { unique: true });
 
     await database.collection('movies').insertMany(moviesFixture);
 
@@ -62,7 +62,7 @@ export default describe('<-- Listing control service / repository -->', () => {
 
   it('gets a public list by id', async () => {
     const list = usersFixture[0].lists[0];
-    const listById = await services.get({listId: list._id});
+    const listById = await services.get({ listId: list._id });
 
     expect(listById.title).toBe(list.title);
     expect(listById.description).toBe(list.description);
@@ -71,14 +71,14 @@ export default describe('<-- Listing control service / repository -->', () => {
 
   it('does not get private listById', async () => {
     const list = usersFixture[0].lists[1];
-    const listById = await services.get({listId: list._id});
+    const listById = await services.get({ listId: list._id });
 
     expect(listById).toBeNull();
   });
 
   it('does not get private listById while requested by other user', async () => {
     const list = usersFixture[0].lists[1];
-    const listById = await services.get({listId: list._id, selfId: usersFixture[1]._id});
+    const listById = await services.get({ listId: list._id, selfId: usersFixture[1]._id });
 
     expect(listById).toBeNull();
   });
@@ -86,7 +86,7 @@ export default describe('<-- Listing control service / repository -->', () => {
   it('gets private listById while requested by owner', async () => {
     const list = usersFixture[0].lists[1];
     const user = usersFixture[0];
-    const listById = await services.get({listId: list._id, selfId: user._id});
+    const listById = await services.get({ listId: list._id, selfId: user._id });
 
     expect(listById).not.toBeNull();
     expect(listById.title).toBe(list.title);
@@ -102,7 +102,7 @@ export default describe('<-- Listing control service / repository -->', () => {
     };
     const user = usersFixture[0];
     const listsOld = await repository.getByUser(user._id);
-    const newList = await services.create({selfId: user._id, ...newListObject});
+    const newList = await services.create({ selfId: user._id, ...newListObject });
     const listsNew = await repository.getByUser(user._id);
 
     const listEntry = listsNew.find(
@@ -122,7 +122,7 @@ export default describe('<-- Listing control service / repository -->', () => {
     };
     const user = usersFixture[0];
     const listsOld = await repository.getByUser(user._id, user._id);
-    const updatedList = await services.modify({selfId: user._id, listId: user.lists[0]._id, ...newListObject});
+    const updatedList = await services.modify({ selfId: user._id, listId: user.lists[0]._id, ...newListObject });
     const listsNew = await repository.getByUser(user._id, user._id);
 
     const listEntry = listsNew.find(
@@ -138,7 +138,7 @@ export default describe('<-- Listing control service / repository -->', () => {
     const user = usersFixture[0];
     const list = user.lists[0];
     const listsOld = await repository.getByUser(user._id, user._id);
-    const updatedList = await services.delete(list._id, user._id);
+    const updatedList = await services.delete({ listId: list._id, selfId: user._id });
     const listsNew = await repository.getByUser(user._id, user._id);
 
     const listEntry = listsNew.find((l: any) => l.title === list.title && l.description === list.description);
@@ -212,7 +212,7 @@ const user0UnwindedLists = [
     description: 'Test List 1 of User0 description',
     private: true,
     movies: [
-      {_id: new ObjectId('5cc85a88f21cf538e79b877b'), poster: 'Movie 0 EN POSTER', rate: 1, title: 'Movie 0 TEST'},
+      { _id: new ObjectId('5cc85a88f21cf538e79b877b'), poster: 'Movie 0 EN POSTER', rate: 1, title: 'Movie 0 TEST' },
     ],
   },
   {
