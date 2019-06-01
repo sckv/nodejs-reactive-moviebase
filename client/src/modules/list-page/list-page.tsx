@@ -7,14 +7,12 @@ import {
   CardHeader,
   Typography,
   CardContent,
-  CardMedia,
   Container,
   makeStyles,
   Button,
   TextField,
   Switch,
   CardActions,
-  Avatar,
 } from '@material-ui/core';
 import invoke from 'lodash/invoke';
 import CheckIcon from '@material-ui/icons/Done';
@@ -139,7 +137,14 @@ const ListPageBase = ({ match }: RouteComponentProps<{ listId: string }>) => {
             </Grid>
             <Grid item={true} xs={12}>
               {invoke(listData.movies, 'map', (item: typeof listData.movies[0], idx: number) => (
-                <ListEntry key={`mov+${idx}`} poster={item.poster} title={item.title} rate={item.rate} _id={item._id} editable={editMode}/>
+                <ListEntry
+                  key={`mov+${idx}`}
+                  poster={item.poster}
+                  title={item.title}
+                  rate={item.rate}
+                  _id={item._id}
+                  editable={editMode}
+                />
               ))}
             </Grid>
           </Grid>
