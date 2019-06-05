@@ -15,8 +15,8 @@ export const AuthApi = {
   forgot: (email: string) => SecureFetcher(fetcher.post({ url: authApiUrl + 'forgot', body: { email } })),
 
   checkRecoveryToken: (token: string) =>
-    SecureFetcher(fetcher.post<{ resetToken: string }>({ url: authApiUrl + 'check-recovery' + token })),
+    SecureFetcher(fetcher.post<{ resetToken: string }>({ url: authApiUrl + 'check-recovery/' + token })),
 
   setNewPassword: (token: string, password: string) =>
-    SecureFetcher(fetcher.post({ url: authApiUrl + 'reset-password' + token, body: { password } })),
+    SecureFetcher(fetcher.post({ url: authApiUrl + 'reset-password/' + token, body: { password } })),
 };

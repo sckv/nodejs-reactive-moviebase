@@ -10,8 +10,8 @@ services:
     volumes:
       - mongo-data:/etc/mongo
     command: ["--replSet", "rs", "--bind_ip_all"]
-    # ports:
-    #   - 27017:27017
+    ports:
+      - 27017:27017
 
   redis:
     image: redis:4.0.5-alpine
@@ -163,8 +163,6 @@ services:
     networks:
       - backendmesh
     volumes:
-      # - ~/nginx_certs:/etc/nginx/certs
-      # - ~/letsencrypt_www:/var/www/letsencrypt
       - ../server/cert/:/etc/nginx/certs
       - ../client/build:/var/www
       - ~/app-logs/nginx:/var/log/nginx

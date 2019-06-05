@@ -160,7 +160,7 @@ export const AuthRepository = (connection: Db) => {
       const success = await connection.collection<User>('users').updateOne(
         { email },
         {
-          $set: { recoveryToken },
+          $set: { recoveryToken, recoveryUsed: false },
           $currentDate: {
             lastModified: true,
           },
@@ -183,10 +183,14 @@ export const AuthRepository = (connection: Db) => {
       resetToken: string;
     }): Promise<{ resetToken: string }> => {
       const result = await connection.collection<User>('users').findOneAndUpdate(
-        { recoveryToken },
+        { $and: [{ recoveryToken, recoveryUsed: false }] },
         {
           $set: {
             resetToken,
+            recoveryUsed: true,
+          },
+          $currentDate: {
+            lastModified: true,
           },
         },
       );

@@ -8,6 +8,7 @@ import { Db, ObjectId } from 'mongodb';
 import { createObjectId } from '@src/utils/create-objectid';
 import { MongoObjectID } from 'types/utils';
 import { CacheServices } from '@src/pkg/cache/cache.services';
+import { PASSWORD_HASHING_ROUNDS } from '@src/pkg/user-controlling/user-controlling.services';
 
 const SESSION_TOKEN_LENGTH = 76;
 const ACTIVATION_RESET_TOKEN_LENGTH = 96;
@@ -71,7 +72,11 @@ export const AuthServices = (mc?: Db) => {
       userId?: ObjectId | MongoObjectID;
       password: string;
     }) => {
-      return AuthRepo.setPassword({ userId: createObjectId(userId), password, resetToken });
+      return AuthRepo.setPassword({
+        userId: createObjectId(userId),
+        password: await bcrypt.hash(String(password).trim(), PASSWORD_HASHING_ROUNDS),
+        resetToken,
+      });
     },
   };
 };

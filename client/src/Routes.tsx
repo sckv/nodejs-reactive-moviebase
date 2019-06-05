@@ -16,6 +16,7 @@ import { AuthSelectors } from '@src/store/reducers/auth.reducer';
 import { RegistrationActivation } from '@src/ui/registration-activation';
 import { RegistrationDone } from '@src/ui/registration-done';
 import { UserPanel } from '@src/modules/user-panel/user-panel';
+import { PasswordRestore } from '@src/ui/password-restore';
 
 export const Router = () => (
   <ConnectedRouter history={history}>
@@ -25,7 +26,7 @@ export const Router = () => (
       <GuardUnAuthRoute exact={true} path="/registration-ok" component={RegistrationDone} />
       <GuardAuthRoute exact={true} path="/panel" component={UserPanel} />
       <GuardUnAuthRoute exact={true} path="/activate/:token" component={RegistrationActivation} />
-      <GuardUnAuthRoute exact={true} path="/restore/:token" component={HomePage} />
+      <GuardUnAuthRoute exact={true} path="/restore/:token" component={PasswordRestore} />
       <Route exact={true} path="/user/:username" component={UserPage} />
       <Route exact={true} path="/user/:username/lists" component={HomePage} />
       <Route exact={true} path="/user/:username/follows" component={HomePage} />

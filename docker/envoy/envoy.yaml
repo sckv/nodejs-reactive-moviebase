@@ -25,10 +25,7 @@ static_resources:
               domains:
               - "*"
               routes:
-              # - match:
-              #     prefix: "/"
-              #   route:
-              #     cluster: front_service
+
               - match:
                   prefix: "/api/auth/"
                 route:
@@ -53,6 +50,10 @@ static_resources:
                   cluster: users_service
                   timeout: 60s
                   prefix_rewrite: "/"
+              - match:
+                  prefix: "/"
+                route:
+                  cluster: front_service
               cors:
                 allow_origin:
                   - "*"
@@ -147,34 +148,24 @@ static_resources:
               socket_address:
                 address: users
                 port_value: 443
-  # - name: users_service
-  #   connect_timeout: 0.25s
-  #   # tcp_keepalive:
-  #   #   keepalive_time: 32
-  #   type: strict_dns
-  #   lb_policy: round_robin
-  #   load_assignment:
-  #     cluster_name: users_service
-  #     endpoints:
-  #     - lb_endpoints:
-  #       - endpoint:
-  #           address:
-  #             socket_address:
-  #               address: users
-  #               port_value: 8000
-  # - name: front_service
-  #   connect_timeout: 0.25s
-  #   type: strict_dns
-  #   lb_policy: round_robin
-  #   load_assignment:
-  #     cluster_name: front_service
-  #     endpoints:
-  #     - lb_endpoints:
-  #       - endpoint:
-  #           address:
-  #             socket_address:
-  #               address: front
-  #               port_value: 80
+  - name: front_service
+    connect_timeout: 0.25s
+    type: strict_dns
+    lb_policy: round_robin
+    tls_context:
+      common_tls_context:
+        alpn_protocols: "h2"
+      sni: users:443
+    http2_protocol_options: {}
+    load_assignment:
+      cluster_name: front_service
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: nginx
+                port_value: 443
 cluster_manager:
   outlier_detection:
     event_log_path: /tmp/outlier_events.log
