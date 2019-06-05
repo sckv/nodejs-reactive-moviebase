@@ -46,6 +46,7 @@ module.exports = require('./webpack.config')({
     new ForkTsCheckerWebpackPlugin({
       workers: 2,
       checkSyntacticErrors: true,
+      useTypescriptIncrementalApi: false,
     }),
     new HtmlWebpackPlugin({
       title: 'Movies Reactive Base',
