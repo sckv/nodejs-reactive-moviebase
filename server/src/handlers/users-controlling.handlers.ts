@@ -32,8 +32,8 @@ export const register: CustomRequestHandler = async (req, res) => {
     html: `<html>
       <div>Please click the below link to activate your account and password</div>
       <p>
-        <a href="https://${WEB_HOSTNAME}/users/activate/${activationToken}">
-          https://${WEB_HOSTNAME}/users/activate/${activationToken}
+        <a href="https://${WEB_HOSTNAME}/activate/${activationToken}">
+          https://${WEB_HOSTNAME}/activate/${activationToken}
         </a>
       </p>
     </html>`,
